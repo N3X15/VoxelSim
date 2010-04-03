@@ -1153,6 +1153,7 @@ namespace OpenSim.Framework
         void SendGenericMessage(string method, List<string> message);
 
         void SendLayerData(float[] map);
+        void SendVoxelData(bool[] map);
         void SendLayerData(int px, int py, float[] map);
 
         void SendWindData(Vector2[] windSpeeds);

@@ -857,17 +857,16 @@ namespace OpenSim.Region.Framework.Scenes
             {
                 localAVHeight = m_avHeight;
             }
-
-            float posZLimit = 0;
-
+			
             if (pos.X < Constants.RegionSize && pos.Y < Constants.RegionSize)
-                posZLimit = (float)m_scene.Heightmap[(int)pos.X, (int)pos.Y];
-            
-            float newPosZ = posZLimit + localAVHeight / 2;
-            if (posZLimit >= (pos.Z - (localAVHeight / 2)) && !(Single.IsInfinity(newPosZ) || Single.IsNaN(newPosZ)))
-            {
-                pos.Z = newPosZ;
-            }
+			{
+				if(m_scene.Voxels.IsInsideTerrain(pos))
+				{
+					Vector3 newPos=m_scene.Voxels.FindNearestAirVoxel(pos,true);
+            		newPos.Z+=localAVHeight / 2;
+					pos=newPos;
+				}
+			}
             AbsolutePosition = pos;
 
             AddToPhysicalScene(isFlying);

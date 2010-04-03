@@ -58,7 +58,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
         public SolidBrush brush;
         public face[] trns;
     }
-
+	
     public class MapImageModule : IMapImageGenerator, IRegionModule
     {
         private static readonly ILog m_log =
@@ -207,7 +207,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
         private Bitmap DrawObjectVolume(Scene whichScene, Bitmap mapbmp)
         {
             int tc = 0;
-            double[,] hm = whichScene.Heightmap.GetDoubles();
+            double[,] hm = whichScene.Voxels.GetDoubles();
             tc = Environment.TickCount;
             m_log.Info("[MAPTILE]: Generating Maptile Step 2: Object Volume Profile");
             List<EntityBase> objs = whichScene.GetEntities();

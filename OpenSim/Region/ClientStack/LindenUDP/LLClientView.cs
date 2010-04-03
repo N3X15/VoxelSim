@@ -1036,7 +1036,24 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             Util.FireAndForget(DoSendLayerData, map);
         }
-
+		
+		public virtual void SendVoxelData(bool[,,] map)
+		{
+			Util.FireAndForget(DoSendVoxels, map);
+		}
+				
+		public void DoSendVoxels(object o)
+		{
+			int x,y,z;
+			bool[,,] voxels = (bool[,,])o;
+			for(z=0;z<voxels.GetLength(2);z++)
+			{
+				VoxelLayerPacket vlp = (VoxelLayersPacket)PacketPool.Instance.GetPacket(PacketType.VoxelLayers);
+				vlp.Reliable=true;
+				for(x=0;x<voxels.GetLength(0);x++)
+					for(y=0;y<voxels.GetLength(1);y++)
+						vlp
+		}
         /// <summary>
         /// Send terrain layer information to the client.
         /// </summary>

@@ -263,12 +263,12 @@ namespace OpenSim.Region.Framework.Scenes
 
         public string SaveCurrentSceneMapToXmlString()
         {
-            return CurrentOrFirstScene.Heightmap.SaveToXmlString();
+            return CurrentOrFirstScene.Voxels.SaveToXmlString();
         }
 
         public void LoadCurrenSceneMapFromXmlString(string mapData)
         {
-            CurrentOrFirstScene.Heightmap.LoadFromXmlString(mapData);
+            CurrentOrFirstScene.Voxels.LoadFromXmlString(mapData);
         }
 
         public void SendCommandToPluginModules(string[] cmdparams)

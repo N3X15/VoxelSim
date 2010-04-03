@@ -1710,7 +1710,8 @@ namespace OpenSim.Region.Framework.Scenes
         /// </summary>
         public void SaveTerrain()
         {
-            m_storageManager.DataStore.StoreTerrain(Heightmap.GetDoubles(), RegionInfo.RegionID);
+            //m_storageManager.DataStore.StoreTerrain(Heightmap.GetDoubles(), RegionInfo.RegionID);
+			Voxels.Save(RegionInfo.RegionID.ToString());
         }
 
         /// <summary>
@@ -1718,32 +1719,25 @@ namespace OpenSim.Region.Framework.Scenes
         /// </summary>
         public override void LoadWorldMap()
         {
+			uint sz=Constants.RegionSize;
+			Voxels=new VoxelChannel(sz,sz,sz);
             try
             {
-                double[,] map = m_storageManager.DataStore.LoadTerrain(RegionInfo.RegionID);
-                if (map == null)
-                {
-                    m_log.Info("[TERRAIN]: No default terrain. Generating a new terrain.");
-                    Heightmap = new TerrainChannel();
-
-                    m_storageManager.DataStore.StoreTerrain(Heightmap.GetDoubles(), RegionInfo.RegionID);
-                }
-                else
-                {
-                    Heightmap = new TerrainChannel(map);
-                }
+                Voxels.Load(RegionInfo.RegionID.ToString());  	
             }
             catch (IOException e)
             {
-                m_log.Warn("[TERRAIN]: Scene.cs: LoadWorldMap() - Failed with exception " + e.ToString() + " Regenerating");
-                
+				m_log.Info("[TERRAIN]: No default terrain. Generating a new terrain.");
+                Voxels = (new VoxelChannel(sz,sz,sz)).Generate("default");
+                Voxels.Save(RegionInfo.RegionID.ToString());
+				
                 // Non standard region size.    If there's an old terrain in the database, it might read past the buffer
                 #pragma warning disable 0162
                 if ((int)Constants.RegionSize != 256)
                 {
-                    Heightmap = new TerrainChannel();
+                    Voxels = new VoxelChannel(sz,sz,sz);
 
-                    m_storageManager.DataStore.StoreTerrain(Heightmap.GetDoubles(), RegionInfo.RegionID);
+                    Voxels.Save(RegionInfo.RegionID.ToString());
                 }
             }
             catch (Exception e)
@@ -1799,7 +1793,7 @@ namespace OpenSim.Region.Framework.Scenes
             IMapImageGenerator terrain = RequestModuleInterface<IMapImageGenerator>();
 
             // Cannot create a map for a nonexistant heightmap yet.
-            if (Heightmap == null)
+            if (Voxels == null)
                 return;
 
             if (terrain == null)
@@ -4430,7 +4424,7 @@ namespace OpenSim.Region.Framework.Scenes
         public void TerrainUnAcked(IClientAPI client, int patchX, int patchY)
         {
             //m_log.Debug("Terrain packet unacked, resending patch: " + patchX + " , " + patchY);
-             client.SendLayerData(patchX, patchY, Heightmap.GetFloatsSerialised());
+             client.SendVoxelData(Voxels.GetBoolsSerialised());
         }
 
         public void SetRootAgentScene(UUID agentID)
@@ -4833,24 +4827,25 @@ namespace OpenSim.Region.Framework.Scenes
         {
             if (x < 0)
                 x = 0;
-            if (x >= Heightmap.Width)
-                x = Heightmap.Width - 1;
+            if (x >= Voxels.Width)
+                x = Voxels.Width - 1;
             if (y < 0)
                 y = 0;
-            if (y >= Heightmap.Height)
-                y = Heightmap.Height - 1;
+            if (y >= Voxels.Length)
+                y = Voxels.Length - 1;
 
-            Vector3 p0 = new Vector3(x, y, (float)Heightmap[(int)x, (int)y]);
+			double[,] heights = Voxels.GetDoubles();
+            Vector3 p0 = new Vector3(x, y, (float)heights[(int)x, (int)y]);
             Vector3 p1 = new Vector3(p0);
             Vector3 p2 = new Vector3(p0);
 
             p1.X += 1.0f;
-            if (p1.X < Heightmap.Width)
-                p1.Z = (float)Heightmap[(int)p1.X, (int)p1.Y];
+            if (p1.X < Voxels.Width)
+                p1.Z = (float)heights[(int)p1.X, (int)p1.Y];
 
             p2.Y += 1.0f;
-            if (p2.Y < Heightmap.Height)
-                p2.Z = (float)Heightmap[(int)p2.X, (int)p2.Y];
+            if (p2.Y < Voxels.Length)
+                p2.Z = (float)heights[(int)p2.X, (int)p2.Y];
 
             Vector3 v0 = new Vector3(p1.X - p0.X, p1.Y - p0.Y, p1.Z - p0.Z);
             Vector3 v1 = new Vector3(p2.X - p0.X, p2.Y - p0.Y, p2.Z - p0.Z);

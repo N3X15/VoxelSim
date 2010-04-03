@@ -38,6 +38,7 @@ using OpenSim.Framework.Console;
 using OpenSim.Region.Framework.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
 
+
 namespace OpenSim.Region.Framework.Scenes
 {
     public abstract class SceneBase : IScene
@@ -113,7 +114,7 @@ namespace OpenSim.Region.Framework.Scenes
         protected string m_regionName;
         protected RegionInfo m_regInfo;
 
-        public ITerrainChannel Heightmap;
+        public IVoxelChannel Voxels;
 
         /// <value>
         /// Allows retrieval of land information for this scene.
@@ -170,7 +171,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="RemoteClient">Client to send to</param>
         public virtual void SendLayerData(IClientAPI RemoteClient)
         {
-            RemoteClient.SendLayerData(Heightmap.GetFloatsSerialised());
+            RemoteClient.SendVoxelData(Voxels.GetBoolsSerialised());
         }
 
         #endregion
