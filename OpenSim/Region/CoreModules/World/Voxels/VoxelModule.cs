@@ -47,8 +47,9 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         /// </summary>
         public enum StandardVoxelActions : byte
         {
-            Add = 0,
-            Remote = 1
+            Add 	= 0,
+            Remove 	= 1,
+			TNT		= 2
         }
 
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -61,7 +62,6 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
         private VoxelChannel m_channel;
         private VoxelChannel m_revert;
-		private Dictionary<string, IVoxelEffect> m_plugineffects;
         private Scene m_scene;
         private volatile bool m_tainted;
         private readonly UndoStack<LandUndoState> m_undo = new UndoStack<LandUndoState>(5);

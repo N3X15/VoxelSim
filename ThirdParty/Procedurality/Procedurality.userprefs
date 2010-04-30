@@ -1,0 +1,34 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Procedurality/RiverBuilder.cs" ctype="Workbench">
+    <Files>
+      <File FileName="Procedurality.Console/Main.cs" Line="184" Column="45" />
+      <File FileName="Procedurality/PathFinder/IPathFinder.cs" Line="1" Column="1" />
+      <File FileName="Procedurality/PathFinder/PathFinderFast.cs" Line="1" Column="1" />
+      <File FileName="Procedurality/PathFinder/PathFinder.cs" Line="52" Column="21" />
+      <File FileName="Procedurality/PathFinder/Djikstra.cs" Line="293" Column="34" />
+      <File FileName="Procedurality/RiverBuilder.cs" Line="231" Column="3" />
+      <File FileName="Procedurality.Console/IO/LLRAW.cs" Line="1" Column="1" />
+      <File FileName="Procedurality/Tools.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Procedurality" expanded="True">
+            <Node name="PathFinder" expanded="True" />
+            <Node name="RiverBuilder.cs" selected="True" />
+          </Node>
+          <Node name="Procedurality.Console" expanded="True">
+            <Node name="IO" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
+</Properties>

@@ -1,13 +1,9 @@
 
 using System;
-using VoxelVW;
 namespace OpenSim.Region.CoreModules.World.Voxels
 {
-	public class IVoxelAction
+	public interface IVoxelAction
 	{
-		public void PaintEffect(VoxelChannel chan, bool[,] mask, int x, int y, int z)
-		{
-			
-		}
+		void PaintEffect(IVoxelChannel chan, bool[,] mask, int x, int y, int z, double strength);		
 	}
 }
