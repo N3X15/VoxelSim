@@ -30,8 +30,16 @@ namespace Procedurality
 	
 		private Random random;
 		public Channel channel;
-	
-		public Mountain(int size, int base_freq, float pers, long seed) {
+		
+		public Mountain(int size, int base_freq, float pers, long seed)
+		{
+			this.Gen(size,base_freq,pers,seed,0,0);
+		}
+		public Mountain(int size, int base_freq, float pers, long seed,int x_o,int y_o) 
+		{
+			this.Gen(size,base_freq,pers,seed,x_o,y_o);
+		}
+		private void Gen(int size, int base_freq, float pers, long seed,int x_o,int y_o) {
 			if(!Utils.isPowerOf2(size))
 				throw new Exception("size must be power of 2");
 			
