@@ -235,6 +235,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         public event Action<UUID> OnRemoveAvatar;
 
         public event CreateNewInventoryItem OnCreateNewInventoryItem;
+        public event LinkInventoryItem OnLinkInventoryItem;
         public event CreateInventoryFolder OnCreateNewInventoryFolder;
         public event UpdateInventoryFolder OnUpdateInventoryFolder;
         public event MoveInventoryFolder OnMoveInventoryFolder;
@@ -550,7 +551,7 @@ namespace OpenSim.Region.OptionalModules.World.NPC
             
         }
 
-        public void SendGenericMessage(string method, List<string> message)
+        public void SendGenericMessage(string method, List<byte[]> message)
         {
 
         }

@@ -112,9 +112,15 @@
     ;storage_plugin = "OpenSim.Data.Null.dll"
 
     ; --- To use sqlite as region storage:
-    ; NOTE: SQLite and OpenSim are not functioning properly with Mono 2.4.3 or greater.
-    ; If you are using Mono you probably should be using MySQL
+    ;
+    ; PLEASE NOTE: Unfortunately, the current SQLite database plugin (necessary to use SQLite with Mono on Linux) is 
+    ; not compatible with the sqlite3 library installed on Mac OSX.  If you're using Mono 2.4 you can still use the old sqlite
+    ; library by uncommenting the SQLiteLegacy.dll storage plugin (and commenting out SQLite.dll).  Unfortunately, the older library
+    ; will not work with Mono 2.6 on Mac OSX so you will either need to replace the OSX sqlite3 system library or use MySQL instead
+    ;
+    ; You will also need to do the same thing in config-include/StandaloneCommon.ini if you are running in standalone mode
     storage_plugin = "OpenSim.Data.SQLite.dll"
+    ;storage_plugin = "OpenSim.Data.SQLiteLegacy.dll"
     storage_connection_string="URI=file:OpenSim.db,version=3";
 
     ; --- To use MySQL storage, supply your own connection string (this is only an example):
@@ -768,6 +774,12 @@
     ; default is 1000
     cloud_update_rate = 1000
 
+[LightShare]
+
+    ; This enables the transmission of Windlight scenes to supporting clients, such as the Meta7 viewer.
+    ; It has no ill effect on viewers which do not support server-side windlight settings.
+    ; Currently we only have support for MySQL databases.
+    enable_windlight = false;
 
 [Trees]
     ; Enable this to allow the tree module to manage your sim trees, including growing, reproducing and dying
@@ -1170,10 +1182,18 @@
     ;MessagingModule = GroupsMessagingModule
     ;MessagingEnabled = true
 
-    ; Service connector to Groups Service [Select One]
-    ; XmlRpc Service Connector to the Flotsam XmlRpc Groups Service Implementation
+    ; Service connector to Groups Service [Select One] ServicesConnectorModule
+
+	
+    ; Simian Grid Service for Groups
+    ;ServicesConnectorModule = SimianGroupsServicesConnector
+    ;GroupsServerURI = http://mygridserver.com:82/Grid/
+
+    ; XmlRpc Service Connector to the Flotsam XmlRpc Groups Service settings
     ;ServicesConnectorModule = XmlRpcGroupsServicesConnector
-    ;XmlRpcServiceURL        = http://yourxmlrpcserver.com/xmlrpc.php
+    ;GroupsServerURI        = http://yourxmlrpcserver.com/xmlrpc.php
+
+    ; XmlRpc Service Settings
     ;XmlRpcServiceReadKey    = 1234
     ;XmlRpcServiceWriteKey   = 1234
 
@@ -1214,11 +1234,6 @@
 ;; These defaults allow OpenSim to work out of the box with
 ;; zero configuration
 ;;
-[DatabaseService]
-    ;; default standalone, overridable in StandaloneCommon.ini
-    StorageProvider = "OpenSim.Data.SQLite.dll"
-
-
 [AssetService]
     DefaultAssetLoader = "OpenSim.Framework.AssetLoader.Filesystem.dll"
     AssetLoaderArgs = "assets/AssetSets.xml"

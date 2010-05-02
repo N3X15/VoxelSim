@@ -724,6 +724,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         public event Action<UUID> OnRemoveAvatar;
         public event ObjectPermissions OnObjectPermissions;
         public event CreateNewInventoryItem OnCreateNewInventoryItem;
+        public event LinkInventoryItem OnLinkInventoryItem;
         public event CreateInventoryFolder OnCreateNewInventoryFolder;
         public event UpdateInventoryFolder OnUpdateInventoryFolder;
         public event MoveInventoryFolder OnMoveInventoryFolder;
@@ -964,7 +965,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             // TODO
         }
 
-        public void SendGenericMessage(string method, List<string> message)
+        public void SendGenericMessage(string method, List<byte[]> message)
         {
             
         }

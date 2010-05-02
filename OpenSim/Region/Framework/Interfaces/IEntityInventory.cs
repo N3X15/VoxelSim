@@ -74,6 +74,7 @@ namespace OpenSim.Region.Framework.Interfaces
         void CreateScriptInstances(int startParam, bool postOnRez, string engine, int stateSource);
         
         ArrayList GetScriptErrors(UUID itemID);
+        void ResumeScripts();
 
         /// <summary>
         /// Stop all the scripts in this entity.
@@ -160,6 +161,7 @@ namespace OpenSim.Region.Framework.Interfaces
         /// in this prim's inventory.</param>
         /// <returns>false if the item did not exist, true if the update occurred successfully</returns>
         bool UpdateInventoryItem(TaskInventoryItem item);
+        bool UpdateInventoryItem(TaskInventoryItem item, bool fireScriptEvents);
 
         /// <summary>
         /// Remove an item from this entity's inventory

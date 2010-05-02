@@ -73,7 +73,7 @@ namespace OpenSim.Framework
 
     public delegate void LinkObjects(IClientAPI remoteClient, uint parent, List<uint> children);
 
-    public delegate void DelinkObjects(List<uint> primIds);
+    public delegate void DelinkObjects(List<uint> primIds, IClientAPI client);
 
     public delegate void RequestMapBlocks(IClientAPI remoteClient, int minX, int minY, int maxX, int maxY, uint flag);
 
@@ -235,6 +235,10 @@ namespace OpenSim.Framework
     public delegate void CreateNewInventoryItem(
         IClientAPI remoteClient, UUID transActionID, UUID folderID, uint callbackID, string description, string name,
         sbyte invType, sbyte type, byte wearableType, uint nextOwnerMask, int creationDate);
+
+    public delegate void LinkInventoryItem(
+        IClientAPI remoteClient, UUID transActionID, UUID folderID, uint callbackID, string description, string name,
+        sbyte invType, sbyte type, UUID olditemID);
 
     public delegate void FetchInventoryDescendents(
         IClientAPI remoteClient, UUID folderID, UUID ownerID, bool fetchFolders, bool fetchItems, int sortOrder);
@@ -930,6 +934,7 @@ namespace OpenSim.Framework
         event ObjectPermissions OnObjectPermissions;
 
         event CreateNewInventoryItem OnCreateNewInventoryItem;
+        event LinkInventoryItem OnLinkInventoryItem;
         event CreateInventoryFolder OnCreateNewInventoryFolder;
         event UpdateInventoryFolder OnUpdateInventoryFolder;
         event MoveInventoryFolder OnMoveInventoryFolder;
@@ -1150,7 +1155,7 @@ namespace OpenSim.Framework
 
         void SendInstantMessage(GridInstantMessage im);
 
-        void SendGenericMessage(string method, List<string> message);
+        void SendGenericMessage(string method, List<byte[]> message);
 
         void SendLayerData(float[] map);
         void SendVoxelData(bool[] map);

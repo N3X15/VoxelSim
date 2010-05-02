@@ -291,6 +291,7 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
         public event Action<UUID> OnRemoveAvatar = delegate { };
         public event ObjectPermissions OnObjectPermissions = delegate { };
         public event CreateNewInventoryItem OnCreateNewInventoryItem = delegate { };
+        public event LinkInventoryItem OnLinkInventoryItem = delegate { };
         public event CreateInventoryFolder OnCreateNewInventoryFolder = delegate { };
         public event UpdateInventoryFolder OnUpdateInventoryFolder = delegate { };
         public event MoveInventoryFolder OnMoveInventoryFolder = delegate { };
@@ -509,7 +510,7 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
             throw new System.NotImplementedException();
         }
 
-        public void SendGenericMessage(string method, List<string> message)
+        public void SendGenericMessage(string method, List<byte[]> message)
         {
             throw new System.NotImplementedException();
         }

@@ -635,6 +635,8 @@ namespace OpenSim.Region.Framework.Scenes
 
                             int estateID = estateIDs[0];
 
+                            m_regInfo.EstateSettings = m_storageManager.EstateDataStore.LoadEstateSettings(estateID);
+
                             if (m_storageManager.EstateDataStore.LinkRegion(m_regInfo.RegionID, estateID))
                                 break;
 
@@ -1129,7 +1131,6 @@ namespace OpenSim.Region.Framework.Scenes
         {
             if (m_scripts_enabled != !ScriptEngine)
             {
-                // Tedd!   Here's the method to disable the scripting engine!
                 if (ScriptEngine)
                 {
                     m_log.Info("Stopping all Scripts in Scene");
@@ -1151,6 +1152,7 @@ namespace OpenSim.Region.Framework.Scenes
                             if (ent is SceneObjectGroup)
                             {
                                 ((SceneObjectGroup)ent).CreateScriptInstances(0, false, DefaultScriptEngine, 0);
+                                ((SceneObjectGroup)ent).ResumeScripts();
                             }
                         }
                     }
@@ -1712,6 +1714,19 @@ namespace OpenSim.Region.Framework.Scenes
         {
             //m_storageManager.DataStore.StoreTerrain(Heightmap.GetDoubles(), RegionInfo.RegionID);
 			Voxels.Save(RegionInfo.RegionID.ToString());
+        }
+
+        public void StoreWindlightProfile(RegionLightShareData wl)
+        {
+            m_regInfo.WindlightSettings = wl;
+            m_storageManager.DataStore.StoreRegionWindlightSettings(wl);
+            m_eventManager.TriggerOnSaveNewWindlightProfile();
+        }
+
+        public void LoadWindlightProfile()
+        {
+            m_regInfo.WindlightSettings = m_storageManager.DataStore.LoadRegionWindlightSettings(RegionInfo.RegionID);
+            m_eventManager.TriggerOnSaveNewWindlightProfile();
         }
 
         /// <summary>
@@ -2700,8 +2715,8 @@ namespace OpenSim.Region.Framework.Scenes
             client.OnObjectName += m_sceneGraph.PrimName;
             client.OnObjectClickAction += m_sceneGraph.PrimClickAction;
             client.OnObjectMaterial += m_sceneGraph.PrimMaterial;
-            client.OnLinkObjects += m_sceneGraph.LinkObjects;
-            client.OnDelinkObjects += m_sceneGraph.DelinkObjects;
+            client.OnLinkObjects += LinkObjects;
+            client.OnDelinkObjects += DelinkObjects;
             client.OnObjectDuplicate += m_sceneGraph.DuplicateObject;
             client.OnObjectDuplicateOnRay += doObjectDuplicateOnRay;
             client.OnUpdatePrimFlags += m_sceneGraph.UpdatePrimFlags;
@@ -2728,6 +2743,7 @@ namespace OpenSim.Region.Framework.Scenes
         public virtual void SubscribeToClientInventoryEvents(IClientAPI client)
         {
             client.OnCreateNewInventoryItem += CreateNewInventoryItem;
+            client.OnLinkInventoryItem += HandleLinkInventoryItem;
             client.OnCreateNewInventoryFolder += HandleCreateInventoryFolder;
             client.OnUpdateInventoryFolder += HandleUpdateInventoryFolder;
             client.OnMoveInventoryFolder += HandleMoveInventoryFolder; // 2; //!!
@@ -2747,14 +2763,13 @@ namespace OpenSim.Region.Framework.Scenes
         }
 
         public virtual void SubscribeToClientAttachmentEvents(IClientAPI client)
-        {            
-            client.OnRezMultipleAttachmentsFromInv += RezMultipleAttachments;            
-            client.OnObjectDetach += m_sceneGraph.DetachObject;
-
+        {                                    
             if (AttachmentsModule != null)
             {
                 client.OnRezSingleAttachmentFromInv += AttachmentsModule.RezSingleAttachmentFromInventory;
+                client.OnRezMultipleAttachmentsFromInv += AttachmentsModule.RezMultipleAttachmentsFromInventory;
                 client.OnObjectAttach += AttachmentsModule.AttachObject;
+                client.OnObjectDetach += AttachmentsModule.DetachObject;
                 client.OnDetachAttachmentIntoInv += AttachmentsModule.ShowDetachInUserInventory;
             }
         }
@@ -2857,8 +2872,8 @@ namespace OpenSim.Region.Framework.Scenes
             client.OnObjectName -= m_sceneGraph.PrimName;
             client.OnObjectClickAction -= m_sceneGraph.PrimClickAction;
             client.OnObjectMaterial -= m_sceneGraph.PrimMaterial;
-            client.OnLinkObjects -= m_sceneGraph.LinkObjects;
-            client.OnDelinkObjects -= m_sceneGraph.DelinkObjects;
+            client.OnLinkObjects -= LinkObjects;
+            client.OnDelinkObjects -= DelinkObjects;
             client.OnObjectDuplicate -= m_sceneGraph.DuplicateObject;
             client.OnObjectDuplicateOnRay -= doObjectDuplicateOnRay;
             client.OnUpdatePrimFlags -= m_sceneGraph.UpdatePrimFlags;
@@ -2903,14 +2918,13 @@ namespace OpenSim.Region.Framework.Scenes
         }
 
         public virtual void UnSubscribeToClientAttachmentEvents(IClientAPI client)
-        {
-            client.OnRezMultipleAttachmentsFromInv -= RezMultipleAttachments;            
-            client.OnObjectDetach -= m_sceneGraph.DetachObject;
-
+        {            
             if (AttachmentsModule != null)
             {
-                client.OnRezSingleAttachmentFromInv -= AttachmentsModule.RezSingleAttachmentFromInventory;            
+                client.OnRezSingleAttachmentFromInv -= AttachmentsModule.RezSingleAttachmentFromInventory;
+                client.OnRezMultipleAttachmentsFromInv -= AttachmentsModule.RezMultipleAttachmentsFromInventory;
                 client.OnObjectAttach -= AttachmentsModule.AttachObject;
+                client.OnObjectDetach -= AttachmentsModule.DetachObject;
                 client.OnDetachAttachmentIntoInv -= AttachmentsModule.ShowDetachInUserInventory;
             }
         }
