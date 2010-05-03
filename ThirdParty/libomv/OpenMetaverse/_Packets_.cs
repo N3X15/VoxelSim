@@ -640,6 +640,10 @@ namespace OpenMetaverse.Packets
         ChildAgentAlive = 196634,
         ChildAgentPositionUpdate = 196635,
         SoundTrigger = 196637,
+		VoxelLayer,
+		VoxelAdd,
+		VoxelUpdate,
+		VoxelRemove,
     }
 
     public abstract partial class Packet
@@ -1002,6 +1006,12 @@ namespace OpenMetaverse.Packets
                         case 424: return PacketType.ObjectIncludeInSearch;
                         case 425: return PacketType.RezRestoreToWorld;
                         case 426: return PacketType.LinkInventoryItem;
+/// VOXELS
+						case 911: return PacketType.VoxelAdd;
+						case 912: return PacketType.VoxelLayer;
+						case 913: return PacketType.VoxelRemove;
+						case 914: return PacketType.VoxelUpdate;
+/// END VOXELS
                         case 65531: return PacketType.PacketAck;
                         case 65532: return PacketType.OpenCircuit;
                         case 65533: return PacketType.CloseCircuit;
@@ -1449,6 +1459,12 @@ namespace OpenMetaverse.Packets
             if(type == PacketType.PacketAck) return new PacketAckPacket();
             if(type == PacketType.OpenCircuit) return new OpenCircuitPacket();
             if(type == PacketType.CloseCircuit) return new CloseCircuitPacket();
+			
+            if(type == PacketType.VoxelAdd) return new VoxelAddPacket();
+            if(type == PacketType.VoxelLayer) return new VoxelLayerPacket();
+            if(type == PacketType.VoxelRemove) return new VoxelRemovePacket();
+            if(type == PacketType.VoxelUpdate) return new VoxelUpdatePacket();
+			
             return null;
 
         }
@@ -1814,6 +1830,12 @@ namespace OpenMetaverse.Packets
                         case 424: return new ObjectIncludeInSearchPacket(header, bytes, ref i);
                         case 425: return new RezRestoreToWorldPacket(header, bytes, ref i);
                         case 426: return new LinkInventoryItemPacket(header, bytes, ref i);
+							
+						case 911: return new VoxelAddPacket(header,bytes,ref i);
+						case 912: return new VoxelLayerPacket(header,bytes,ref i);
+						case 913: return new VoxelRemovePacket(header,bytes,ref i);
+						case 914: return new VoxelUpdatePacket(header,bytes,ref i);
+							
                         case 65531: return new PacketAckPacket(header, bytes, ref i);
                         case 65532: return new OpenCircuitPacket(header, bytes, ref i);
                         case 65533: return new CloseCircuitPacket(header, bytes, ref i);
