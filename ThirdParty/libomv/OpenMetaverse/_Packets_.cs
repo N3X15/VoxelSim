@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, openmetaverse.org
+ * Copyright (c) 2010, openmetaverse.org
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -596,6 +596,10 @@ namespace OpenMetaverse.Packets
         ObjectIncludeInSearch = 65960,
         RezRestoreToWorld = 65961,
         LinkInventoryItem = 65962,
+        VoxelLayer = 66447,
+        VoxelAdd = 66448,
+        VoxelRemove = 66449,
+        VoxelUpdate = 66450,
         PacketAck = 131067,
         OpenCircuit = 131068,
         CloseCircuit = 131069,
@@ -640,10 +644,6 @@ namespace OpenMetaverse.Packets
         ChildAgentAlive = 196634,
         ChildAgentPositionUpdate = 196635,
         SoundTrigger = 196637,
-		VoxelLayer,
-		VoxelAdd,
-		VoxelUpdate,
-		VoxelRemove,
     }
 
     public abstract partial class Packet
@@ -1006,12 +1006,10 @@ namespace OpenMetaverse.Packets
                         case 424: return PacketType.ObjectIncludeInSearch;
                         case 425: return PacketType.RezRestoreToWorld;
                         case 426: return PacketType.LinkInventoryItem;
-/// VOXELS
-						case 911: return PacketType.VoxelAdd;
-						case 912: return PacketType.VoxelLayer;
-						case 913: return PacketType.VoxelRemove;
-						case 914: return PacketType.VoxelUpdate;
-/// END VOXELS
+                        case 911: return PacketType.VoxelLayer;
+                        case 912: return PacketType.VoxelAdd;
+                        case 913: return PacketType.VoxelRemove;
+                        case 914: return PacketType.VoxelUpdate;
                         case 65531: return PacketType.PacketAck;
                         case 65532: return PacketType.OpenCircuit;
                         case 65533: return PacketType.CloseCircuit;
@@ -1456,15 +1454,13 @@ namespace OpenMetaverse.Packets
             if(type == PacketType.ObjectIncludeInSearch) return new ObjectIncludeInSearchPacket();
             if(type == PacketType.RezRestoreToWorld) return new RezRestoreToWorldPacket();
             if(type == PacketType.LinkInventoryItem) return new LinkInventoryItemPacket();
+            if(type == PacketType.VoxelLayer) return new VoxelLayerPacket();
+            if(type == PacketType.VoxelAdd) return new VoxelAddPacket();
+            if(type == PacketType.VoxelRemove) return new VoxelRemovePacket();
+            if(type == PacketType.VoxelUpdate) return new VoxelUpdatePacket();
             if(type == PacketType.PacketAck) return new PacketAckPacket();
             if(type == PacketType.OpenCircuit) return new OpenCircuitPacket();
             if(type == PacketType.CloseCircuit) return new CloseCircuitPacket();
-			
-            if(type == PacketType.VoxelAdd) return new VoxelAddPacket();
-            if(type == PacketType.VoxelLayer) return new VoxelLayerPacket();
-            if(type == PacketType.VoxelRemove) return new VoxelRemovePacket();
-            if(type == PacketType.VoxelUpdate) return new VoxelUpdatePacket();
-			
             return null;
 
         }
@@ -1830,12 +1826,10 @@ namespace OpenMetaverse.Packets
                         case 424: return new ObjectIncludeInSearchPacket(header, bytes, ref i);
                         case 425: return new RezRestoreToWorldPacket(header, bytes, ref i);
                         case 426: return new LinkInventoryItemPacket(header, bytes, ref i);
-							
-						case 911: return new VoxelAddPacket(header,bytes,ref i);
-						case 912: return new VoxelLayerPacket(header,bytes,ref i);
-						case 913: return new VoxelRemovePacket(header,bytes,ref i);
-						case 914: return new VoxelUpdatePacket(header,bytes,ref i);
-							
+                        case 911: return new VoxelLayerPacket(header, bytes, ref i);
+                        case 912: return new VoxelAddPacket(header, bytes, ref i);
+                        case 913: return new VoxelRemovePacket(header, bytes, ref i);
+                        case 914: return new VoxelUpdatePacket(header, bytes, ref i);
                         case 65531: return new PacketAckPacket(header, bytes, ref i);
                         case 65532: return new OpenCircuitPacket(header, bytes, ref i);
                         case 65533: return new CloseCircuitPacket(header, bytes, ref i);
@@ -69281,6 +69275,596 @@ namespace OpenMetaverse.Packets
             Header.ToBytes(bytes, ref i);
             AgentData.ToBytes(bytes, ref i);
             InventoryBlock.ToBytes(bytes, ref i);
+            if (Header.AckList != null && Header.AckList.Length > 0) { Header.AcksToBytes(bytes, ref i); }
+            return bytes;
+        }
+
+        public override byte[][] ToBytesMultiple()
+        {
+            return new byte[][] { ToBytes() };
+        }
+    }
+
+    /// <exclude/>
+    public sealed class VoxelLayerPacket : Packet
+    {
+        /// <exclude/>
+        public sealed class LayerDataBlock : PacketBlock
+        {
+            public uint Z;
+
+            public override int Length
+            {
+                get
+                {
+                    return 4;
+                }
+            }
+
+            public LayerDataBlock() { }
+            public LayerDataBlock(byte[] bytes, ref int i)
+            {
+                FromBytes(bytes, ref i);
+            }
+
+            public override void FromBytes(byte[] bytes, ref int i)
+            {
+                try
+                {
+                    Z = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                }
+                catch (Exception)
+                {
+                    throw new MalformedDataException();
+                }
+            }
+
+            public override void ToBytes(byte[] bytes, ref int i)
+            {
+                Utils.UIntToBytes(Z, bytes, i); i += 4;
+            }
+
+        }
+
+        /// <exclude/>
+        public sealed class VoxelDataBlock : PacketBlock
+        {
+            public uint X;
+            public uint Y;
+            public uint Material;
+
+            public override int Length
+            {
+                get
+                {
+                    return 12;
+                }
+            }
+
+            public VoxelDataBlock() { }
+            public VoxelDataBlock(byte[] bytes, ref int i)
+            {
+                FromBytes(bytes, ref i);
+            }
+
+            public override void FromBytes(byte[] bytes, ref int i)
+            {
+                try
+                {
+                    X = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Y = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Material = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                }
+                catch (Exception)
+                {
+                    throw new MalformedDataException();
+                }
+            }
+
+            public override void ToBytes(byte[] bytes, ref int i)
+            {
+                Utils.UIntToBytes(X, bytes, i); i += 4;
+                Utils.UIntToBytes(Y, bytes, i); i += 4;
+                Utils.UIntToBytes(Material, bytes, i); i += 4;
+            }
+
+        }
+
+        public override int Length
+        {
+            get
+            {
+                int length = 11;
+                length += LayerData.Length;
+                for (int j = 0; j < VoxelData.Length; j++)
+                    length += VoxelData[j].Length;
+                return length;
+            }
+        }
+        public LayerDataBlock LayerData;
+        public VoxelDataBlock[] VoxelData;
+
+        public VoxelLayerPacket()
+        {
+            HasVariableBlocks = true;
+            Type = PacketType.VoxelLayer;
+            Header = new Header();
+            Header.Frequency = PacketFrequency.Low;
+            Header.ID = 911;
+            Header.Reliable = true;
+            Header.Zerocoded = true;
+            LayerData = new LayerDataBlock();
+            VoxelData = null;
+        }
+
+        public VoxelLayerPacket(byte[] bytes, ref int i) : this()
+        {
+            int packetEnd = bytes.Length - 1;
+            FromBytes(bytes, ref i, ref packetEnd, null);
+        }
+
+        override public void FromBytes(byte[] bytes, ref int i, ref int packetEnd, byte[] zeroBuffer)
+        {
+            Header.FromBytes(bytes, ref i, ref packetEnd);
+            if (Header.Zerocoded && zeroBuffer != null)
+            {
+                packetEnd = Helpers.ZeroDecode(bytes, packetEnd + 1, zeroBuffer) - 1;
+                bytes = zeroBuffer;
+            }
+            LayerData.FromBytes(bytes, ref i);
+            int count = (int)bytes[i++];
+            if(VoxelData == null || VoxelData.Length != -1) {
+                VoxelData = new VoxelDataBlock[count];
+                for(int j = 0; j < count; j++)
+                { VoxelData[j] = new VoxelDataBlock(); }
+            }
+            for (int j = 0; j < count; j++)
+            { VoxelData[j].FromBytes(bytes, ref i); }
+        }
+
+        public VoxelLayerPacket(Header head, byte[] bytes, ref int i): this()
+        {
+            int packetEnd = bytes.Length - 1;
+            FromBytes(head, bytes, ref i, ref packetEnd);
+        }
+
+        override public void FromBytes(Header header, byte[] bytes, ref int i, ref int packetEnd)
+        {
+            Header = header;
+            LayerData.FromBytes(bytes, ref i);
+            int count = (int)bytes[i++];
+            if(VoxelData == null || VoxelData.Length != count) {
+                VoxelData = new VoxelDataBlock[count];
+                for(int j = 0; j < count; j++)
+                { VoxelData[j] = new VoxelDataBlock(); }
+            }
+            for (int j = 0; j < count; j++)
+            { VoxelData[j].FromBytes(bytes, ref i); }
+        }
+
+        public override byte[] ToBytes()
+        {
+            int length = 10;
+            length += LayerData.Length;
+            length++;
+            for (int j = 0; j < VoxelData.Length; j++) { length += VoxelData[j].Length; }
+            if (Header.AckList != null && Header.AckList.Length > 0) { length += Header.AckList.Length * 4 + 1; }
+            byte[] bytes = new byte[length];
+            int i = 0;
+            Header.ToBytes(bytes, ref i);
+            LayerData.ToBytes(bytes, ref i);
+            bytes[i++] = (byte)VoxelData.Length;
+            for (int j = 0; j < VoxelData.Length; j++) { VoxelData[j].ToBytes(bytes, ref i); }
+            if (Header.AckList != null && Header.AckList.Length > 0) { Header.AcksToBytes(bytes, ref i); }
+            return bytes;
+        }
+
+        public override byte[][] ToBytesMultiple()
+        {
+            System.Collections.Generic.List<byte[]> packets = new System.Collections.Generic.List<byte[]>();
+            int i = 0;
+            int fixedLength = 10;
+
+            byte[] ackBytes = null;
+            int acksLength = 0;
+            if (Header.AckList != null && Header.AckList.Length > 0) {
+                Header.AppendedAcks = true;
+                ackBytes = new byte[Header.AckList.Length * 4 + 1];
+                Header.AcksToBytes(ackBytes, ref acksLength);
+            }
+
+            fixedLength += LayerData.Length;
+            byte[] fixedBytes = new byte[fixedLength];
+            Header.ToBytes(fixedBytes, ref i);
+            LayerData.ToBytes(fixedBytes, ref i);
+            fixedLength += 1;
+
+            int VoxelDataStart = 0;
+            do
+            {
+                int variableLength = 0;
+                int VoxelDataCount = 0;
+
+                i = VoxelDataStart;
+                while (fixedLength + variableLength + acksLength < Packet.MTU && i < VoxelData.Length) {
+                    int blockLength = VoxelData[i].Length;
+                    if (fixedLength + variableLength + blockLength + acksLength <= MTU) {
+                        variableLength += blockLength;
+                        ++VoxelDataCount;
+                    }
+                    else { break; }
+                    ++i;
+                }
+
+                byte[] packet = new byte[fixedLength + variableLength + acksLength];
+                int length = fixedBytes.Length;
+                Buffer.BlockCopy(fixedBytes, 0, packet, 0, length);
+                if (packets.Count > 0) { packet[0] = (byte)(packet[0] & ~0x10); }
+
+                packet[length++] = (byte)VoxelDataCount;
+                for (i = VoxelDataStart; i < VoxelDataStart + VoxelDataCount; i++) { VoxelData[i].ToBytes(packet, ref length); }
+                VoxelDataStart += VoxelDataCount;
+
+                if (acksLength > 0) {
+                    Buffer.BlockCopy(ackBytes, 0, packet, length, acksLength);
+                    acksLength = 0;
+                }
+
+                packets.Add(packet);
+            } while (
+                VoxelDataStart < VoxelData.Length);
+
+            return packets.ToArray();
+        }
+    }
+
+    /// <exclude/>
+    public sealed class VoxelAddPacket : Packet
+    {
+        /// <exclude/>
+        public sealed class VoxelDataBlock : PacketBlock
+        {
+            public uint X;
+            public uint Y;
+            public uint Z;
+            public uint Material;
+
+            public override int Length
+            {
+                get
+                {
+                    return 16;
+                }
+            }
+
+            public VoxelDataBlock() { }
+            public VoxelDataBlock(byte[] bytes, ref int i)
+            {
+                FromBytes(bytes, ref i);
+            }
+
+            public override void FromBytes(byte[] bytes, ref int i)
+            {
+                try
+                {
+                    X = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Y = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Z = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Material = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                }
+                catch (Exception)
+                {
+                    throw new MalformedDataException();
+                }
+            }
+
+            public override void ToBytes(byte[] bytes, ref int i)
+            {
+                Utils.UIntToBytes(X, bytes, i); i += 4;
+                Utils.UIntToBytes(Y, bytes, i); i += 4;
+                Utils.UIntToBytes(Z, bytes, i); i += 4;
+                Utils.UIntToBytes(Material, bytes, i); i += 4;
+            }
+
+        }
+
+        public override int Length
+        {
+            get
+            {
+                int length = 10;
+                length += VoxelData.Length;
+                return length;
+            }
+        }
+        public VoxelDataBlock VoxelData;
+
+        public VoxelAddPacket()
+        {
+            HasVariableBlocks = false;
+            Type = PacketType.VoxelAdd;
+            Header = new Header();
+            Header.Frequency = PacketFrequency.Low;
+            Header.ID = 912;
+            Header.Reliable = true;
+            VoxelData = new VoxelDataBlock();
+        }
+
+        public VoxelAddPacket(byte[] bytes, ref int i) : this()
+        {
+            int packetEnd = bytes.Length - 1;
+            FromBytes(bytes, ref i, ref packetEnd, null);
+        }
+
+        override public void FromBytes(byte[] bytes, ref int i, ref int packetEnd, byte[] zeroBuffer)
+        {
+            Header.FromBytes(bytes, ref i, ref packetEnd);
+            if (Header.Zerocoded && zeroBuffer != null)
+            {
+                packetEnd = Helpers.ZeroDecode(bytes, packetEnd + 1, zeroBuffer) - 1;
+                bytes = zeroBuffer;
+            }
+            VoxelData.FromBytes(bytes, ref i);
+        }
+
+        public VoxelAddPacket(Header head, byte[] bytes, ref int i): this()
+        {
+            int packetEnd = bytes.Length - 1;
+            FromBytes(head, bytes, ref i, ref packetEnd);
+        }
+
+        override public void FromBytes(Header header, byte[] bytes, ref int i, ref int packetEnd)
+        {
+            Header = header;
+            VoxelData.FromBytes(bytes, ref i);
+        }
+
+        public override byte[] ToBytes()
+        {
+            int length = 10;
+            length += VoxelData.Length;
+            if (Header.AckList != null && Header.AckList.Length > 0) { length += Header.AckList.Length * 4 + 1; }
+            byte[] bytes = new byte[length];
+            int i = 0;
+            Header.ToBytes(bytes, ref i);
+            VoxelData.ToBytes(bytes, ref i);
+            if (Header.AckList != null && Header.AckList.Length > 0) { Header.AcksToBytes(bytes, ref i); }
+            return bytes;
+        }
+
+        public override byte[][] ToBytesMultiple()
+        {
+            return new byte[][] { ToBytes() };
+        }
+    }
+
+    /// <exclude/>
+    public sealed class VoxelRemovePacket : Packet
+    {
+        /// <exclude/>
+        public sealed class VoxelDataBlock : PacketBlock
+        {
+            public uint X;
+            public uint Y;
+            public uint Z;
+
+            public override int Length
+            {
+                get
+                {
+                    return 12;
+                }
+            }
+
+            public VoxelDataBlock() { }
+            public VoxelDataBlock(byte[] bytes, ref int i)
+            {
+                FromBytes(bytes, ref i);
+            }
+
+            public override void FromBytes(byte[] bytes, ref int i)
+            {
+                try
+                {
+                    X = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Y = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Z = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                }
+                catch (Exception)
+                {
+                    throw new MalformedDataException();
+                }
+            }
+
+            public override void ToBytes(byte[] bytes, ref int i)
+            {
+                Utils.UIntToBytes(X, bytes, i); i += 4;
+                Utils.UIntToBytes(Y, bytes, i); i += 4;
+                Utils.UIntToBytes(Z, bytes, i); i += 4;
+            }
+
+        }
+
+        public override int Length
+        {
+            get
+            {
+                int length = 10;
+                length += VoxelData.Length;
+                return length;
+            }
+        }
+        public VoxelDataBlock VoxelData;
+
+        public VoxelRemovePacket()
+        {
+            HasVariableBlocks = false;
+            Type = PacketType.VoxelRemove;
+            Header = new Header();
+            Header.Frequency = PacketFrequency.Low;
+            Header.ID = 913;
+            Header.Reliable = true;
+            VoxelData = new VoxelDataBlock();
+        }
+
+        public VoxelRemovePacket(byte[] bytes, ref int i) : this()
+        {
+            int packetEnd = bytes.Length - 1;
+            FromBytes(bytes, ref i, ref packetEnd, null);
+        }
+
+        override public void FromBytes(byte[] bytes, ref int i, ref int packetEnd, byte[] zeroBuffer)
+        {
+            Header.FromBytes(bytes, ref i, ref packetEnd);
+            if (Header.Zerocoded && zeroBuffer != null)
+            {
+                packetEnd = Helpers.ZeroDecode(bytes, packetEnd + 1, zeroBuffer) - 1;
+                bytes = zeroBuffer;
+            }
+            VoxelData.FromBytes(bytes, ref i);
+        }
+
+        public VoxelRemovePacket(Header head, byte[] bytes, ref int i): this()
+        {
+            int packetEnd = bytes.Length - 1;
+            FromBytes(head, bytes, ref i, ref packetEnd);
+        }
+
+        override public void FromBytes(Header header, byte[] bytes, ref int i, ref int packetEnd)
+        {
+            Header = header;
+            VoxelData.FromBytes(bytes, ref i);
+        }
+
+        public override byte[] ToBytes()
+        {
+            int length = 10;
+            length += VoxelData.Length;
+            if (Header.AckList != null && Header.AckList.Length > 0) { length += Header.AckList.Length * 4 + 1; }
+            byte[] bytes = new byte[length];
+            int i = 0;
+            Header.ToBytes(bytes, ref i);
+            VoxelData.ToBytes(bytes, ref i);
+            if (Header.AckList != null && Header.AckList.Length > 0) { Header.AcksToBytes(bytes, ref i); }
+            return bytes;
+        }
+
+        public override byte[][] ToBytesMultiple()
+        {
+            return new byte[][] { ToBytes() };
+        }
+    }
+
+    /// <exclude/>
+    public sealed class VoxelUpdatePacket : Packet
+    {
+        /// <exclude/>
+        public sealed class VoxelDataBlock : PacketBlock
+        {
+            public uint X;
+            public uint Y;
+            public uint Z;
+            public uint Material;
+
+            public override int Length
+            {
+                get
+                {
+                    return 16;
+                }
+            }
+
+            public VoxelDataBlock() { }
+            public VoxelDataBlock(byte[] bytes, ref int i)
+            {
+                FromBytes(bytes, ref i);
+            }
+
+            public override void FromBytes(byte[] bytes, ref int i)
+            {
+                try
+                {
+                    X = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Y = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Z = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                    Material = (uint)(bytes[i++] + (bytes[i++] << 8) + (bytes[i++] << 16) + (bytes[i++] << 24));
+                }
+                catch (Exception)
+                {
+                    throw new MalformedDataException();
+                }
+            }
+
+            public override void ToBytes(byte[] bytes, ref int i)
+            {
+                Utils.UIntToBytes(X, bytes, i); i += 4;
+                Utils.UIntToBytes(Y, bytes, i); i += 4;
+                Utils.UIntToBytes(Z, bytes, i); i += 4;
+                Utils.UIntToBytes(Material, bytes, i); i += 4;
+            }
+
+        }
+
+        public override int Length
+        {
+            get
+            {
+                int length = 10;
+                length += VoxelData.Length;
+                return length;
+            }
+        }
+        public VoxelDataBlock VoxelData;
+
+        public VoxelUpdatePacket()
+        {
+            HasVariableBlocks = false;
+            Type = PacketType.VoxelUpdate;
+            Header = new Header();
+            Header.Frequency = PacketFrequency.Low;
+            Header.ID = 914;
+            Header.Reliable = true;
+            VoxelData = new VoxelDataBlock();
+        }
+
+        public VoxelUpdatePacket(byte[] bytes, ref int i) : this()
+        {
+            int packetEnd = bytes.Length - 1;
+            FromBytes(bytes, ref i, ref packetEnd, null);
+        }
+
+        override public void FromBytes(byte[] bytes, ref int i, ref int packetEnd, byte[] zeroBuffer)
+        {
+            Header.FromBytes(bytes, ref i, ref packetEnd);
+            if (Header.Zerocoded && zeroBuffer != null)
+            {
+                packetEnd = Helpers.ZeroDecode(bytes, packetEnd + 1, zeroBuffer) - 1;
+                bytes = zeroBuffer;
+            }
+            VoxelData.FromBytes(bytes, ref i);
+        }
+
+        public VoxelUpdatePacket(Header head, byte[] bytes, ref int i): this()
+        {
+            int packetEnd = bytes.Length - 1;
+            FromBytes(head, bytes, ref i, ref packetEnd);
+        }
+
+        override public void FromBytes(Header header, byte[] bytes, ref int i, ref int packetEnd)
+        {
+            Header = header;
+            VoxelData.FromBytes(bytes, ref i);
+        }
+
+        public override byte[] ToBytes()
+        {
+            int length = 10;
+            length += VoxelData.Length;
+            if (Header.AckList != null && Header.AckList.Length > 0) { length += Header.AckList.Length * 4 + 1; }
+            byte[] bytes = new byte[length];
+            int i = 0;
+            Header.ToBytes(bytes, ref i);
+            VoxelData.ToBytes(bytes, ref i);
             if (Header.AckList != null && Header.AckList.Length > 0) { Header.AcksToBytes(bytes, ref i); }
             return bytes;
         }
