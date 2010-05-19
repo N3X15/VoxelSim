@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Tests
+END
+BoxStack.cs
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Tests/BoxStack.cs
+END
+premake.lua
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Tests/premake.lua
+END

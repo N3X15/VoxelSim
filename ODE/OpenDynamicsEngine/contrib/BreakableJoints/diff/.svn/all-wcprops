@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff
+END
+ode.cpp.diff
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff/ode.cpp.diff
+END
+joint.h.diff
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff/joint.h.diff
+END
+stepfast.cpp.diff
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff/stepfast.cpp.diff
+END
+step.cpp.diff
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff/step.cpp.diff
+END
+test_buggy.cpp.diff
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff/test_buggy.cpp.diff
+END
+common.h.diff
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff/common.h.diff
+END
+objects.h.diff
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff/objects.h.diff
+END
+joint.cpp.diff
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/diff/joint.cpp.diff
+END

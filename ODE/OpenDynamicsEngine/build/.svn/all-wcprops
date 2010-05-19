@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build
+END
+tests.lua
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/tests.lua
+END
+premake.exe
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/68/trunk/unmanaged/OpenDynamicsEngine/build/premake.exe
+END
+premake.lua
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/premake.lua
+END
+drawstuff.lua
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/drawstuff.lua
+END
+demos.lua
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/68/trunk/unmanaged/OpenDynamicsEngine/build/demos.lua
+END
+ode.lua
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/ode.lua
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/README.txt
+END
+config-default.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/68/trunk/unmanaged/OpenDynamicsEngine/build/config-default.h
+END

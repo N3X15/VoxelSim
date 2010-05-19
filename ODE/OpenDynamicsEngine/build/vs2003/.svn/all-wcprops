@@ -1,0 +1,203 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003
+END
+demo_buggy.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_buggy.vcproj
+END
+demo_friction.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_friction.vcproj
+END
+demo_boxstack.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_boxstack.vcproj
+END
+demo_plane2d.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_plane2d.vcproj
+END
+demo_jointPR.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_jointPR.vcproj
+END
+demo_cyl.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_cyl.vcproj
+END
+demo_I.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_I.vcproj
+END
+demo_hinge.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_hinge.vcproj
+END
+demo_space.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_space.vcproj
+END
+demo_collision.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_collision.vcproj
+END
+tests.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/tests.vcproj
+END
+drawstuff.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/drawstuff.vcproj
+END
+ode.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/ode.vcproj
+END
+demo_chain1.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_chain1.vcproj
+END
+demo_ode.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_ode.vcproj
+END
+demo_cylvssphere.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_cylvssphere.vcproj
+END
+demo_basket.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_basket.vcproj
+END
+demo_trimesh.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_trimesh.vcproj
+END
+demo_step.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_step.vcproj
+END
+demo_piston.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_piston.vcproj
+END
+demo_heightfield.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_heightfield.vcproj
+END
+demo_gyroscopic.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_gyroscopic.vcproj
+END
+demo_slider.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_slider.vcproj
+END
+demo_feedback.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_feedback.vcproj
+END
+demo_jointPU.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_jointPU.vcproj
+END
+demo_moving_trimesh.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_moving_trimesh.vcproj
+END
+ode.sln
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/ode.sln
+END
+demo_space_stress.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_space_stress.vcproj
+END
+demo_motor.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_motor.vcproj
+END
+demo_crash.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_crash.vcproj
+END
+demo_chain2.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_chain2.vcproj
+END
+demo_motion.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_motion.vcproj
+END
+demo_joints.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/build/vs2003/demo_joints.vcproj
+END

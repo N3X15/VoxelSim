@@ -1,0 +1,202 @@
+collision_trimesh_distance.lo: collision_trimesh_distance.cpp \
+  ../../include/ode/common.h ../../include/ode/odeconfig.h \
+  /usr/include/stdio.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+  /usr/include/gnu/stubs-32.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/stddef.h \
+  /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/stdarg.h \
+  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+  /usr/include/bits/stdio.h /usr/include/bits/stdio2.h \
+  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
+  /usr/include/bits/waitstatus.h /usr/include/endian.h \
+  /usr/include/bits/endian.h /usr/include/bits/byteswap.h \
+  /usr/include/xlocale.h /usr/include/sys/types.h /usr/include/time.h \
+  /usr/include/sys/select.h /usr/include/bits/select.h \
+  /usr/include/bits/sigset.h /usr/include/bits/time.h \
+  /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
+  /usr/include/alloca.h /usr/include/bits/stdlib.h /usr/include/math.h \
+  /usr/include/bits/huge_val.h /usr/include/bits/huge_valf.h \
+  /usr/include/bits/huge_vall.h /usr/include/bits/inf.h \
+  /usr/include/bits/nan.h /usr/include/bits/mathdef.h \
+  /usr/include/bits/mathcalls.h /usr/include/bits/mathinline.h \
+  /usr/include/string.h /usr/include/bits/string3.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/float.h \
+  ../../include/ode/error.h ../../include/ode/odemath.h \
+  ../../include/ode/collision.h ../../include/ode/collision_space.h \
+  ../../include/ode/contact.h ../../include/ode/odeinit.h \
+  ../../include/ode/collision_trimesh.h collision_trimesh_internal.h \
+  collision_kernel.h config.h /usr/include/malloc.h /usr/include/stdint.h \
+  /usr/include/bits/wchar.h objects.h ../../include/ode/memory.h \
+  ../../include/ode/mass.h array.h collision_trimesh_colliders.h \
+  ../../include/ode/collision_trimesh.h \
+  ../../GIMPACT/include/GIMPACT/gimpact.h \
+  ../../GIMPACT/include/GIMPACT/gim_trimesh.h \
+  ../../GIMPACT/include/GIMPACT/gim_boxpruning.h \
+  ../../GIMPACT/include/GIMPACT/gim_radixsort.h \
+  ../../GIMPACT/include/GIMPACT/gim_memory.h \
+  ../../GIMPACT/include/GIMPACT/gim_math.h /usr/include/memory.h \
+  ../../GIMPACT/include/GIMPACT/gim_geometry.h \
+  ../../GIMPACT/include/GIMPACT/gim_tri_collision.h \
+  ../../GIMPACT/include/GIMPACT/gim_tri_sphere_collision.h \
+  ../../GIMPACT/include/GIMPACT/gim_tri_capsule_collision.h \
+  ../../GIMPACT/include/GIMPACT/gim_contact.h
+
+../../include/ode/common.h:
+
+../../include/ode/odeconfig.h:
+
+/usr/include/stdio.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-32.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/stddef.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/bits/stdio2.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/time.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/alloca.h:
+
+/usr/include/bits/stdlib.h:
+
+/usr/include/math.h:
+
+/usr/include/bits/huge_val.h:
+
+/usr/include/bits/huge_valf.h:
+
+/usr/include/bits/huge_vall.h:
+
+/usr/include/bits/inf.h:
+
+/usr/include/bits/nan.h:
+
+/usr/include/bits/mathdef.h:
+
+/usr/include/bits/mathcalls.h:
+
+/usr/include/bits/mathinline.h:
+
+/usr/include/string.h:
+
+/usr/include/bits/string3.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/float.h:
+
+../../include/ode/error.h:
+
+../../include/ode/odemath.h:
+
+../../include/ode/collision.h:
+
+../../include/ode/collision_space.h:
+
+../../include/ode/contact.h:
+
+../../include/ode/odeinit.h:
+
+../../include/ode/collision_trimesh.h:
+
+collision_trimesh_internal.h:
+
+collision_kernel.h:
+
+config.h:
+
+/usr/include/malloc.h:
+
+/usr/include/stdint.h:
+
+/usr/include/bits/wchar.h:
+
+objects.h:
+
+../../include/ode/memory.h:
+
+../../include/ode/mass.h:
+
+array.h:
+
+collision_trimesh_colliders.h:
+
+../../include/ode/collision_trimesh.h:
+
+../../GIMPACT/include/GIMPACT/gimpact.h:
+
+../../GIMPACT/include/GIMPACT/gim_trimesh.h:
+
+../../GIMPACT/include/GIMPACT/gim_boxpruning.h:
+
+../../GIMPACT/include/GIMPACT/gim_radixsort.h:
+
+../../GIMPACT/include/GIMPACT/gim_memory.h:
+
+../../GIMPACT/include/GIMPACT/gim_math.h:
+
+/usr/include/memory.h:
+
+../../GIMPACT/include/GIMPACT/gim_geometry.h:
+
+../../GIMPACT/include/GIMPACT/gim_tri_collision.h:
+
+../../GIMPACT/include/GIMPACT/gim_tri_sphere_collision.h:
+
+../../GIMPACT/include/GIMPACT/gim_tri_capsule_collision.h:
+
+../../GIMPACT/include/GIMPACT/gim_contact.h:

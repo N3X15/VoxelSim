@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Drawstuff
+END
+AssemblyInfo.cs
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Drawstuff/AssemblyInfo.cs
+END
+premake.lua
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Drawstuff/premake.lua
+END
+Drawstuff.cs
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Drawstuff/Drawstuff.cs
+END

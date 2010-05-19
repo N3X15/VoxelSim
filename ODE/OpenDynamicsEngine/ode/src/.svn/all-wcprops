@@ -1,0 +1,479 @@
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src
+END
+collision_trimesh_box.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_box.cpp
+END
+plane.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/plane.cpp
+END
+rotation.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/rotation.cpp
+END
+scrapbook.cpp_deprecated
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/scrapbook.cpp_deprecated
+END
+fastdot.c
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/fastdot.c
+END
+collision_space.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_space.cpp
+END
+collision_space_internal.h
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_space_internal.h
+END
+memory.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/memory.cpp
+END
+quickstep.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/quickstep.cpp
+END
+cylinder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/cylinder.cpp
+END
+config.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/config.h
+END
+collision_std.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_std.h
+END
+fastldlt.c
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/fastldlt.c
+END
+testing.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/testing.cpp
+END
+lcp.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/lcp.cpp
+END
+odeou.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/odeou.h
+END
+mat.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/mat.cpp
+END
+export-dif.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/export-dif.cpp
+END
+collision_trimesh_trimesh.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_trimesh.cpp
+END
+fastlsolve.c
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/fastlsolve.c
+END
+util.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/util.h
+END
+array.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/array.h
+END
+stack.cpp_deprecated
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/stack.cpp_deprecated
+END
+box.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/box.cpp
+END
+odeinit.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/odeinit.cpp
+END
+obstack.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/obstack.h
+END
+misc.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/misc.cpp
+END
+capsule.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/capsule.cpp
+END
+collision_quadtreespace.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_quadtreespace.cpp
+END
+mass.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/mass.cpp
+END
+collision_cylinder_plane.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_cylinder_plane.cpp
+END
+odeou.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/odeou.cpp
+END
+quickstep.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/quickstep.h
+END
+util.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/util.cpp
+END
+odemath.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/odemath.cpp
+END
+lcp.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/lcp.h
+END
+collision_transform.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_transform.cpp
+END
+collision_util.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_util.cpp
+END
+error.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/error.cpp
+END
+odetls.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/odetls.cpp
+END
+collision_trimesh_gimpact.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_gimpact.cpp
+END
+collision_cylinder_box.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_cylinder_box.cpp
+END
+collision_trimesh_distance.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_distance.cpp
+END
+collision_trimesh_ray.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_ray.cpp
+END
+convex.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/opensim-libs/!svn/ver/68/trunk/unmanaged/OpenDynamicsEngine/ode/src/convex.cpp
+END
+matrix.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/matrix.cpp
+END
+fastltsolve.c
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/fastltsolve.c
+END
+collision_sapspace.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_sapspace.cpp
+END
+heightfield.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/heightfield.cpp
+END
+collision_trimesh_disabled.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_disabled.cpp
+END
+collision_cylinder_trimesh.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_cylinder_trimesh.cpp
+END
+collision_trimesh_opcode.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_opcode.cpp
+END
+step.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/step.h
+END
+timer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/timer.cpp
+END
+collision_trimesh_ccylinder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_ccylinder.cpp
+END
+sphere.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/opensim-libs/!svn/ver/68/trunk/unmanaged/OpenDynamicsEngine/ode/src/sphere.cpp
+END
+collision_trimesh_internal.h
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_internal.h
+END
+stack.h_deprecated
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/stack.h_deprecated
+END
+collision_transform.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_transform.h
+END
+collision_trimesh_colliders.h
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_colliders.h
+END
+ray.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/68/trunk/unmanaged/OpenDynamicsEngine/ode/src/ray.cpp
+END
+collision_util.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_util.h
+END
+objects.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/objects.h
+END
+odetls.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/odetls.h
+END
+collision_kernel.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_kernel.h
+END
+collision_trimesh_plane.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_plane.cpp
+END
+ode.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/ode.cpp
+END
+step.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/step.cpp
+END
+array.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/array.cpp
+END
+heightfield.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/heightfield.h
+END
+testing.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/testing.h
+END
+obstack.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/obstack.cpp
+END
+mat.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/mat.h
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/Makefile.am
+END
+stepfast.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/stepfast.cpp
+END
+collision_cylinder_sphere.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_cylinder_sphere.cpp
+END
+collision_trimesh_trimesh_new.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_trimesh_new.cpp
+END
+collision_kernel.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_kernel.cpp
+END
+collision_trimesh_sphere.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/collision_trimesh_sphere.cpp
+END

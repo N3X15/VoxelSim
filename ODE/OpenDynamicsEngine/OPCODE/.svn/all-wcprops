@@ -1,0 +1,395 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE
+END
+OPC_RayAABBOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_RayAABBOverlap.h
+END
+OPC_PlanesTriOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_PlanesTriOverlap.h
+END
+OPC_Model.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Model.cpp
+END
+OPC_TriBoxOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_TriBoxOverlap.h
+END
+OPC_Settings.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Settings.h
+END
+Opcode.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Opcode.cpp
+END
+OPC_RayTriOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_RayTriOverlap.h
+END
+OPC_RayCollider.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_RayCollider.h
+END
+OPC_LSSTriOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_LSSTriOverlap.h
+END
+OPC_SweepAndPrune.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_SweepAndPrune.cpp
+END
+OPC_ThreadLocalData.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_ThreadLocalData.h
+END
+OPC_TreeCollider.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_TreeCollider.h
+END
+OPC_LSSCollider.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_LSSCollider.h
+END
+OPC_Picking.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Picking.cpp
+END
+OPC_VolumeCollider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_VolumeCollider.cpp
+END
+OPC_IceHook.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_IceHook.h
+END
+StdAfx.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/StdAfx.cpp
+END
+OPC_Common.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Common.h
+END
+Stdafx.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Stdafx.h
+END
+OPC_BoxBoxOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_BoxBoxOverlap.h
+END
+OPC_AABBCollider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_AABBCollider.cpp
+END
+OPC_HybridModel.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_HybridModel.h
+END
+OPC_SphereCollider.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_SphereCollider.h
+END
+OPC_TriTriOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_TriTriOverlap.h
+END
+Opcode.dsp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Opcode.dsp
+END
+OPC_ThreadLocalData.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_ThreadLocalData.cpp
+END
+Opcode.dsw
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Opcode.dsw
+END
+OPC_Common.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Common.cpp
+END
+ReadMe.txt
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/ReadMe.txt
+END
+OPC_TreeBuilders.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_TreeBuilders.cpp
+END
+OPC_OptimizedTree.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_OptimizedTree.h
+END
+OPC_VolumeCollider.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_VolumeCollider.h
+END
+OPC_SphereAABBOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_SphereAABBOverlap.h
+END
+OPC_BoxPruning.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_BoxPruning.cpp
+END
+OPC_BaseModel.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_BaseModel.cpp
+END
+TemporalCoherence.txt
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/TemporalCoherence.txt
+END
+OPC_Collider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Collider.cpp
+END
+OPC_HybridModel.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_HybridModel.cpp
+END
+OPC_SphereCollider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_SphereCollider.cpp
+END
+OPC_PlanesCollider.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_PlanesCollider.h
+END
+OPC_AABBTree.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_AABBTree.cpp
+END
+OPC_LSSAABBOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_LSSAABBOverlap.h
+END
+OPC_AABBCollider.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_AABBCollider.h
+END
+OPC_MeshInterface.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_MeshInterface.cpp
+END
+OPC_OptimizedTree.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_OptimizedTree.cpp
+END
+OPC_OBBCollider.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_OBBCollider.h
+END
+OPC_PlanesAABBOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_PlanesAABBOverlap.h
+END
+README-ODE.txt
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/README-ODE.txt
+END
+OPC_TreeBuilders.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_TreeBuilders.h
+END
+OPC_PlanesCollider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_PlanesCollider.cpp
+END
+OPC_BoxPruning.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_BoxPruning.h
+END
+OPC_BaseModel.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_BaseModel.h
+END
+OPC_Collider.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Collider.h
+END
+OPC_SphereTriOverlap.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_SphereTriOverlap.h
+END
+OPC_Model.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Model.h
+END
+OPC_RayCollider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_RayCollider.cpp
+END
+OPC_AABBTree.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_AABBTree.h
+END
+Opcode.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Opcode.h
+END
+OPC_TreeCollider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_TreeCollider.cpp
+END
+OPC_LSSCollider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_LSSCollider.cpp
+END
+OPC_OBBCollider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_OBBCollider.cpp
+END
+OPC_MeshInterface.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_MeshInterface.h
+END
+OPC_SweepAndPrune.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_SweepAndPrune.h
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Makefile.am
+END
+OPC_Picking.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/OPC_Picking.h
+END

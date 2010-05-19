@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/TerrainAndCone
+END
+test_boxstackb.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/TerrainAndCone/test_boxstackb.cpp
+END
+dTerrainY.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/TerrainAndCone/dTerrainY.cpp
+END
+dTerrainZ.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/TerrainAndCone/dTerrainZ.cpp
+END
+collision_std_internal.h
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/TerrainAndCone/collision_std_internal.h
+END
+dCone.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/TerrainAndCone/dCone.cpp
+END
+readme.txt
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/TerrainAndCone/readme.txt
+END

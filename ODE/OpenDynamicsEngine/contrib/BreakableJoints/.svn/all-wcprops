@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints
+END
+objects.h
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/objects.h
+END
+joint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/joint.cpp
+END
+ode.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/ode.cpp
+END
+test_breakable.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/test_breakable.cpp
+END
+joint.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/joint.h
+END
+stepfast.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/stepfast.cpp
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/README.txt
+END
+step.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/step.cpp
+END
+test_buggy.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/test_buggy.cpp
+END
+common.h
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/BreakableJoints/common.h
+END

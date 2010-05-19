@@ -1,0 +1,82 @@
+gim_trimesh_trimesh_collision.lo: gim_trimesh_trimesh_collision.cpp \
+  ../../GIMPACT/include/GIMPACT/gim_trimesh.h \
+  ../../GIMPACT/include/GIMPACT/gim_boxpruning.h \
+  ../../GIMPACT/include/GIMPACT/gim_radixsort.h \
+  ../../GIMPACT/include/GIMPACT/gim_memory.h \
+  ../../GIMPACT/include/GIMPACT/gim_math.h /usr/include/math.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+  /usr/include/gnu/stubs-32.h /usr/include/bits/huge_val.h \
+  /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h \
+  /usr/include/bits/inf.h /usr/include/bits/nan.h \
+  /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h \
+  /usr/include/bits/mathinline.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/float.h /usr/include/memory.h \
+  /usr/include/string.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/stddef.h \
+  /usr/include/xlocale.h /usr/include/bits/string3.h \
+  ../../GIMPACT/include/GIMPACT/gim_geometry.h \
+  ../../GIMPACT/include/GIMPACT/gim_tri_collision.h \
+  ../../GIMPACT/include/GIMPACT/gim_tri_sphere_collision.h \
+  ../../GIMPACT/include/GIMPACT/gim_tri_capsule_collision.h \
+  ../../GIMPACT/include/GIMPACT/gim_contact.h
+
+../../GIMPACT/include/GIMPACT/gim_trimesh.h:
+
+../../GIMPACT/include/GIMPACT/gim_boxpruning.h:
+
+../../GIMPACT/include/GIMPACT/gim_radixsort.h:
+
+../../GIMPACT/include/GIMPACT/gim_memory.h:
+
+../../GIMPACT/include/GIMPACT/gim_math.h:
+
+/usr/include/math.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-32.h:
+
+/usr/include/bits/huge_val.h:
+
+/usr/include/bits/huge_valf.h:
+
+/usr/include/bits/huge_vall.h:
+
+/usr/include/bits/inf.h:
+
+/usr/include/bits/nan.h:
+
+/usr/include/bits/mathdef.h:
+
+/usr/include/bits/mathcalls.h:
+
+/usr/include/bits/mathinline.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/float.h:
+
+/usr/include/memory.h:
+
+/usr/include/string.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/stddef.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/bits/string3.h:
+
+../../GIMPACT/include/GIMPACT/gim_geometry.h:
+
+../../GIMPACT/include/GIMPACT/gim_tri_collision.h:
+
+../../GIMPACT/include/GIMPACT/gim_tri_sphere_collision.h:
+
+../../GIMPACT/include/GIMPACT/gim_tri_capsule_collision.h:
+
+../../GIMPACT/include/GIMPACT/gim_contact.h:

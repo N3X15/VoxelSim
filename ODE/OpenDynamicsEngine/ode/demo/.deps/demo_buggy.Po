@@ -1,0 +1,188 @@
+demo_buggy.o: demo_buggy.cpp \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/ode.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odeconfig.h \
+  /usr/include/stdio.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+  /usr/include/gnu/stubs-32.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/stddef.h \
+  /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/stdarg.h \
+  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+  /usr/include/bits/stdio.h /usr/include/bits/stdio2.h \
+  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
+  /usr/include/bits/waitstatus.h /usr/include/endian.h \
+  /usr/include/bits/endian.h /usr/include/bits/byteswap.h \
+  /usr/include/xlocale.h /usr/include/sys/types.h /usr/include/time.h \
+  /usr/include/sys/select.h /usr/include/bits/select.h \
+  /usr/include/bits/sigset.h /usr/include/bits/time.h \
+  /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
+  /usr/include/alloca.h /usr/include/bits/stdlib.h /usr/include/math.h \
+  /usr/include/bits/huge_val.h /usr/include/bits/huge_valf.h \
+  /usr/include/bits/huge_vall.h /usr/include/bits/inf.h \
+  /usr/include/bits/nan.h /usr/include/bits/mathdef.h \
+  /usr/include/bits/mathcalls.h /usr/include/bits/mathinline.h \
+  /usr/include/string.h /usr/include/bits/string3.h \
+  /usr/lib/gcc/i486-linux-gnu/4.3.3/include/float.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/compatibility.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/common.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/error.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odeinit.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/contact.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/memory.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odemath.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/matrix.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/timer.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/rotation.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/mass.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/misc.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/objects.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odecpp.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/collision_space.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/collision.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/collision_trimesh.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odecpp_collision.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/export-dif.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/drawstuff/drawstuff.h \
+  /home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/drawstuff/version.h \
+  texturepath.h
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/ode.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odeconfig.h:
+
+/usr/include/stdio.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-32.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/stddef.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/bits/stdio2.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/time.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/alloca.h:
+
+/usr/include/bits/stdlib.h:
+
+/usr/include/math.h:
+
+/usr/include/bits/huge_val.h:
+
+/usr/include/bits/huge_valf.h:
+
+/usr/include/bits/huge_vall.h:
+
+/usr/include/bits/inf.h:
+
+/usr/include/bits/nan.h:
+
+/usr/include/bits/mathdef.h:
+
+/usr/include/bits/mathcalls.h:
+
+/usr/include/bits/mathinline.h:
+
+/usr/include/string.h:
+
+/usr/include/bits/string3.h:
+
+/usr/lib/gcc/i486-linux-gnu/4.3.3/include/float.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/compatibility.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/common.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/error.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odeinit.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/contact.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/memory.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odemath.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/matrix.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/timer.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/rotation.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/mass.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/misc.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/objects.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odecpp.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/collision_space.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/collision.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/collision_trimesh.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/odecpp_collision.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/ode/export-dif.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/drawstuff/drawstuff.h:
+
+/home/nexis/OpenSim/ODE/OpenDynamicsEngine/include/drawstuff/version.h:
+
+texturepath.h:

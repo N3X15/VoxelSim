@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/dRay
+END
+dRay_Plane.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/dRay/dRay_Plane.cpp
+END
+dRay.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/dRay/dRay.cpp
+END
+dRay_Sphere.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/dRay/dRay_Sphere.cpp
+END
+dRay_Box.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/dRay/dRay_Box.cpp
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/dRay/README.txt
+END
+dRay_CCylinder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/dRay/dRay_CCylinder.cpp
+END
+dxRay.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/dRay/dxRay.h
+END

@@ -1,0 +1,34 @@
+9
+
+dir
+108
+http://opensimulator.org/svn/opensim-libs/trunk/unmanaged/OpenDynamicsEngine/contrib/Mac_CFMCarbon/mac_source/include
+http://opensimulator.org/svn/opensim-libs
+
+
+
+2008-10-12T23:17:41.292094Z
+69
+teravus
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+7c4940e8-6ff7-4914-b775-378afef7cd2e
+
+GL
+dir
+
+ode
+dir
+

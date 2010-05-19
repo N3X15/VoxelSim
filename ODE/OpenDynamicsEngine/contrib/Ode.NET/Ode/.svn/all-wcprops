@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/102/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Ode
+END
+AssemblyInfo.cs
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/71/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Ode/AssemblyInfo.cs
+END
+BoxStack.cs
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Ode/BoxStack.cs
+END
+premake.lua
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Ode/premake.lua
+END
+Ode.NET.csproj.user
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Ode/Ode.NET.csproj.user
+END
+Drawstuff.cs
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Ode/Drawstuff.cs
+END
+Ode.NET.csproj
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/102/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Ode/Ode.NET.csproj
+END
+Ode.cs
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/85/trunk/unmanaged/OpenDynamicsEngine/contrib/Ode.NET/Ode/Ode.cs
+END

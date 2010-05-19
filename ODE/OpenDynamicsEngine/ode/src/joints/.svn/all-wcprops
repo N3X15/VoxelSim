@@ -1,0 +1,203 @@
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints
+END
+fixed.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/fixed.cpp
+END
+contact.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/contact.h
+END
+amotor.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/amotor.h
+END
+ball.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/ball.cpp
+END
+joints.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/joints.h
+END
+piston.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/piston.cpp
+END
+lmotor.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/lmotor.cpp
+END
+hinge2.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/hinge2.cpp
+END
+universal.h
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/universal.h
+END
+null.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/null.h
+END
+pr.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/pr.cpp
+END
+slider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/slider.cpp
+END
+pu.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/pu.cpp
+END
+joint_internal.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/joint_internal.h
+END
+plane2d.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/plane2d.cpp
+END
+joint.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/joint.h
+END
+contact.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/contact.cpp
+END
+hinge.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/hinge.h
+END
+amotor.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/amotor.cpp
+END
+fixed.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/fixed.h
+END
+universal.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/universal.cpp
+END
+null.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/null.cpp
+END
+ball.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/ball.h
+END
+piston.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/piston.h
+END
+lmotor.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/lmotor.h
+END
+hinge2.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/hinge2.h
+END
+joint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/joint.cpp
+END
+pr.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/pr.h
+END
+slider.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/slider.h
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/Makefile.am
+END
+pu.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/pu.h
+END
+plane2d.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/plane2d.h
+END
+hinge.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/ode/src/joints/hinge.cpp
+END

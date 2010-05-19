@@ -1,0 +1,71 @@
+9
+
+dir
+108
+http://opensimulator.org/svn/opensim-libs/trunk/unmanaged/OpenDynamicsEngine/drawstuff
+http://opensimulator.org/svn/opensim-libs
+
+
+
+2008-10-12T23:17:41.292094Z
+69
+teravus
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+7c4940e8-6ff7-4914-b775-378afef7cd2e
+
+textures
+dir
+
+dstest
+dir
+
+src
+dir
+
+Makefile.am
+file
+
+
+
+
+2009-11-02T23:24:03.000000Z
+a0fa170014c70eaccbda9356266a2d84
+2008-10-12T23:17:41.292094Z
+69
+teravus
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+69
+

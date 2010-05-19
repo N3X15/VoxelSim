@@ -1,0 +1,191 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged
+END
+JointHinge.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointHinge.cpp
+END
+JointGroup.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointGroup.cpp
+END
+JointFixed.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointFixed.cpp
+END
+JointAMotor.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointAMotor.cpp
+END
+JointBall.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointBall.cpp
+END
+JointHinge2.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointHinge2.cpp
+END
+Joint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Joint.cpp
+END
+JointSlider.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointSlider.cpp
+END
+World.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/World.cpp
+END
+Geom.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Geom.h
+END
+Stdafx.h
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Stdafx.h
+END
+Space.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Space.h
+END
+Body.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Body.h
+END
+JointHinge.h
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointHinge.h
+END
+JointGroup.h
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointGroup.h
+END
+JointFixed.h
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointFixed.h
+END
+JointAMotor.h
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointAMotor.h
+END
+JointBall.h
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointBall.h
+END
+TEST.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/TEST.h
+END
+DotNetManaged.sln
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/DotNetManaged.sln
+END
+JointHinge2.h
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointHinge2.h
+END
+CommonMgd.h
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/CommonMgd.h
+END
+Geom.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Geom.cpp
+END
+Joint.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Joint.h
+END
+Stdafx.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Stdafx.cpp
+END
+Space.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Space.cpp
+END
+JointSlider.h
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/JointSlider.h
+END
+AssemblyInfo.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/AssemblyInfo.cpp
+END
+DotNetManaged.vcproj
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/DotNetManaged.vcproj
+END
+World.h
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/World.h
+END
+Body.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/contrib/DotNetManaged/Body.cpp
+END

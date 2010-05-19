@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/tools
+END
+ode_convex_export.py
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/tools/ode_convex_export.py
+END
+msw-release.bat
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/tools/msw-release.bat
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/tools/README.txt
+END
+src-release.sh
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/68/trunk/unmanaged/OpenDynamicsEngine/tools/src-release.sh
+END

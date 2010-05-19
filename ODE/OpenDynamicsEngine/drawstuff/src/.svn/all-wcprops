@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src
+END
+internal.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src/internal.h
+END
+drawstuff.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src/drawstuff.cpp
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src/Makefile.am
+END
+osx.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src/osx.cpp
+END
+x11.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src/x11.cpp
+END
+windows.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src/windows.cpp
+END
+resource.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src/resource.h
+END
+resources.rc
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/drawstuff/src/resources.rc
+END

@@ -1,0 +1,245 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice
+END
+IceMemoryMacros.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceMemoryMacros.h
+END
+IceContainer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceContainer.cpp
+END
+IcePairs.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IcePairs.h
+END
+IceRandom.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceRandom.h
+END
+IceAABB.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceAABB.cpp
+END
+IceRevisitedRadix.h
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceRevisitedRadix.h
+END
+IceRay.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceRay.cpp
+END
+IcePreprocessor.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IcePreprocessor.h
+END
+IcePoint.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IcePoint.h
+END
+IceFPU.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceFPU.h
+END
+IceTriList.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceTriList.h
+END
+IceUtils.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceUtils.cpp
+END
+IceHPoint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceHPoint.cpp
+END
+IceSegment.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceSegment.cpp
+END
+IceOBB.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceOBB.cpp
+END
+IcePlane.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IcePlane.h
+END
+IceAxes.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceAxes.h
+END
+IceIndexedTriangle.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceIndexedTriangle.cpp
+END
+IceMatrix3x3.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceMatrix3x3.h
+END
+IceMatrix4x4.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceMatrix4x4.h
+END
+IceTriangle.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceTriangle.h
+END
+IceRandom.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceRandom.cpp
+END
+IceBoundingSphere.h
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceBoundingSphere.h
+END
+IceRevisitedRadix.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceRevisitedRadix.cpp
+END
+IceContainer.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceContainer.h
+END
+IcePoint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IcePoint.cpp
+END
+IceAABB.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceAABB.h
+END
+IcePlane.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IcePlane.cpp
+END
+IceRay.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceRay.h
+END
+IceMatrix3x3.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceMatrix3x3.cpp
+END
+IceMatrix4x4.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceMatrix4x4.cpp
+END
+IceTriangle.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceTriangle.cpp
+END
+IceUtils.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceUtils.h
+END
+IceHPoint.h
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceHPoint.h
+END
+IceLSS.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceLSS.h
+END
+IceOBB.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceOBB.h
+END
+IceSegment.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceSegment.h
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/Makefile.am
+END
+IceTypes.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceTypes.h
+END
+IceIndexedTriangle.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/OPCODE/Ice/IceIndexedTriangle.h
+END

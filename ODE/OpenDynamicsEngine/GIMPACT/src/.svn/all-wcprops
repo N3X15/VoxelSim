@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src
+END
+gim_trimesh_capsule_collision.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_trimesh_capsule_collision.cpp
+END
+gim_tri_tri_overlap.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_tri_tri_overlap.cpp
+END
+gim_memory.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_memory.cpp
+END
+gimpact.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gimpact.cpp
+END
+gim_math.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_math.cpp
+END
+gim_boxpruning.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_boxpruning.cpp
+END
+gim_contact.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_contact.cpp
+END
+gim_trimesh.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_trimesh.cpp
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/Makefile.am
+END
+gim_trimesh_sphere_collision.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_trimesh_sphere_collision.cpp
+END
+gim_trimesh_ray_collision.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/opensim-libs/!svn/ver/69/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_trimesh_ray_collision.cpp
+END
+gim_trimesh_trimesh_collision.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/opensim-libs/!svn/ver/68/trunk/unmanaged/OpenDynamicsEngine/GIMPACT/src/gim_trimesh_trimesh_collision.cpp
+END
