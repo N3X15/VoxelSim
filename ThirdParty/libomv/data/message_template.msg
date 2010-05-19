@@ -8986,7 +8986,7 @@ version 2.0
 //	Sparse matrix of {x,y,MaterialID}
 //
 {
-	VoxelLayer Low 911 NotTrusted Zerocoded
+	VoxelLayer Low 911 NotTrusted Unencoded
 	{
 		LayerData		Single
 		{	Z		U32	}

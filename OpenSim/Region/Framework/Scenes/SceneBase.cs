@@ -171,7 +171,8 @@ namespace OpenSim.Region.Framework.Scenes
         /// <param name="RemoteClient">Client to send to</param>
         public virtual void SendLayerData(IClientAPI RemoteClient)
         {
-            RemoteClient.SendVoxelData(Voxels.GetBoolsSerialised());
+            RemoteClient.SendVoxelData((Voxels as VoxelChannel).ToMaterialMap());
+			RemoteClient.SendLayerData(Voxels.GetFloatsSerialised());
         }
 
         #endregion

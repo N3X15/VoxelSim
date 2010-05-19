@@ -46,22 +46,23 @@ namespace OpenSim.Region.OptionalModules.Scripting.Minimodule
 
         public int Length
         {
-            get { return m_scene.Heightmap.Height; }
+            get { return m_scene.Voxels.Length; }
         }
 
         public int Width
         {
-            get { return m_scene.Heightmap.Width; }
+            get { return m_scene.Voxels.Width; }
         }
 
         protected double Get(int x, int y)
         {
-            return m_scene.Heightmap[x, y];
+            return m_scene.Voxels.GetDoubles()[x, y];
         }
 
         protected void Set(int x, int y, double val)
         {
-            m_scene.Heightmap[x, y] = val;
+			// TODO: Fix this.
+            //m_scene.Heightmap[x, y] = val;
         }
     }
 }

@@ -54,7 +54,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
             int tc = Environment.TickCount;
             m_log.Info("[MAPTILE]: Generating Maptile Step 1: Terrain");
 
-            double[,] hm = m_scene.Heightmap.GetDoubles();
+            double[,] hm = m_scene.Voxels.GetDoubles();
             bool ShadowDebugContinue = true;
 
             bool terraincorruptedwarningsaid = false;

@@ -974,6 +974,10 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         {
             
         }
+		
+		public void SendVoxelData(int[,,] map)
+		{
+		}
 
         public void SendLayerData(int px, int py, float[] map)
         {

@@ -73,7 +73,7 @@ namespace OpenSim.Region.CoreModules.World.Serialiser
         {
             lock (m_serialisers)
             {
-                m_serialisers.Add(new SerialiseTerrain());
+                //m_serialisers.Add(new SerialiseTerrain());
                 m_serialisers.Add(new SerialiseObjects());
             }
 

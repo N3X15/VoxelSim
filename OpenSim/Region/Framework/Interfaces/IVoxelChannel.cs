@@ -1,7 +1,7 @@
 using OpenMetaverse;
 using System;
 
-namespace OpenSim.Region.Framework
+namespace OpenSim.Region.Framework.Interfaces
 {
 	/// <summary>
 	/// 3D grid of voxels
@@ -20,6 +20,7 @@ namespace OpenSim.Region.Framework
         /// </summary>
         /// <returns></returns>
         bool[] GetBoolsSerialised();
+		float[] GetFloatsSerialised();
 
         double[,] GetDoubles();
 		

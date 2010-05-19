@@ -4438,7 +4438,7 @@ namespace OpenSim.Region.Framework.Scenes
         public void TerrainUnAcked(IClientAPI client, int patchX, int patchY)
         {
             //m_log.Debug("Terrain packet unacked, resending patch: " + patchX + " , " + patchY);
-             client.SendVoxelData(Voxels.GetBoolsSerialised());
+             client.SendVoxelData((Voxels as VoxelChannel).ToMaterialMap());
         }
 
         public void SetRootAgentScene(UUID agentID)

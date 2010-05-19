@@ -1066,7 +1066,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             Util.FireAndForget(DoSendLayerData, map);
         }
 		
-		public virtual void SendVoxelData(bool[,,] map)
+		public virtual void SendVoxelData(int[,,] map)
 		{
 			Util.FireAndForget(DoSendVoxels, map);
 		}
@@ -1074,14 +1074,30 @@ namespace OpenSim.Region.ClientStack.LindenUDP
 		public void DoSendVoxels(object o)
 		{
 			int x,y,z;
-			bool[,,] voxels = (bool[,,])o;
+			int[,,] voxels = (int[,,])o;
 			for(z=0;z<voxels.GetLength(2);z++)
 			{
-				VoxelLayerPacket vlp = (VoxelLayersPacket)PacketPool.Instance.GetPacket(PacketType.VoxelLayers);
-				vlp.Reliable=true;
+				VoxelLayerPacket vlp = (VoxelLayerPacket)PacketPool.Instance.GetPacket(PacketType.VoxelLayer);
+				vlp.LayerData.Z=(uint)z;
+				List<VoxelLayerPacket.VoxelDataBlock> vlbs = new List<VoxelLayerPacket.VoxelDataBlock>();
 				for(x=0;x<voxels.GetLength(0);x++)
+				{
 					for(y=0;y<voxels.GetLength(1);y++)
-						vlp
+					{
+						if(voxels[x,y,z]>-1)
+						{
+							VoxelLayerPacket.VoxelDataBlock vlb = new VoxelLayerPacket.VoxelDataBlock();
+							vlb.X=(uint)x;
+							vlb.Y=(uint)z;
+							vlb.Material=(uint)voxels[x,y,z];
+							vlbs.Add(vlb);
+						}
+					}
+				}
+				vlp.VoxelData=vlbs.ToArray();
+				OutPacket(vlp,ThrottleOutPacketType.Land);
+			}
+			
 		}
         /// <summary>
         /// Send terrain layer information to the client.

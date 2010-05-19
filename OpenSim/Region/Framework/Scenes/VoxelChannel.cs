@@ -2,9 +2,11 @@
 using System;
 using OpenMetaverse;
 using System.IO;
+using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
-
+using LibNbt;
+using LibNbt.Tags;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Framework;
 
@@ -119,6 +121,11 @@ namespace OpenSim.Region.Framework.Scenes
 			x=(int)Math.Round(pos.X);
 			y=(int)Math.Round(pos.Y);
 			z=(int)Math.Round(pos.Z);
+			return Voxels[x,y,z];
+		}
+		public Voxel GetVoxel(int x,int y,int z)
+		{
+			if(!inGrid(new Vector3(x,y,z))) return null;
 			return Voxels[x,y,z];
 		}
 		
@@ -238,8 +245,50 @@ namespace OpenSim.Region.Framework.Scenes
 			return vl;
 		}
 		
+		public double GetHeightAt(int x,int y)
+		{
+			double h=0;
+			for(int z=0;z<ZScale;z++)
+			{
+				if((Voxels[x,y,z].Flags & VoxFlags.Solid)==VoxFlags.Solid)
+					h=Math.Max(h,z);
+			}
+			return h;
+		}
 		
+		/// <summary>
+		/// For the physics subsystem (DEPRECIATED) and mapping.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Single[]"/>
+		/// </returns>
+		public float[] GetFloatsSerialised()
+		{
+			/* Basically, get the highest point on each column. */
+			List<float> sf = new List<float>();
+			for(int x=0;x<XScale;x++)
+			{
+				for(int y=0;y<YScale;y++)
+				{
+					float ch = 0;
+					for(int z=0;z<ZScale;z++)
+					{
+						// If Voxel is Solid
+						if((Voxels[x,y,z].Flags & VoxFlags.Solid)==VoxFlags.Solid)
+						{
+							ch=Math.Max(z,ch);
+						}
+					}
+					sf.Add(ch);
+				}
+			}
+			return sf.ToArray();
+		}
 		public IVoxelChannel Generate(string method)
+		{
+			return Generate(method,new object[]{});
+		}
+		public IVoxelChannel Generate(string method,object[] args)
 		{
 			bool[,,] p0,p1,p2;
 			
@@ -352,6 +401,15 @@ namespace OpenSim.Region.Framework.Scenes
 			});
 			return nearest;
 		}
+		public int[,,] ToMaterialMap()
+		{
+			int[,,] map = new int[XScale,YScale,ZScale];
+			for(int x=0;x<XScale;x++)
+				for(int y=0;y<YScale;y++)
+					for(int z=0;z<ZScale;z++)
+						map[x,y,z]=((Voxels[x,y,z].Flags&VoxFlags.Solid)==VoxFlags.Solid) ? 0 : -1;
+			return map;
+		}
 		public void ImportHeightmap(float[,] heightmap)
 		{
 			int MX=heightmap.GetLength(0);
@@ -407,9 +465,9 @@ namespace OpenSim.Region.Framework.Scenes
             }
 		}
 		
-		private void WriteXML(XmlWriter w)
+		public byte[] ToBytes()
 		{
-			w.WriteStartElement("Voxels");
+			
 			byte[] o = new byte[XScale*YScale*ZScale*2];
 			int i =0;
 			for(int z=0;z<ZScale;z++)
@@ -425,10 +483,59 @@ namespace OpenSim.Region.Framework.Scenes
 					}
 				}
 			}
-			// o=Compress(o);
+			return o;
+		}
+		
+		public void FromBytes(byte[] b)
+		{
+			int i =0;
+			for(int z=0;z<ZScale;z++)
+			{
+				for(int x=0;x<XScale;x++)
+				{
+					for(int y=0;y<YScale;y++)
+					{
+						Voxels[x,y,z]=new Voxel(new byte[]{b[i],b[i+1]});
+						i+=2;
+					}
+				}
+			}
+		}
+		
+		private void WriteXML(XmlWriter w)
+		{
+			w.WriteStartElement("Voxels");
 			XmlSerializer xs = new XmlSerializer(typeof(byte[]));
-			xs.Serialize(w,o);
+			xs.Serialize(w,ToBytes());
 			w.WriteEndElement();
+		}
+		public void LoadFromFile(string file)
+		{
+			using(NbtFile rdr = new NbtFile(file))
+			{
+				if(rdr.RootTag is NbtCompound && (rdr.RootTag as NbtCompound).Name.Equals("Region"))
+				{
+					foreach(NbtTag tag in rdr.RootTag.Tags)
+					{
+						switch(tag.Name)
+						{
+							case "Voxels":
+								NbtByteArray vba = (NbtByteArray)tag;
+								FromBytes(vba.Value);
+								break;
+						}
+					}
+				}
+			}
+		}
+		public void SaveToFile(string file)
+		{
+			using(NbtFile rdr = new NbtFile())
+			{
+				//rdr.RootTag.Name="VoxelSim";
+				rdr.RootTag.Tags.Add(new NbtByteArray("Voxels",ToBytes()));
+				rdr.SaveFile(file);
+			}
 		}
 		public void LoadFromXmlString(string data)
         {

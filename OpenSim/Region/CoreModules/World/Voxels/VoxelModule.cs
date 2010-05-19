@@ -37,10 +37,11 @@ using OpenSim.Framework;
 using OpenSim.Region.CoreModules.Framework.InterfaceCommander;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using Voxel=OpenSim.Region.Framework.Scenes.Voxel;
 
 namespace OpenSim.Region.CoreModules.World.Voxels
 {
-    public class VoxelModule : INonSharedRegionModule, ICommandableModule
+    public class VoxelModule : INonSharedRegionModule, ICommandableModule, IVoxelModule
     {
         /// <summary>
         /// A standard set of terrain brushes and effects recognised by viewers
@@ -60,11 +61,12 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         private readonly Dictionary<StandardVoxelActions, IVoxelAction> m_painteffects =
             new Dictionary<StandardVoxelActions, IVoxelAction>();
 
+		private Dictionary<string,IVoxelFileHandler> m_loaders = new Dictionary<string, IVoxelFileHandler>();
         private VoxelChannel m_channel;
         private VoxelChannel m_revert;
         private Scene m_scene;
         private volatile bool m_tainted;
-        private readonly UndoStack<LandUndoState> m_undo = new UndoStack<LandUndoState>(5);
+        private readonly UndoStack<VoxelUndoState> m_undo = new UndoStack<VoxelUndoState>(5);
 
         #region ICommandableModule Members
 
@@ -93,17 +95,17 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             // Install terrain module in the simulator
             lock (m_scene)
             {
-                if (m_scene.Heightmap == null)
+                if (m_scene.Voxels == null)
                 {
-                    m_channel = new VoxelChannel(256,256,256);
-                    m_revert = new VoxelChannel(256,256,256);
+                    m_channel = new VoxelChannel(Constants.RegionSize,Constants.RegionSize,256);
+                    m_revert = new VoxelChannel(Constants.RegionSize,Constants.RegionSize,256);
                     m_scene.Voxels = m_channel;
                     UpdateRevertMap();
                 }
                 else
                 {
-                    m_channel = m_scene.Voxels;
-                    m_revert = new VoxelChannel(256,256,256);
+                    m_channel = (VoxelChannel)m_scene.Voxels;
+                    m_revert = new VoxelChannel(Constants.RegionSize,Constants.RegionSize,256);
                     UpdateRevertMap();
                 }
 
@@ -155,9 +157,9 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
         //#region ITerrainModule Members
 
-        public void UndoTerrain(VoxelChannel channel)
+        public void UndoTerrain(IVoxelChannel channel)
         {
-            m_channel = channel;
+            m_channel = (VoxelChannel)channel;
         }
 
         /// <summary>
@@ -185,12 +187,12 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             catch (NotImplementedException)
             {
                 m_log.Error("Unable to save to " + filename + ", saving of this file format has not been implemented.");
-                throw new TerrainException(String.Format("Unable to save heightmap: saving of this file format not implemented"));
+                throw new Exception(String.Format("Unable to save heightmap: saving of this file format not implemented"));
             }
             catch (IOException ioe)
             {
                 m_log.Error(String.Format("[TERRAIN]: Unable to save to {0}, {1}", filename, ioe.Message));
-                throw new TerrainException(String.Format("Unable to save heightmap: {0}", ioe.Message));
+                throw new Exception(String.Format("Unable to save heightmap: {0}", ioe.Message));
             }
         }
 
@@ -211,7 +213,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         /// <param name="stream"></param>
         public void LoadFromStream(string filename, Stream stream)
         {
-            foreach (KeyValuePair<string, ITerrainLoader> loader in m_loaders)
+            foreach (KeyValuePair<string, IVoxelFileHandler> loader in m_loaders)
             {
                 if (filename.EndsWith(loader.Key))
                 {
@@ -219,16 +221,16 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                     {
                         try
                         {
-                            ITerrainChannel channel = loader.Value.LoadStream(stream);
-                            m_scene.Heightmap = channel;
-                            m_channel = channel;
+                            IVoxelChannel channel = loader.Value.LoadStream(stream);
+                            m_scene.Voxels = channel;
+                            m_channel = (VoxelChannel)channel;
                             UpdateRevertMap();
                         }
                         catch (NotImplementedException)
                         {
-                            m_log.Error("[TERRAIN]: Unable to load heightmap, the " + loader.Value +
+                            m_log.Error("[TERRAIN]: Unable to load voxelmap, the " + loader.Value +
                                         " parser does not support file loading. (May be save only)");
-                            throw new TerrainException(String.Format("unable to load heightmap: parser {0} does not support loading", loader.Value));
+                            throw new Exception(String.Format("unable to load heightmap: parser {0} does not support loading", loader.Value));
                         }
                     }
 
@@ -238,7 +240,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 }
             }
             m_log.Error("[TERRAIN]: Unable to load heightmap, no file loader available for that format.");
-            throw new TerrainException(String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
+            throw new Exception(String.Format("unable to load heightmap from file {0}: no loader available for that format", filename));
         }
 
         private static Stream URIFetch(Uri uri)
@@ -272,7 +274,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             float duration = 0.25f;
             if (action == 0)
                 duration = 4.0f;
-            client_OnModifyTerrain(user, (float)pos.Z, duration, size, action, pos.Y, pos.X, pos.Y, pos.X, agentId);
+			client_OnModifyTerrain(user,(int)pos.X,(int)pos.Y,(int)pos.Z,action,(double)duration,agentId);
         }
 
         /// <summary>
@@ -284,7 +286,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         {
             try
             {
-                foreach (KeyValuePair<string, ITerrainLoader> loader in m_loaders)
+                foreach (KeyValuePair<string, IVoxelFileHandler> loader in m_loaders)
                 {
                     if (filename.EndsWith(loader.Key))
                     {
@@ -296,7 +298,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             catch (NotImplementedException)
             {
                 m_log.Error("Unable to save to " + filename + ", saving of this file format has not been implemented.");
-                throw new TerrainException(String.Format("Unable to save heightmap: saving of this file format not implemented"));
+                throw new Exception(String.Format("Unable to save heightmap: saving of this file format not implemented"));
             }
         }
 
@@ -371,13 +373,13 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         #endregion
 
         #endregion
-
+*/
         /// <summary>
         /// Installs into terrain module the standard suite of brushes
         /// </summary>
         private void InstallDefaultEffects()
         {
-            // Draggable Paint Brush Effects
+            /*// Draggable Paint Brush Effects
             m_painteffects[StandardTerrainEffects.Raise] = new RaiseSphere();
             m_painteffects[StandardTerrainEffects.Lower] = new LowerSphere();
             m_painteffects[StandardTerrainEffects.Smooth] = new SmoothSphere();
@@ -395,10 +397,10 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             m_floodeffects[StandardTerrainEffects.Noise] = new NoiseArea();
             m_floodeffects[StandardTerrainEffects.Flatten] = new FlattenArea();
             m_floodeffects[StandardTerrainEffects.Revert] = new RevertArea(m_revert);
-
+			*/
             // Filesystem load/save loaders
-            m_loaders[".r32"] = new RAW32();
-            m_loaders[".f32"] = m_loaders[".r32"];
+            m_loaders[".osvox"] = new NBTFileHandler();
+           /*m_loaders[".f32"] = m_loaders[".r32"];
             m_loaders[".ter"] = new Terragen();
             m_loaders[".raw"] = new LLRAW();
             m_loaders[".jpg"] = new JPEG();
@@ -407,9 +409,9 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             m_loaders[".png"] = new PNG();
             m_loaders[".gif"] = new GIF();
             m_loaders[".tif"] = new TIFF();
-            m_loaders[".tiff"] = m_loaders[".tif"];
+            m_loaders[".tiff"] = m_loaders[".tif"];*/
         }
-*/
+
         /// <summary>
         /// Saves the current state of the region into the revert map buffer.
         /// </summary>
@@ -417,7 +419,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         {
             for (int z = 0; z < m_channel.Height; z++)
                 for (int x = 0; x < m_channel.Width; x++)
-                	for (y = 0; y < m_channel.Height; y++)
+                	for (int y = 0; y < m_channel.Height; y++)
                     	m_revert.Voxels[x, y, z] = m_channel.Voxels[x, y, z];
         }
 /*
@@ -502,7 +504,9 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         /// <param name="client"></param>
         private void EventManager_OnNewClient(IClientAPI client)
         {
-            client.OnModifyTerrain += client_OnModifyTerrain;
+            client.OnModifyTerrain += delegate(UUID user, float height, float seconds, byte size, byte action, float north, float west, float south, float east, UUID agentId) {
+				client_OnModifyTerrain(user,(int)west,(int)south,(int)height,action,(double)seconds,agentId);
+			};
             client.OnBakeTerrain += client_OnBakeTerrain;
             client.OnLandUndo += client_OnLandUndo;
         }
@@ -528,32 +532,21 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         private void CheckForTerrainUpdates(bool respectEstateSettings)
         {
             bool shouldTaint = false;
-            bool[] serialised = m_channel.GetBoolsSerialized();
+            int[,,] serialised = m_channel.ToMaterialMap();
 			int z;
-			for(z=0;z<m_channel.Height;z+=Constants.TerrainPatchSize)
+			for(z=0;z<m_channel.Height;z++)
 			{
-	            int x;
-	            for (x = 0; x < m_channel.Width; x += Constants.TerrainPatchSize)
+				// if we should respect the estate settings then
+	            // fixup and height deltas that don't respect them
+	            if (respectEstateSettings && LimitChannelChanges(z))
 	            {
-	                int y;
-	                for (y = 0; y < m_channel.Length; y += Constants.TerrainPatchSize)
-	                {
-	                    if (m_channel.Tainted(x, y))
-	                    {
-	                        // if we should respect the estate settings then
-	                        // fixup and height deltas that don't respect them
-	                        if (respectEstateSettings && LimitChannelChanges(x, y))
-	                        {
-	                            // this has been vetoed, so update
-	                            // what we are going to send to the client
-	                            serialised = m_channel.GetFloatsSerialised();
-	                        }
-	
-	                        SendToClients(serialised, x, y);
-	                        shouldTaint = true;
-	                    }
-	                }
+	                // this has been vetoed, so update
+	                // what we are going to send to the client
+	                serialised = m_channel.ToMaterialMap();
 	            }
+	
+	            SendToClients(serialised);
+	            shouldTaint = true;
 			}
             if (shouldTaint)
             {
@@ -566,31 +559,36 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         /// are all within the current estate limits
         /// <returns>true if changes were limited, false otherwise</returns>
         /// </summary>
-        private bool LimitChannelChanges(int xStart, int yStart)
+        private bool LimitChannelChanges(int z)
         {
+			// TODO: This needs work.
+			return false;
+			
             bool changesLimited = false;
             double minDelta = m_scene.RegionInfo.RegionSettings.TerrainLowerLimit;
             double maxDelta = m_scene.RegionInfo.RegionSettings.TerrainRaiseLimit;
 
             // loop through the height map for this patch and compare it against
             // the revert map
-            for (int x = xStart; x < xStart + Constants.TerrainPatchSize; x++)
+            for (int x = 0; x < m_channel.Width; x++)
             {
-                for (int y = yStart; y < yStart + Constants.TerrainPatchSize; y++)
+                for (int y = 0; y < m_channel.Length; y++)
                 {
-
-                    double requestedHeight = m_channel[x, y];
-                    double bakedHeight = m_revert[x, y];
-                    double requestedDelta = requestedHeight - bakedHeight;
+                    double requestedHeight = m_channel.GetHeightAt(x, y);
+                    double bakedHeight = m_revert.GetHeightAt(x, y);
+					Voxel MyVoxel=m_channel.Voxels[x,y,z];
+					Voxel BakedVoxel=m_revert.Voxels[x,y,z];
+                
+					double requestedDelta = requestedHeight - bakedHeight;
 
                     if (requestedDelta > maxDelta)
                     {
-                        m_channel[x, y] = bakedHeight + maxDelta;
+                        m_channel.SetVoxel(x, y, z, BakedVoxel);
                         changesLimited = true;
                     }
                     else if (requestedDelta < minDelta)
                     {
-                        m_channel[x, y] = bakedHeight + minDelta; //as lower is a -ve delta
+                        m_channel.SetVoxel(x, y, z, BakedVoxel);
                         changesLimited = true;
                     }
                 }
@@ -605,7 +603,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             {
                 if (m_undo.Count > 0)
                 {
-                    LandUndoState goback = m_undo.Pop();
+                    VoxelUndoState goback = m_undo.Pop();
                     if (goback != null)
                         goback.PlaybackState();
                 }
@@ -617,17 +615,17 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         /// </summary>
         /// <param name="serialised">A copy of the terrain as a 1D float array of size w*h</param>
         /// <param name="z">Layer ID</param>
-        private void SendToClients(bool[] serialised, int z)
+        private void SendToClients(int[,,] map)
         {
             m_scene.ForEachClient(
                 delegate(IClientAPI controller)
 				{ 
-					controller.SendLayerData(z, serialised);
+					controller.SendVoxelData(map);
 				}
             );
         }
 
-        private void client_OnModifyTerrain(UUID user, int x, int y, int z, byte action, UUID agentId)
+        private void client_OnModifyTerrain(UUID user, int x, int y, int z, byte action, double str, UUID agentId)
         {
             bool god = m_scene.Permissions.IsGod(user);
             bool allowed = false;
@@ -647,8 +645,8 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 if (allowed)
                 {
                     StoreUndoState();
-                    m_painteffects[(StandardTerrainEffects) action].PaintEffect(
-                        m_channel, allowMask, x,y,z);
+                    m_painteffects[(StandardVoxelActions) action].PaintEffect(
+                        m_channel, allowMask, x,y,z,str);
 
                     CheckForTerrainUpdates(!god); //revert changes outside estate limits
                 }
@@ -672,7 +670,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             {
                 if (m_undo.Count > 0)
                 {
-                    LandUndoState last = m_undo.Peek();
+                    VoxelUndoState last = m_undo.Peek();
                     if (last != null)
                     {
                         if (last.Compare(m_channel))
@@ -680,7 +678,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                     }
                 }
 
-                LandUndoState nUndo = new LandUndoState(this, m_channel);
+                VoxelUndoState nUndo = new VoxelUndoState(this, m_channel);
                 m_undo.Push(nUndo);
             }
         }
@@ -695,12 +693,14 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
         private void InterfaceLoadTileFile(Object[] args)
         {
+			return;
+			/*
             LoadFromFile((string) args[0],
                          (int) args[1],
                          (int) args[2],
                          (int) args[3],
                          (int) args[4]);
-            CheckForTerrainUpdates();
+            CheckForTerrainUpdates();*/
         }
 
         private void InterfaceSaveFile(Object[] args)
@@ -715,10 +715,11 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
         private void InterfaceRevertTerrain(Object[] args)
         {
-            int x, y;
+            int x, y, z;
             for (x = 0; x < m_channel.Width; x++)
-                for (y = 0; y < m_channel.Height; y++)
-                    m_channel[x, y] = m_revert[x, y];
+            	for (y = 0; y < m_channel.Length; y++)
+                	for (z = 0; z < m_channel.Height; z++)
+                    m_channel[x, y,z] = m_revert[x, y,z];
 
             CheckForTerrainUpdates();
         }
@@ -733,12 +734,14 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 {
                     for (int y = 0; y < Constants.RegionSize / 2; y++)
                     {
-                        double height = m_channel[x, y];
-                        double flippedHeight = m_channel[x, (int)Constants.RegionSize - 1 - y];
-                        m_channel[x, y] = flippedHeight;
-                        m_channel[x, (int)Constants.RegionSize - 1 - y] = height;
-
-                    }
+                    	for (int z = 0; z < Constants.RegionSize; z++)
+                    	{
+	                        Voxel vox = m_channel.GetVoxel(x, y, z);
+	                        Voxel flippedVox = m_channel.GetVoxel(x, (int)Constants.RegionSize - 1 - y, z);
+	                        m_channel.SetVoxel(x, y, z, flippedVox);
+	                        m_channel.SetVoxel(x, (int)Constants.RegionSize - 1 - y, z, vox);
+                    	}
+					}
                 }
             }
             else if (direction.ToLower().StartsWith("x"))
@@ -747,11 +750,13 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 {
                     for (int x = 0; x < Constants.RegionSize / 2; x++)
                     {
-                        double height = m_channel[x, y];
-                        double flippedHeight = m_channel[(int)Constants.RegionSize - 1 - x, y];
-                        m_channel[x, y] = flippedHeight;
-                        m_channel[(int)Constants.RegionSize - 1 - x, y] = height;
-
+                    	for (int z = 0; z < Constants.RegionSize; z++)
+                    	{
+	                        Voxel v = m_channel.GetVoxel(x, y, z);
+	                        Voxel flippedVox = m_channel.GetVoxel((int)Constants.RegionSize - 1 - x, y, z);
+	                        m_channel.SetVoxel(x, y, z, flippedVox);
+	                        m_channel.SetVoxel((int)Constants.RegionSize - 1 - x, y, z, v);
+						}
                     }
                 }
             }
@@ -766,98 +771,83 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
         private void InterfaceRescaleTerrain(Object[] args)
         {
-            double desiredMin = (double)args[0];
-            double desiredMax = (double)args[1];
-
-            // determine desired scaling factor
-            double desiredRange = desiredMax - desiredMin;
-            //m_log.InfoFormat("Desired {0}, {1} = {2}", new Object[] { desiredMin, desiredMax, desiredRange });
-
-            if (desiredRange == 0d)
-            {
-                // delta is zero so flatten at requested height
-                InterfaceFillTerrain(new Object[] { args[1] });
-            }
-            else
-            {
-                //work out current heightmap range
-                double currMin = double.MaxValue;
-                double currMax = double.MinValue;
-
-                int width = m_channel.Width;
-                int height = m_channel.Height;
-
-                for (int x = 0; x < width; x++)
-                {
-                    for (int y = 0; y < height; y++)
-                    {
-                        double currHeight = m_channel[x, y];
-                        if (currHeight < currMin)
-                        {
-                            currMin = currHeight;
-                        }
-                        else if (currHeight > currMax)
-                        {
-                            currMax = currHeight;
-                        }
-                    }
-                }
-
-                double currRange = currMax - currMin;
-                double scale = desiredRange / currRange;
-
-                //m_log.InfoFormat("Current {0}, {1} = {2}", new Object[] { currMin, currMax, currRange });
-                //m_log.InfoFormat("Scale = {0}", scale);
-
-                // scale the heightmap accordingly
-                for (int x = 0; x < width; x++)
-                {
-                    for (int y = 0; y < height; y++)
-                    {
-                            double currHeight = m_channel[x, y] - currMin;
-                            m_channel[x, y] = desiredMin + (currHeight * scale);
-                    }
-                }
-
-                CheckForTerrainUpdates();
-            }
-
+			m_log.Error("Unimplemented for voxels.");
         }
 
         private void InterfaceElevateTerrain(Object[] args)
         {
-            int x, y;
+            int x, y, z;
+			int zo = (int)args[0];
             for (x = 0; x < m_channel.Width; x++)
-                for (y = 0; y < m_channel.Height; y++)
-                    m_channel[x, y] += (double) args[0];
+			{
+                for (y = 0; y < m_channel.Length; y++)
+				{
+					// Move voxels up X units.
+					for(z=m_channel.Height-1;z>0;z--)
+					{
+						// just overwrite stuff that would be moved out of bounds
+						if(z+zo > m_channel.Height-1)
+							continue;
+                    	m_channel.SetVoxel(x, y, z+zo, m_channel.GetVoxel(x,y,z));
+					}
+				}
+			}
             CheckForTerrainUpdates();
         }
 
         private void InterfaceMultiplyTerrain(Object[] args)
         {
+			m_log.Error("Unimplemented for voxels.");
+			/*
             int x, y;
             for (x = 0; x < m_channel.Width; x++)
                 for (y = 0; y < m_channel.Height; y++)
                     m_channel[x, y] *= (double) args[0];
+            */
             CheckForTerrainUpdates();
         }
 
         private void InterfaceLowerTerrain(Object[] args)
         {
-            int x, y;
+            int x, y, z;
+			int zo = (int)args[0];
             for (x = 0; x < m_channel.Width; x++)
-                for (y = 0; y < m_channel.Height; y++)
-                    m_channel[x, y] -= (double) args[0];
+			{
+                for (y = 0; y < m_channel.Length; y++)
+				{
+					// Move voxels down X units.
+					for(z=0;z<m_channel.Height;z++)
+					{
+						// just overwrite stuff that would be moved out of bounds
+						if(z-zo < 0)
+							continue;
+                    	m_channel.SetVoxel(x, y, z-zo, m_channel.GetVoxel(x,y,z));
+					}
+				}
+			}
             CheckForTerrainUpdates();
         }
 
         private void InterfaceFillTerrain(Object[] args)
         {
-            int x, y;
+            int x, y, z;
 
             for (x = 0; x < m_channel.Width; x++)
-                for (y = 0; y < m_channel.Height; y++)
-                    m_channel[x, y] = (double) args[0];
+			{
+                for (y = 0; y < m_channel.Length; y++)
+				{
+                	for (z = 0; z < m_channel.Height; z++)
+					{
+						Voxel v = new Voxel();
+						if(z<=(double)args[0])
+						{
+                    		v.Flags=VoxFlags.Solid;
+							v.MaterialID=0x01; // TODO: Random material.
+						}
+						m_channel.SetVoxel(x,y,z,v);
+					}
+				}
+			}
             CheckForTerrainUpdates();
         }
 
@@ -871,24 +861,29 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             for (x = 0; x < m_channel.Width; x++)
             {
                 int y;
-                for (y = 0; y < m_channel.Height; y++)
+                for (y = 0; y < m_channel.Length; y++)
                 {
-                    sum += m_channel[x, y];
-                    if (max < m_channel[x, y])
-                        max = m_channel[x, y];
-                    if (min > m_channel[x, y])
-                        min = m_channel[x, y];
+					int z;
+					double ch = m_channel.GetHeightAt(x,y);
+					
+                    sum += ch;
+                    if (max < ch)
+                        max = ch;
+                    if (min > ch)
+                        min = ch;
                 }
             }
 
-            double avg = sum / (m_channel.Height * m_channel.Width);
+            double avg = sum / (m_channel.Length * m_channel.Width);
 
-            m_log.Info("Channel " + m_channel.Width + "x" + m_channel.Height);
+            m_log.Info("Channel " + m_channel.Width + "x" + m_channel.Length);
             m_log.Info("max/min/avg/sum: " + max + "/" + min + "/" + avg + "/" + sum);
         }
 
         private void InterfaceEnableExperimentalBrushes(Object[] args)
         {
+			m_log.Error("They're all experimental on VoxelSim :V");
+			/*
             if ((bool) args[0])
             {
                 m_painteffects[StandardTerrainEffects.Revert] = new WeatherSphere();
@@ -898,15 +893,16 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             else
             {
                 InstallDefaultEffects();
-            }
+            }*/
         }
 
         private void InterfaceRunPluginEffect(Object[] args)
         {
+			/*
             if ((string) args[0] == "list")
             {
                 m_log.Info("List of loaded plugins");
-                foreach (KeyValuePair<string, ITerrainEffect> kvp in m_plugineffects)
+                foreach (KeyValuePair<string, IVoxelEffect> kvp in m_plugineffects)
                 {
                     m_log.Info(kvp.Key);
                 }
@@ -925,14 +921,14 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             else
             {
                 m_log.Warn("No such plugin effect loaded.");
-            }
+            }*/
         }
 
         private void InstallInterfaces()
         {
             // Load / Save
             string supportedFileExtensions = "";
-            foreach (KeyValuePair<string, ITerrainLoader> loader in m_loaders)
+            foreach (KeyValuePair<string, IVoxelFileHandler> loader in m_loaders)
                 supportedFileExtensions += " " + loader.Key + " (" + loader.Value + ")";
 
             Command loadFromFileCommand =

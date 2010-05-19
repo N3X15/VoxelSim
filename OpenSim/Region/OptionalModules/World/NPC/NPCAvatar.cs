@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -567,6 +567,8 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
+		public virtual void SendVoxelData(int[,,] map) {}
+		
         public virtual void SendWindData(Vector2[] windSpeeds) { }
 
         public virtual void SendCloudData(float[] cloudCover) { }

@@ -493,7 +493,7 @@ namespace OpenSim.Region.RegionCombinerModule
             // Reset Terrain..  since terrain loads before we get here, we need to load 
             // it again so it loads in the root region
 
-            scene.PhysicsScene.SetTerrain(scene.Heightmap.GetFloatsSerialised());
+            scene.PhysicsScene.SetTerrain(scene.Voxels.GetFloatsSerialised());
 
             // Unlock borders
             conn.RegionScene.BordersLocked = false;
@@ -549,9 +549,9 @@ namespace OpenSim.Region.RegionCombinerModule
             }
 
             // Reset Terrain..  since terrain normally loads first.
-            //conn.RegionScene.PhysicsScene.SetTerrain(conn.RegionScene.Heightmap.GetFloatsSerialised());
-            scene.PhysicsScene.SetTerrain(scene.Heightmap.GetFloatsSerialised());
-            //conn.RegionScene.PhysicsScene.SetTerrain(conn.RegionScene.Heightmap.GetFloatsSerialised());
+            //conn.RegionScene.PhysicsScene.SetTerrain(conn.RegionScene.Voxels.GetFloatsSerialised());
+            scene.PhysicsScene.SetTerrain(scene.Voxels.GetFloatsSerialised());
+            //conn.RegionScene.PhysicsScene.SetTerrain(conn.RegionScene.Voxels.GetFloatsSerialised());
 
             scene.BordersLocked = false;
             conn.RegionScene.BordersLocked = false;
@@ -645,9 +645,9 @@ namespace OpenSim.Region.RegionCombinerModule
 
 
             // Reset Terrain..  since terrain normally loads first.
-            //conn.RegionScene.PhysicsScene.SetTerrain(conn.RegionScene.Heightmap.GetFloatsSerialised());
-            scene.PhysicsScene.SetTerrain(scene.Heightmap.GetFloatsSerialised());
-            //conn.RegionScene.PhysicsScene.SetTerrain(conn.RegionScene.Heightmap.GetFloatsSerialised());
+            //conn.RegionScene.PhysicsScene.SetTerrain(conn.RegionScene.Voxels.GetFloatsSerialised());
+            scene.PhysicsScene.SetTerrain(scene.Voxels.GetFloatsSerialised());
+            //conn.RegionScene.PhysicsScene.SetTerrain(conn.RegionScene.Voxels.GetFloatsSerialised());
             scene.BordersLocked = false;
             conn.RegionScene.BordersLocked = false;
 

@@ -160,4 +160,29 @@ namespace OpenSim.Region.Framework.Scenes
             m_terrainModule.UndoTerrain(m_terrainChannel);
         }
     }
+	
+    public class VoxelUndoState
+    {
+        public IVoxelModule m_module;
+        public IVoxelChannel m_channel;
+
+        public VoxelUndoState(IVoxelModule terrainModule, IVoxelChannel terrainChannel)
+        {
+            m_module = terrainModule;
+            m_channel = terrainChannel;
+        }
+
+        public bool Compare(IVoxelChannel terrainChannel)
+        {
+            if (m_channel != terrainChannel)
+                return false;
+            else
+                return false;
+        }
+
+        public void PlaybackState()
+        {
+            m_module.UndoTerrain(m_channel);
+        }
+    }
 }

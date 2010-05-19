@@ -549,7 +549,7 @@ namespace OpenSim
             scene.LoadWorldMap();
 
             scene.PhysicsScene = GetPhysicsScene(scene.RegionInfo.RegionName);
-            scene.PhysicsScene.SetTerrain(scene.Heightmap.GetFloatsSerialised());
+            scene.PhysicsScene.SetTerrain(scene.Voxels.GetFloatsSerialised());
             scene.PhysicsScene.SetWaterLevel((float) regionInfo.RegionSettings.WaterHeight);
 
             return scene;

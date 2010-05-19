@@ -16,6 +16,11 @@ namespace OpenSim.Region.Framework.Scenes
 	public class Voxel
 	{
 		public Voxel(){}
+		public Voxel(byte[] b)
+		{
+			Flags=(VoxFlags)b[0];
+			MaterialID=b[1];
+		}
 		public byte[] asBytes()
 		{
 			// Flags Material

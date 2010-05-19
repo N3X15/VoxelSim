@@ -640,7 +640,7 @@ namespace mapgenerator
 									//Client.Log("Unknown block frequency", Helpers.LogLevel.Error);
                                     throw new Exception("Unknown block frequency");
 								}
-
+								Console.WriteLine("{0} - Block Count: {1}",currentBlock.Name,currentBlock.Count);
 								#endregion
 							}
 						}

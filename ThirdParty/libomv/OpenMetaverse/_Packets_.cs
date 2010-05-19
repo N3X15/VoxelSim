@@ -69392,7 +69392,6 @@ namespace OpenMetaverse.Packets
             Header.Frequency = PacketFrequency.Low;
             Header.ID = 911;
             Header.Reliable = true;
-            Header.Zerocoded = true;
             LayerData = new LayerDataBlock();
             VoxelData = null;
         }

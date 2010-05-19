@@ -499,7 +499,7 @@ namespace OpenSim.Region.CoreModules.World.Land
                 ty = ((int)Constants.RegionSize - 1);
             LandData.AABBMin =
                 new Vector3((float) (min_x * 4), (float) (min_y * 4),
-                              (float) m_scene.Heightmap[tx, ty]);
+                              m_scene.GetGroundHeight((float)tx, (float)ty));
 
             tx = max_x * 4;
             if (tx > ((int)Constants.RegionSize - 1))
@@ -509,7 +509,7 @@ namespace OpenSim.Region.CoreModules.World.Land
                 ty = ((int)Constants.RegionSize - 1);
             LandData.AABBMax =
                 new Vector3((float) (max_x * 4), (float) (max_y * 4),
-                              (float) m_scene.Heightmap[tx, ty]);
+                              m_scene.GetGroundHeight((float)tx,(float)ty));
             LandData.Area = tempArea;
         }
 

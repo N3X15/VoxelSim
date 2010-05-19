@@ -1,4 +1,5 @@
 
+using OpenSim.Region.Framework.Interfaces;
 using System;
 namespace OpenSim.Region.CoreModules.World.Voxels
 {

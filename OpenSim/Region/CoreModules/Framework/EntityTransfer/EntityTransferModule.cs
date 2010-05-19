@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -163,10 +163,10 @@ namespace OpenSim.Region.CoreModules.Framework.EntityTransfer
                     float posZLimit = 22;
 
                     // TODO: Check other Scene HeightField
-                    if (position.X > 0 && position.X <= (int)Constants.RegionSize && position.Y > 0 && position.Y <= (int)Constants.RegionSize)
+                    /*if (position.X > 0 && position.X <= (int)Constants.RegionSize && position.Y > 0 && position.Y <= (int)Constants.RegionSize)
                     {
                         posZLimit = (float)sp.Scene.Heightmap[(int)position.X, (int)position.Y];
-                    }
+                    }*/
 
                     float newPosZ = posZLimit + localAVHeight;
                     if (posZLimit >= (position.Z - (localAVHeight / 2)) && !(Single.IsInfinity(newPosZ) || Single.IsNaN(newPosZ)))
