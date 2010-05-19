@@ -49,6 +49,7 @@ using OpenSim.Region.ScriptEngine.Shared.Api.Interfaces;
 using TPFlags = OpenSim.Framework.Constants.TeleportFlags;
 using OpenSim.Services.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
+using Voxel=OpenSim.Region.Framework.Scenes.Voxel;
 using System.Text.RegularExpressions;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
@@ -307,7 +308,25 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
             if (World.Permissions.CanTerraformLand(m_host.OwnerID, new Vector3(x, y, 0)))
             {
-                World.Heightmap[x, y] = val;
+				int initial_height=(int)World.GetGroundHeight(x,y);
+				if(initial_height>(int)val)
+				{
+					for(int z=initial_height;z<(int)val;z++)
+					{
+						Voxel v = new Voxel();
+						v.Flags=VoxFlags.Solid;
+						(World.Voxels as VoxelChannel).SetVoxel(x,y,z,v);
+					}
+				} 
+				else if(initial_height<(int)val)
+				{
+					for(int z=initial_height;z>(int)val;z++)
+					{
+						Voxel v = new Voxel();
+						v.Flags=VoxFlags.Solid;
+						(World.Voxels as VoxelChannel).SetVoxel(x,y,z,v);
+					}
+				}
                 return 1;
             }
             else
@@ -324,7 +343,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             if (x > ((int)Constants.RegionSize - 1) || x < 0 || y > ((int)Constants.RegionSize - 1) || y < 0)
                 OSSLError("osTerrainGetHeight: Coordinate out of bounds");
 
-            return World.Heightmap[x, y];
+            return World.GetGroundHeight(x,y);
         }
 
         public void osTerrainFlush()

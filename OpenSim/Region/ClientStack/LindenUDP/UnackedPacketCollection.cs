@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -62,9 +62,9 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         /// <summary>Holds the actual unacked packet data, sorted by sequence number</summary>
         private Dictionary<uint, OutgoingPacket> m_packets = new Dictionary<uint, OutgoingPacket>();
         /// <summary>Holds packets that need to be added to the unacknowledged list</summary>
-        private LocklessQueue<OutgoingPacket> m_pendingAdds = new LocklessQueue<OutgoingPacket>();
+        private OpenSim.Framework.LocklessQueue<OutgoingPacket> m_pendingAdds = new OpenSim.Framework.LocklessQueue<OutgoingPacket>();
         /// <summary>Holds information about pending acknowledgements</summary>
-        private LocklessQueue<PendingAck> m_pendingRemoves = new LocklessQueue<PendingAck>();
+        private OpenSim.Framework.LocklessQueue<PendingAck> m_pendingRemoves = new OpenSim.Framework.LocklessQueue<PendingAck>();
 
         /// <summary>
         /// Add an unacked packet to the collection

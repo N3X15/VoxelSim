@@ -520,6 +520,11 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
             throw new System.NotImplementedException();
         }
 
+        public void SendVoxelData(int[,,] map)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void SendLayerData(int px, int py, float[] map)
         {
             throw new System.NotImplementedException();

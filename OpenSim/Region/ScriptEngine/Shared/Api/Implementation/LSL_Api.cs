@@ -1065,15 +1065,15 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             // Clamp to valid position
             if (pos.X < 0)
                 pos.X = 0;
-            else if (pos.X >= World.Heightmap.Width)
-                pos.X = World.Heightmap.Width - 1;
+            else if (pos.X >= World.Voxels.Width)
+                pos.X = World.Voxels.Width - 1;
             if (pos.Y < 0)
                 pos.Y = 0;
-            else if (pos.Y >= World.Heightmap.Height)
-                pos.Y = World.Heightmap.Height - 1;
+            else if (pos.Y >= World.Voxels.Length)
+                pos.Y = World.Voxels.Length - 1;
 
-            //Get the height for the integer coordinates from the Heightmap
-            float baseheight = (float)World.Heightmap[(int)pos.X, (int)pos.Y];
+            //Get the height for the integer coordinates from the Voxels
+            float baseheight = World.GetGroundHeight(pos.X, pos.Y);
 
             //Calculate the difference between the actual coordinates and the integer coordinates
             float xdiff = pos.X - (float)((int)pos.X);
@@ -1890,14 +1890,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             float ground = World.GetGroundHeight((float)targetPos.x, (float)targetPos.y);
             bool disable_underground_movement = m_ScriptEngine.Config.GetBoolean("DisableUndergroundMovement", true);
 
-            if (part.ParentGroup == null)
-            {
-                if ((targetPos.z < ground) && disable_underground_movement)
-                    targetPos.z = ground;
-                    LSL_Vector real_vec = SetPosAdjust(currentPos, targetPos);
-                    part.UpdateOffSet(new Vector3((float)real_vec.x, (float)real_vec.y, (float)real_vec.z));
-            }
-            else if (part.ParentGroup.RootPart == part)
+            if (part.ParentGroup.RootPart == part)
             {
                 if ((targetPos.z < ground) && disable_underground_movement)
                     targetPos.z = ground;
@@ -1907,7 +1900,6 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             }
             else
             {
-                //it's late... i think this is right ?
                 if (llVecDist(new LSL_Vector(0,0,0), targetPos) <= 10.0f)
                 {
                     part.OffsetPosition = new Vector3((float)targetPos.x, (float)targetPos.y, (float)targetPos.z);
@@ -3892,8 +3884,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
             UserAccount account = World.UserAccountService.GetUserAccount(World.RegionInfo.ScopeID, uuid);
 
+            PresenceInfo pinfo = null;
             PresenceInfo[] pinfos = World.PresenceService.GetAgents(new string[] { uuid.ToString() });
-            PresenceInfo pinfo = PresenceInfo.GetOnlinePresence(pinfos);
+            if (pinfos != null && pinfos.Length > 0)
+                pinfo = pinfos[0];
 
             if (pinfo == null)
                 return UUID.Zero.ToString();
@@ -5602,7 +5596,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
         public LSL_String llGetLandOwnerAt(LSL_Vector pos)
         {
             m_host.AddScriptLPS(1);
-            return World.LandChannel.GetLandObject((float)pos.x, (float)pos.y).LandData.OwnerID.ToString();
+            ILandObject land = World.LandChannel.GetLandObject((float)pos.x, (float)pos.y);
+            if (land == null)
+                return UUID.Zero.ToString();
+            return land.LandData.OwnerID.ToString();
         }
 
         /// <summary>
@@ -5712,30 +5709,30 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
             // Clamp to valid position
             if (pos.X < 0)
                 pos.X = 0;
-            else if (pos.X >= World.Heightmap.Width)
-                pos.X = World.Heightmap.Width - 1;
+            else if (pos.X >= World.Voxels.Width)
+                pos.X = World.Voxels.Width - 1;
             if (pos.Y < 0)
                 pos.Y = 0;
-            else if (pos.Y >= World.Heightmap.Height)
-                pos.Y = World.Heightmap.Height - 1;
+            else if (pos.Y >= World.Voxels.Length)
+                pos.Y = World.Voxels.Length - 1;
 
             //Find two points in addition to the position to define a plane
             Vector3 p0 = new Vector3(pos.X, pos.Y,
-                                     (float)World.Heightmap[(int)pos.X, (int)pos.Y]);
+                                     World.GetGroundHeight(pos.X, pos.Y));
             Vector3 p1 = new Vector3();
             Vector3 p2 = new Vector3();
-            if ((pos.X + 1.0f) >= World.Heightmap.Width)
+            if ((pos.X + 1.0f) >= World.Voxels.Width)
                 p1 = new Vector3(pos.X + 1.0f, pos.Y,
-                            (float)World.Heightmap[(int)pos.X, (int)pos.Y]);
+                            World.GetGroundHeight(pos.X, pos.Y));
             else
                 p1 = new Vector3(pos.X + 1.0f, pos.Y,
-                            (float)World.Heightmap[(int)(pos.X + 1.0f), (int)pos.Y]);
-            if ((pos.Y + 1.0f) >= World.Heightmap.Height)
+			                World.GetGroundHeight(pos.X+1f, pos.Y));
+            if ((pos.Y + 1.0f) >= World.Voxels.Length)
                 p2 = new Vector3(pos.X, pos.Y + 1.0f,
-                            (float)World.Heightmap[(int)pos.X, (int)pos.Y]);
+                            World.GetGroundHeight(pos.X, pos.Y));
             else
                 p2 = new Vector3(pos.X, pos.Y + 1.0f,
-                            (float)World.Heightmap[(int)pos.X, (int)(pos.Y + 1.0f)]);
+                            World.GetGroundHeight(pos.X, pos.Y+1f));
 
             //Find normalized vectors from p0 to p1 and p0 to p2
             Vector3 v0 = new Vector3(p1.X - p0.X, p1.Y - p0.Y, p1.Z - p0.Z);

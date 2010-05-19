@@ -365,6 +365,10 @@ namespace OpenSim.Region.Examples.SimpleModule
             get { return UUID.Zero; }
         }
 
+	public void SendVoxelData(int[,,] derp)
+	{
+	}
+
         public string ActiveGroupName
         {
             get { return String.Empty; }

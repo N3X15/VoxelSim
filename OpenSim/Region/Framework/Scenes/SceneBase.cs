@@ -538,5 +538,6 @@ namespace OpenSim.Region.Framework.Scenes
             get { return false; }
         }
 
+        public abstract bool CheckClient(UUID agentID, System.Net.IPEndPoint ep);
     }
 }

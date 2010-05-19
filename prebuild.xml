@@ -1422,12 +1422,13 @@
         <Match pattern="*.addin.xml" path="Resources" buildAction="EmbeddedResource" recurse="true"/>
         <Match pattern="*.cs" recurse="true">
           <Exclude name="Tests" pattern="Tests" />
+          <Exclude name="Terrain" pattern="World/Terrain" />
           <Exclude name="TerrainDefaultEffects" pattern="World/Terrain/DefaultEffects" />
         </Match>
         <Match pattern="*.addin.xml" path="Resources" buildAction="EmbeddedResource" recurse="true"/>
       </Files>
     </Project>
-
+<!--
     <Project frameworkVersion="v3_5" name="OpenSim.Region.CoreModules.World.Terrain.DefaultEffects" path="OpenSim/Region/CoreModules/World/Terrain/DefaultEffects" type="Library">
       <Configuration name="Debug">
         <Options>
@@ -1449,7 +1450,7 @@
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
-
+-->
 
     <Project frameworkVersion="v3_5" name="OpenSim.Region.OptionalModules" path="OpenSim/Region/OptionalModules" type="Library">
       <Configuration name="Debug">
@@ -2143,6 +2144,7 @@
           <Exclude name="Tests" pattern="Tests" />
         </Match>
         <Match path="Resources" pattern="*.sql" buildAction="EmbeddedResource"/>
+        <Match path="Resources" pattern="*.migrations" buildAction="EmbeddedResource"/>
         <Match pattern="*.addin.xml" path="Resources" buildAction="EmbeddedResource" recurse="true"/>
       </Files>
     </Project>
@@ -2249,6 +2251,7 @@
           <Exclude name="Tests" pattern="Tests" />
         </Match>
         <Match path="Resources" pattern="*.sql" buildAction="EmbeddedResource"/>
+        <Match path="Resources" pattern="*.migrations" buildAction="EmbeddedResource"/>
         <Match pattern="*.addin.xml" path="Resources" buildAction="EmbeddedResource" recurse="true"/>
       </Files>
     </Project>

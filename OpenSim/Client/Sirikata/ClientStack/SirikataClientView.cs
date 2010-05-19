@@ -508,6 +508,11 @@ namespace OpenSim.Client.Sirikata.ClientStack
         {
             throw new System.NotImplementedException();
         }
+		
+		public void SendVoxelData(int[,,] map)
+		{
+			throw new NotImplementedException();
+		}
 
         public void SendLayerData(float[] map)
         {

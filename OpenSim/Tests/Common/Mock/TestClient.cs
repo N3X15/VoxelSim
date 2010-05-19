@@ -528,6 +528,10 @@ namespace OpenSim.Tests.Common.Mock
         {
         }
 
+        public virtual void SendVoxelData(int[,,] map)
+        {
+        }
+
         public virtual void SendLayerData(int px, int py, float[] map)
         {
         }

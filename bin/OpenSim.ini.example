@@ -87,9 +87,6 @@
     ; YOU HAVE BEEN WARNED!!!
     TrustBinaries = false
 
-    ; How many prims to send to each avatar in the scene on each Update()
-    ; MaxPrimsPerFrame = 200
-
     ; Combine all contiguous regions into one large region
     ; Order your regions from South to North, West to East in your regions.ini and then set this to true
     ; Warning!  Don't use this with regions that have existing content!, This will likely break them
@@ -594,6 +591,10 @@
 
 [RemoteAdmin]
     enabled = false
+
+    ; Set this to a nonzero value to have remote admin use a different port
+    port = 0
+
     access_password = unknown
 
     ; set this variable to true if you want the create_region XmlRpc

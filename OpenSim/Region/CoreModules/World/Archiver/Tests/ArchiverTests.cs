@@ -61,10 +61,10 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
         {
             m_archiverModule = new ArchiverModule();
             SerialiserModule serialiserModule = new SerialiserModule();
-            TerrainModule terrainModule = new TerrainModule();
+            //TerrainModule terrainModule = new TerrainModule();
 
             m_scene = SceneSetupHelpers.SetupScene("useraccounts");
-            SceneSetupHelpers.SetupSceneModules(m_scene, m_archiverModule, serialiserModule, terrainModule);
+            SceneSetupHelpers.SetupSceneModules(m_scene, m_archiverModule, serialiserModule);
         }
         
         private void LoadCompleted(Guid requestId, string errorMessage)
@@ -417,10 +417,10 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
             {
                 ArchiverModule archiverModule = new ArchiverModule();
                 SerialiserModule serialiserModule = new SerialiserModule();
-                TerrainModule terrainModule = new TerrainModule();
+                //TerrainModule terrainModule = new TerrainModule();
 
                 Scene scene = SceneSetupHelpers.SetupScene();
-                SceneSetupHelpers.SetupSceneModules(scene, archiverModule, serialiserModule, terrainModule);
+                SceneSetupHelpers.SetupSceneModules(scene, archiverModule, serialiserModule);
 
                 m_scene.AddNewSceneObject(new SceneObjectGroup(part2), false);
 
