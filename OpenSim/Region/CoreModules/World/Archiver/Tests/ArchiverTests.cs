@@ -38,7 +38,7 @@ using OpenSim.Framework;
 using OpenSim.Framework.Serialization;
 using OpenSim.Framework.Serialization.External;
 using OpenSim.Region.CoreModules.World.Serialiser;
-using OpenSim.Region.CoreModules.World.Terrain;
+using OpenSim.Region.CoreModules.World.Voxels;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Tests.Common;

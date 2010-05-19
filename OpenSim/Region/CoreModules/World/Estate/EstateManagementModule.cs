@@ -534,7 +534,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 TerrainUploader = null;
             }
             remoteClient.SendAlertMessage("Terrain Upload Complete. Loading....");
-            ITerrainModule terr = m_scene.RequestModuleInterface<ITerrainModule>();
+            IVoxelModule terr = m_scene.RequestModuleInterface<IVoxelModule>();
 
             if (terr != null)
             {
@@ -632,7 +632,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
         private void handleTerrainRequest(IClientAPI remote_client, string clientFileName)
         {
             // Save terrain here
-            ITerrainModule terr = m_scene.RequestModuleInterface<ITerrainModule>();
+            IVoxelModule terr = m_scene.RequestModuleInterface<IVoxelModule>();
             
             if (terr != null)
             {

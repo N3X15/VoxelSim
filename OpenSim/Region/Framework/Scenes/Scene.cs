@@ -1750,7 +1750,7 @@ namespace OpenSim.Region.Framework.Scenes
         public override void LoadWorldMap()
         {
 			uint sz=Constants.RegionSize;
-			Voxels=new VoxelChannel(sz,sz,sz);
+			Voxels=new VoxelChannel(sz,sz,256);
             try
             {
                 Voxels.Load(RegionInfo.RegionID.ToString());  	
@@ -1758,7 +1758,7 @@ namespace OpenSim.Region.Framework.Scenes
             catch (IOException e)
             {
 				m_log.Info("[TERRAIN]: No default terrain. Generating a new terrain.");
-                Voxels = (new VoxelChannel(sz,sz,sz)).Generate("default");
+                Voxels = (new VoxelChannel(sz,sz,256)).Generate("default");
                 Voxels.Save(RegionInfo.RegionID.ToString());
 				
                 // Non standard region size.    If there's an old terrain in the database, it might read past the buffer

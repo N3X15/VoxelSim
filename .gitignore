@@ -70,4 +70,5 @@ TAGS
 Makefile.local
 bin/.version
 compile.bat
-
+*.userprefs
+*.sln

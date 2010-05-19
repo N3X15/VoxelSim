@@ -36,7 +36,7 @@ using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Serialization;
-using OpenSim.Region.CoreModules.World.Terrain;
+using OpenSim.Region.CoreModules.World.Voxels;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 
@@ -161,7 +161,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             ArchiveWriteRequestExecution awre
                 = new ArchiveWriteRequestExecution(
                     sceneObjects,
-                    m_scene.RequestModuleInterface<ITerrainModule>(),
+                    m_scene.RequestModuleInterface<IVoxelModule>(),
                     m_scene.RequestModuleInterface<IRegionSerialiserModule>(),
                     m_scene,
                     archiveWriter,

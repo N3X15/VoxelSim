@@ -775,7 +775,7 @@
       <Reference name="DotNetOpenMail.dll"/>
       <Reference name="Mono.Addins.dll"/>
       <Reference name="LibNbt.dll" />
-
+      <Reference name="LibNoise.dll" />
       <Files>
         <Match pattern="*.cs" recurse="true">
           <Exclude name="Tests" pattern="Tests" />

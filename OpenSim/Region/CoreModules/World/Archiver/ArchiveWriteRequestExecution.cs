@@ -35,7 +35,7 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Serialization;
 using OpenSim.Framework.Serialization.External;
-using OpenSim.Region.CoreModules.World.Terrain;
+using OpenSim.Region.CoreModules.World.Voxels;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 
@@ -54,7 +54,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        protected ITerrainModule m_terrainModule;
+        protected IVoxelModule m_terrainModule;
         protected IRegionSerialiserModule m_serialiser;
         protected List<SceneObjectGroup> m_sceneObjects;
         protected Scene m_scene;
@@ -63,7 +63,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
         public ArchiveWriteRequestExecution(
              List<SceneObjectGroup> sceneObjects,
-             ITerrainModule terrainModule,
+             IVoxelModule terrainModule,
              IRegionSerialiserModule serialiser,
              Scene scene,
              TarArchiveWriter archiveWriter,
@@ -131,7 +131,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
             // Write out terrain
             string terrainPath
-                = String.Format("{0}{1}.r32", ArchiveConstants.TERRAINS_PATH, m_scene.RegionInfo.RegionName);
+                = String.Format("{0}{1}.osvox", ArchiveConstants.TERRAINS_PATH, m_scene.RegionInfo.RegionName);
 
             MemoryStream ms = new MemoryStream();
             m_terrainModule.SaveToStream(terrainPath, ms);

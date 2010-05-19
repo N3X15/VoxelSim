@@ -15,7 +15,10 @@ namespace OpenSim.Region.Framework.Scenes
 	
 	public class Voxel
 	{
-		public Voxel(){}
+		public Voxel()
+		{
+			Flags=(VoxFlags)0x00;
+		}
 		public Voxel(byte[] b)
 		{
 			Flags=(VoxFlags)b[0];
@@ -32,14 +35,5 @@ namespace OpenSim.Region.Framework.Scenes
 		public byte	   		MaterialID=0x00;
 		public int			Temp=0;
 		public bool			ERROR=false;
-		
-		public delegate void MoveDelegate(Vector3 from, Vector3 to);
-		public event MoveDelegate Moved;
-		
-		public delegate void RemoveDelegate();
-		public event RemoveDelegate Removed;
-		
-		public delegate void ModifyDelegate(VoxFlags Flags,byte Material);
-		public event ModifyDelegate Modified;
 	}
 }
