@@ -37,7 +37,6 @@ using OpenSim.Framework;
 using OpenSim.Region.CoreModules.Framework.InterfaceCommander;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using Voxel=OpenSim.Region.Framework.Scenes.Voxel;
 
 namespace OpenSim.Region.CoreModules.World.Voxels
 {
@@ -55,7 +54,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly Commander m_commander = new Commander("terrain");
+        private readonly Commander m_commander = new Commander("voxels");
 
 
         private readonly Dictionary<StandardVoxelActions, IVoxelAction> m_painteffects =
@@ -576,8 +575,8 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 {
                     double requestedHeight = m_channel.GetHeightAt(x, y);
                     double bakedHeight = m_revert.GetHeightAt(x, y);
-					Voxel MyVoxel=m_channel.Voxels[x,y,z];
-					Voxel BakedVoxel=m_revert.Voxels[x,y,z];
+					byte MyVoxel=m_channel.Voxels[x,y,z];
+					byte BakedVoxel=m_revert.Voxels[x,y,z];
                 
 					double requestedDelta = requestedHeight - bakedHeight;
 
@@ -736,8 +735,8 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                     {
                     	for (int z = 0; z < Constants.RegionSize; z++)
                     	{
-	                        Voxel vox = m_channel.GetVoxel(x, y, z);
-	                        Voxel flippedVox = m_channel.GetVoxel(x, (int)Constants.RegionSize - 1 - y, z);
+	                        byte vox = m_channel.GetVoxel(x, y, z);
+	                        byte flippedVox = m_channel.GetVoxel(x, (int)Constants.RegionSize - 1 - y, z);
 	                        m_channel.SetVoxel(x, y, z, flippedVox);
 	                        m_channel.SetVoxel(x, (int)Constants.RegionSize - 1 - y, z, vox);
                     	}
@@ -752,8 +751,8 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                     {
                     	for (int z = 0; z < Constants.RegionSize; z++)
                     	{
-	                        Voxel v = m_channel.GetVoxel(x, y, z);
-	                        Voxel flippedVox = m_channel.GetVoxel((int)Constants.RegionSize - 1 - x, y, z);
+	                        byte v = m_channel.GetVoxel(x, y, z);
+	                        byte flippedVox = m_channel.GetVoxel((int)Constants.RegionSize - 1 - x, y, z);
 	                        m_channel.SetVoxel(x, y, z, flippedVox);
 	                        m_channel.SetVoxel((int)Constants.RegionSize - 1 - x, y, z, v);
 						}
@@ -838,11 +837,10 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 				{
                 	for (z = 0; z < m_channel.Height; z++)
 					{
-						Voxel v = new Voxel();
+						byte v = 0x00;
 						if(z<=(double)args[0])
 						{
-                    		v.Flags=VoxFlags.Solid;
-							v.MaterialID=0x01; // TODO: Random material.
+                    		v=0x01;
 						}
 						m_channel.SetVoxel(x,y,z,v);
 					}
@@ -895,6 +893,12 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 InstallDefaultEffects();
             }*/
         }
+		
+		private void InterfaceGenerate(Object[] args)
+		{
+			(m_scene.Voxels as VoxelChannel).Generate("default",args);
+			TaintTerrain();
+		}
 
         private void InterfaceRunPluginEffect(Object[] args)
         {
@@ -982,6 +986,13 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 new Command("flip", CommandIntentions.COMMAND_HAZARDOUS, InterfaceFlipTerrain, "Flips the current terrain about the X or Y axis");
             flipCommand.AddArgument("direction", "[x|y] the direction to flip the terrain in", "String");
 
+			Command generateCommand=
+				new Command("generate",CommandIntentions.COMMAND_HAZARDOUS, InterfaceGenerate,"Generate terrain.");
+			generateCommand.AddArgument("Frequency","Hell if I know","Double");
+			generateCommand.AddArgument("Lucunarity","Hell if I know","Double");
+			generateCommand.AddArgument("Persistance","Hell if I know","Double");
+			generateCommand.AddArgument("Octaves","Hell if I know","Integer");
+			
             Command rescaleCommand =
                 new Command("rescale", CommandIntentions.COMMAND_HAZARDOUS, InterfaceRescaleTerrain, "Rescales the current terrain to fit between the given min and max heights");
             rescaleCommand.AddArgument("min", "min terrain height after rescaling", "Double");
@@ -1017,6 +1028,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             m_commander.RegisterCommand("effect", pluginRunCommand);
             m_commander.RegisterCommand("flip", flipCommand);
             m_commander.RegisterCommand("rescale", rescaleCommand);
+            m_commander.RegisterCommand("generate", generateCommand);
 
             // Add this to our scene so scripts can call these functions
             m_scene.RegisterModuleCommander(m_commander);

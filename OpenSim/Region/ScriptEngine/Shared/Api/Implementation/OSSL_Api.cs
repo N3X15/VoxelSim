@@ -49,7 +49,6 @@ using OpenSim.Region.ScriptEngine.Shared.Api.Interfaces;
 using TPFlags = OpenSim.Framework.Constants.TeleportFlags;
 using OpenSim.Services.Interfaces;
 using GridRegion = OpenSim.Services.Interfaces.GridRegion;
-using Voxel=OpenSim.Region.Framework.Scenes.Voxel;
 using System.Text.RegularExpressions;
 
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
@@ -313,18 +312,14 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 				{
 					for(int z=initial_height;z<(int)val;z++)
 					{
-						Voxel v = new Voxel();
-						v.Flags=VoxFlags.Solid;
-						(World.Voxels as VoxelChannel).SetVoxel(x,y,z,v);
+						(World.Voxels as VoxelChannel).SetVoxel(x,y,z,0x01);
 					}
 				} 
 				else if(initial_height<(int)val)
 				{
 					for(int z=initial_height;z>(int)val;z++)
 					{
-						Voxel v = new Voxel();
-						v.Flags=VoxFlags.Solid;
-						(World.Voxels as VoxelChannel).SetVoxel(x,y,z,v);
+						(World.Voxels as VoxelChannel).SetVoxel(x,y,z,0x01);
 					}
 				}
                 return 1;

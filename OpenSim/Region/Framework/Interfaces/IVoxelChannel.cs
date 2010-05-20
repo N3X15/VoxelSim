@@ -12,8 +12,9 @@ namespace OpenSim.Region.Framework.Interfaces
 		int Length { get; } 	// Y
         int Width  { get; } 	// X
 		
-        bool this[int x, int y, int z] { get; set; }
-        //IVoxel bool this[int x, int y, int z] { get; set; }
+        int this[int x, int y, int z] { get; set; }
+		
+		bool IsSolid(int x,int y,int z);
 
         /// <summary>
         /// Squash the entire voxelspace into a single dimensioned array

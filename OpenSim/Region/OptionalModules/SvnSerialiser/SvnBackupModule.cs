@@ -34,7 +34,7 @@ using log4net;
 using Nini.Config;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.CoreModules.World.Serialiser;
-using OpenSim.Region.CoreModules.World.Terrain;
+//using OpenSim.Region.CoreModules.World.Terrain;
 using OpenSim.Region.Framework.Scenes;
 using PumaCode.SvnDotNet.AprSharp;
 using PumaCode.SvnDotNet.SubversionSharp;
@@ -124,9 +124,9 @@ namespace OpenSim.Region.Modules.SvnSerialiser
                     m_svndir + Slash.DirectorySeparatorChar + scene.RegionInfo.RegionID
                         + Slash.DirectorySeparatorChar + "objects.xml");
 
-                scene.RequestModuleInterface<ITerrainModule>().LoadFromFile(
+                scene.RequestModuleInterface<IVoxelModule>().LoadFromFile(
                     m_svndir + Slash.DirectorySeparatorChar + scene.RegionInfo.RegionID
-                        + Slash.DirectorySeparatorChar + "heightmap.r32");
+                        + Slash.DirectorySeparatorChar + "terrain.osvox");
 
                 m_log.Info("[SVNBACKUP]: Region load successful (" + scene.RegionInfo.RegionName + ").");
             }

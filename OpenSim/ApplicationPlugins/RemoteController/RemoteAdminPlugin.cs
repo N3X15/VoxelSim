@@ -45,7 +45,7 @@ using OpenSim.Framework.Communications;
 using OpenSim.Framework.Console;
 using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
-using OpenSim.Region.CoreModules.World.Terrain;
+using OpenSim.Region.CoreModules.World.Voxels;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
@@ -316,7 +316,7 @@ namespace OpenSim.ApplicationPlugins.RemoteController
                 if (!m_app.SceneManager.TryGetScene(regionID, out region))
                     throw new Exception("1: unable to get a scene with that name");
 
-                ITerrainModule terrainModule = region.RequestModuleInterface<ITerrainModule>();
+                IVoxelModule terrainModule = region.RequestModuleInterface<IVoxelModule>();
                 if (null == terrainModule) throw new Exception("terrain module not available");
                 if (Uri.IsWellFormedUriString(file, UriKind.Absolute))
                 {

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -49,7 +49,7 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.CoreModules.World.Serialiser;
-using OpenSim.Region.CoreModules.World.Terrain;
+//using OpenSim.Region.CoreModules.World.Terrain;
 using OpenSim.Region.Physics.Manager;
 
 using log4net;

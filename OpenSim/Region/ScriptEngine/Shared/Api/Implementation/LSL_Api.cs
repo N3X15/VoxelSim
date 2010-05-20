@@ -41,7 +41,7 @@ using OpenSim.Framework;
 
 using OpenSim.Region.CoreModules;
 using OpenSim.Region.CoreModules.World.Land;
-using OpenSim.Region.CoreModules.World.Terrain;
+using OpenSim.Region.CoreModules.World.Voxels;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.Framework.Scenes.Animation;
@@ -4035,12 +4035,15 @@ namespace OpenSim.Region.ScriptEngine.Shared.Api
 
         public void llModifyLand(int action, int brush)
         {
-            m_host.AddScriptLPS(1);
+			LSLError("llModifyLand will not longer work;  Please use llAdd/RemoveVoxel");
+			m_host.AddScriptLPS(1);
+			return;
+            /*
             ITerrainModule tm = m_ScriptEngine.World.RequestModuleInterface<ITerrainModule>();
             if (tm != null)
             {
                 tm.ModifyTerrain(m_host.OwnerID, m_host.AbsolutePosition, (byte) brush, (byte) action, m_host.OwnerID);
-            }
+            }*/
         }
 
         public void llCollisionSound(string impact_sound, double impact_volume)

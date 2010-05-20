@@ -11,6 +11,8 @@ using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Framework;
 using LibNoise;
 using Math=System.Math;
+using VoxMaterial=OpenSim.Region.Framework.Scenes.VoxMaterial;
+using System.Drawing;
 namespace OpenSim.Region.Framework.Scenes
 {
 	public enum ReplaceMode
@@ -21,20 +23,42 @@ namespace OpenSim.Region.Framework.Scenes
 	}
 	public class VoxelChannel:IVoxelChannel
 	{
-		public Voxel[,,] Voxels;
+		// 256x256x256 = 16,777,216 Byte = 16 Megabyte (MB)!
+		public byte[,,] Voxels;
+		/// <summary>
+		/// VoxMaterial ID
+		/// </summary>
+		private byte cMID=0x00;
+		public const byte AIR_VOXEL=0x00;
 		
-		public int XScale;
-		public int YScale;
-		public int ZScale;
+		public Dictionary<byte,VoxMaterial> MaterialTable = new Dictionary<byte, VoxMaterial>();
 		
-		public bool this[int x,int y,int z]
+		public int XScale {get; protected set;}
+		public int YScale {get; protected set;}
+		public int ZScale {get; protected set;}
+		
+		public bool IsSolid(int x,int y,int z)
+		{
+			byte v = Voxels[x,y,z];
+			
+			if(v==AIR_VOXEL) return false;
+			
+			if(!MaterialTable.ContainsKey(v)) 
+				return false;
+			
+			return (MaterialTable[v].Flags & MatFlags.Solid)==MatFlags.Solid;
+		}
+		public int this[int x,int y,int z]
 		{
 			get{
-				return (Voxels[x,y,z].Flags&VoxFlags.Solid)==VoxFlags.Solid;
+				return (int)Voxels[x,y,z];
 			}
 			set
 			{
-				Voxels[x,y,z].Flags|=VoxFlags.Solid;
+				int v = value;
+				if(v>255) v=255;
+				if(v<0) v=0;
+				Voxels[x,y,z]=(byte)v;
 			}
 		}
 		public int Height
@@ -63,24 +87,24 @@ namespace OpenSim.Region.Framework.Scenes
 		/// </param>
 		public VoxelChannel(int x,int y,int z)
 		{
-			Voxels = new Voxel[x,y,z];
+			Voxels = new byte[x,y,z];
 			XScale=x;
 			YScale=y;
 			ZScale=z;
 			
-			FillVoxels(new Vector3(0,0,0),new Vector3(x,y,z),new Voxel());
+			FillVoxels(new Vector3(0,0,0),new Vector3(x,y,z),AIR_VOXEL);
 		}
 		public VoxelChannel(uint x,uint y,uint z)
 		{
-			Voxels = new Voxel[(int)x,(int)y,(int)z];
+			Voxels = new byte[(int)x,(int)y,(int)z];
 			XScale=(int)x;
 			YScale=(int)y;
 			ZScale=(int)z;
 			
-			FillVoxels(new Vector3(0,0,0),new Vector3((int)x,(int)y,(int)z),new Voxel());
+			FillVoxels(new Vector3(0,0,0),new Vector3((int)x,(int)y,(int)z),AIR_VOXEL);
 		}
 		
-		public void SetVoxel(int x,int y,int z,Voxel voxel)
+		public void SetVoxel(int x,int y,int z,byte voxel)
 		{
 			SetVoxel(new Vector3(x,y,z),voxel);
 		}
@@ -89,10 +113,9 @@ namespace OpenSim.Region.Framework.Scenes
 			// TODO: Implement.
 			return false;
 		}
-		public void SetVoxel(Vector3 pos, Voxel v)
+		public void SetVoxel(Vector3 pos, byte v)
 		{
 			if(!inGrid(pos)) return;
-			v.Position=pos;
 			int x,y,z;
 			x=(int)Math.Round(pos.X);
 			y=(int)Math.Round(pos.Y);
@@ -115,21 +138,21 @@ namespace OpenSim.Region.Framework.Scenes
 			   0 > pos.Z || ZScale < pos.Z );
 		}
 		
-		public Voxel GetVoxel(Vector3 pos)
+		public byte GetVoxel(Vector3 pos)
 		{
-			if(!inGrid(pos)) return new Voxel();
+			if(!inGrid(pos)) return AIR_VOXEL;
 			int x,y,z;
 			x=(int)Math.Round(pos.X);
 			y=(int)Math.Round(pos.Y);
 			z=(int)Math.Round(pos.Z);
 			return Voxels[x,y,z];
 		}
-		public Voxel GetVoxel(int x,int y,int z)
+		public byte GetVoxel(int x,int y,int z)
 		{
-			if(!inGrid(new Vector3(x,y,z))) return null;
-			Voxel v = Voxels[x,y,z];
+			if(!inGrid(new Vector3(x,y,z))) return AIR_VOXEL;
+			byte v = Voxels[x,y,z];
 			if(v==null)
-				v=new Voxel();
+				v=AIR_VOXEL;
 			return v;
 		}
 		
@@ -138,22 +161,19 @@ namespace OpenSim.Region.Framework.Scenes
 			SetVoxel(to,GetVoxel(from));
 		}
 		
-		public void FillVoxels(Vector3 min,Vector3 max,Voxel v)
+		public void FillVoxels(Vector3 min,Vector3 max,byte v)
 		{
-			
-			int x,y,z,X,Y,Z;
-			x=(int)Math.Round(min.X);
-			y=(int)Math.Round(min.Y);
-			z=(int)Math.Round(min.Z);
-			
-			X=(int)Math.Round(max.X);
-			Y=(int)Math.Round(max.Y);
-			Z=(int)Math.Round(max.Z);
-			
-			for(;z<Z;z++)
-				for(;y<Y;y++)
-					for(;x<X;x++)
-						SetVoxel(new Vector3(x,y,z),v);
+			for(int x = (int)Math.Round(min.X);x<(int)Math.Round(max.X);x++)
+			{
+				for(int y = (int)Math.Round(min.Y);y<(int)Math.Round(max.Y);y++)
+				{
+					for(int z = (int)Math.Round(min.Z);z<(int)Math.Round(max.Z);z++)
+					{
+						///Console.WriteLine("({0},{1},{2}) {3}",x,y,z,v);
+						SetVoxel(x,y,z,v);
+					}
+				}
+			}
 		}
 		
 		static public VoxelChannel AND(VoxelChannel a,VoxelChannel b,ReplaceMode rep)
@@ -165,11 +185,11 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(x=0;x<a.XScale;x++)
 					{
-						Voxel av=a.GetVoxel(new Vector3(x,y,z));
-						Voxel bv=b.GetVoxel(new Vector3(x,y,z));
-						if((av.Flags&VoxFlags.Solid)>0 && (av.Flags&VoxFlags.Solid)>0)
+						bool As=a.IsSolid(x,y,z);
+						bool Bs=b.IsSolid(x,y,z);
+						if(As && As)
 						{
-							a.SetVoxel(new Vector3(x,y,z),bv);
+							a.SetVoxel(x,y,z,b.GetVoxel(x,y,z));
 						}
 					}
 				}
@@ -186,9 +206,8 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(x=0;x<a.XScale;x++)
 					{
-						Voxel bv=b.GetVoxel(new Vector3(x,y,z));
-						if((bv.Flags&VoxFlags.Solid)>0 || (bv.Flags&VoxFlags.Fluid)>0)
-							a.SetVoxel(new Vector3(x,y,z),bv);
+						if(b.IsSolid(x,y,z))
+							a.SetVoxel(x,y,z,b.GetVoxel(x,y,z));
 					}
 				}
 			}
@@ -205,9 +224,8 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(x=0;x<a.XScale;x++)
 					{
-						Voxel bv=b.GetVoxel(new Vector3(x,y,z));
-						if((bv.Flags&VoxFlags.Solid)>0 || (bv.Flags&VoxFlags.Fluid)>0)
-							a.SetVoxel(new Vector3(x,y,z),new Voxel());
+						if(b.IsSolid(x,y,z))
+							a.SetVoxel(x,y,z,0x00);
 					}
 				}
 			}
@@ -236,7 +254,7 @@ namespace OpenSim.Region.Framework.Scenes
 						Voxels[x,y,z]=l.Layer[x,y];
 			}*/
 		}
-		
+		/*
 		public VoxelLayer[] GetLayers()
 		{
 			VoxelLayer[] vl=new VoxelLayer[ZScale];
@@ -250,13 +268,13 @@ namespace OpenSim.Region.Framework.Scenes
 			}
 			return vl;
 		}
-		
+		*/
 		public double GetHeightAt(int x,int y)
 		{
 			double h=0;
 			for(int z=0;z<ZScale;z++)
 			{
-				if((Voxels[x,y,z].Flags & VoxFlags.Solid)==VoxFlags.Solid)
+				if(IsSolid(x,y,z))
 					h=Math.Max(h,z);
 			}
 			return h;
@@ -287,14 +305,9 @@ namespace OpenSim.Region.Framework.Scenes
 						}
 						if(Voxels[x,y,z]==null)
 						{
-							Voxels[x,y,z]=new Voxel();
+							Voxels[x,y,z]=AIR_VOXEL;
 						}
-						if(Voxels[x,y,z].Flags==null)
-						{
-							Console.WriteLine("Selected Voxel == NULL!");
-							continue;
-						}
-						if((Voxels[x,y,z].Flags & VoxFlags.Solid)==VoxFlags.Solid)
+						if(IsSolid(x,y,z))
 						{
 							ch=Math.Max(z,ch);
 						}
@@ -310,38 +323,74 @@ namespace OpenSim.Region.Framework.Scenes
 		}
 		public IVoxelChannel Generate(string method,object[] args)
 		{
-			Perlin p = new Perlin();
-			int seed1=DateTime.Now.Millisecond;
-			int seed2=DateTime.Now.Millisecond+2;
-			double of=p.Frequency;
-			double min = double.MaxValue;
-			double max = double.MinValue;
-			for(int z=0;z<ZScale;z++)
+			Perlin p1 = new Perlin();
+			Perlin p2 = new Perlin();
+			p1.Seed=DateTime.Now.Millisecond;
+			p2.Seed=DateTime.Now.Millisecond+2;
+			Bitmap image = new Bitmap(XScale,YScale);
+			double freq=0.05;
+			double lacu=0.01;
+			double pers=0.01;
+			int octv=1;
+			
+			try
 			{
-				p.Frequency=of/((double)(z+1));
+				freq=(Double)args[0];
+				lacu=(Double)args[1];
+				pers=(Double)args[2];
+				octv=(int)args[3];
+			}
+			catch(Exception)
+			{
+				Console.WriteLine("Using defaults.");
+			}
+            p1.Frequency = freq;
+            p1.NoiseQuality = NoiseQuality.Standard;
+            p1.OctaveCount = octv;
+            p1.Lacunarity = lacu;
+            p1.Persistence = pers;
+			
+            p2.Frequency = freq;
+            p2.NoiseQuality = NoiseQuality.Standard;
+            p2.OctaveCount = octv;
+            p2.Lacunarity = lacu;
+            p2.Persistence = pers;
+			{
 				for(int x=0;x<XScale;x++)
 				{
 					for(int y=0;y<YScale;y++)
 					{
-						double d1 = p.GradientCoherentNoise(x,y,z,seed1,NoiseQuality.Standard);
-						double d2 = p.GradientCoherentNoise(x,y,z,seed2,NoiseQuality.Standard);
-						max=Math.Max(max,d1);
-						min=Math.Min(min,d1);
-						double val=d1-d2;
-						if (val < 0) val = 0;
-                        if (val > 1.0) val = 1.0;
-						int vb = (int)Math.Round(val);
-						if(vb==1)
+						image.SetPixel(x,y,Color.FromArgb(255,0,0));
+					}
+				}
+			}
+			int ZH=Math.Min(ZScale,64);
+			for(int z=0;z<ZH;z++)
+			{
+				int intensity=z*4;
+				for(int x=0;x<XScale;x++)
+				{
+					//Console.WriteLine();
+					for(int y=0;y<YScale;y++)
+					{
+						bool d1 = ((p1.GetValue(x,y,z)+1)/2.0)>0.5;
+						bool d2 = ((p2.GetValue(x,y,z)+1)/2.0)>0.5;
+						if(d1 || d2)
 						{
-							Voxels[x,y,z]=new Voxel();
-							Voxels[x,y,z].Flags=VoxFlags.Solid;
+							//Console.Write("#");
+							image.SetPixel(x,y,Color.FromArgb(255,intensity,intensity,intensity));
+							Voxels[x,y,z]=0x01;
 						} else {
-							Voxels[x,y,z]=new Voxel();
+							//Console.Write(" ");
+							//image.SetPixel(x,y,Color.FromArgb(255,0,0,0));
+							Voxels[x,y,z]=AIR_VOXEL;
 						}
 					}
 				}
-				Console.WriteLine("{0}/{1} layers created....",z+1,ZScale);
+				Console.WriteLine("{0}% ({1}/{2}) of layers created...",(int)(((float)(z+1)/((float)ZH))*100f),z+1,ZH);
 			}
+			image.Save("terrain/GEN.png",System.Drawing.Imaging.ImageFormat.Png);
+			image.Dispose();
 			return this;
 		}
 		public double[,] GetDoubles()
@@ -349,7 +398,7 @@ namespace OpenSim.Region.Framework.Scenes
 			return GetDoubles(false);
 		}
 		
-		public void ForEachVoxel(Action<Voxel> a)
+		public void ForEachVoxel(Action<byte,int,int,int> a)
 		{
 			for(int x=0;x<XScale;x++)
 			{
@@ -357,7 +406,7 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(int z=0;z<ZScale;z++)
 					{
-						a(Voxels[x,y,z]);
+						a(Voxels[x,y,z],x,y,z);
 					}
 				}
 			}
@@ -373,7 +422,7 @@ namespace OpenSim.Region.Framework.Scenes
 					o[x,y]=0;
 					for(int z=0;z<ZScale;z++)
 					{
-						if((Voxels[x,y,z].Flags&VoxFlags.Solid)==VoxFlags.Solid)
+						if(IsSolid(x,y,z))
 						{
 							if(o[x,y]<(double)z) 
 							{
@@ -390,28 +439,26 @@ namespace OpenSim.Region.Framework.Scenes
 		// For finding stuck avs/objects
 		public bool IsInsideTerrain(Vector3 pos)
 		{
-			return (Voxels[(int)pos.X,(int)pos.Y,(int)pos.Z].Flags&VoxFlags.Solid)==VoxFlags.Solid;
+			return (IsSolid((int)pos.X,(int)pos.Y,(int)pos.Z));
 		}
 		// For fixing stuck avs/objects.
 		public Vector3 FindNearestAirVoxel(Vector3 subject, bool ForAvatar)
 		{
 			Vector3 nearest = new Vector3(0,0,0);
 			float nd = 10000f;
-			ForEachVoxel(delegate(Voxel a){
-				float d = Vector3.Distance(subject,a.Position);
+			ForEachVoxel(delegate(byte a,int x,int y,int z){
+				if(IsSolid(x,y,z)) return;
+				float d = Vector3.Distance(subject,new Vector3(x,y,z));
 				if(d<nd)
 				{
 					if(ForAvatar)
 					{
 						//Avatars need 2m vertical space instead of 1m.
-						int x = (int)a.Position.X;
-						int y = (int)a.Position.Y;
-						int z = (int)a.Position.Z;
-						if(z!=255||(Voxels[x,y,z+1].Flags&VoxFlags.Solid)==VoxFlags.Solid)
+						if(z==ZScale-1||IsSolid(x,y,z+1))
 							return;
 					}
 					nd=d;
-					nearest=a.Position;
+					nearest=new Vector3(x,y,z);
 				}
 			});
 			return nearest;
@@ -422,17 +469,13 @@ namespace OpenSim.Region.Framework.Scenes
 			for(int x=0;x<XScale;x++)
 				for(int y=0;y<YScale;y++)
 					for(int z=0;z<ZScale;z++)
-						map[x,y,z]=((Voxels[x,y,z].Flags&VoxFlags.Solid)==VoxFlags.Solid) ? 0 : -1;
+						map[x,y,z]=(int)Voxels[x,y,z];
 			return map;
 		}
 		public void ImportHeightmap(float[,] heightmap)
 		{
 			int MX=heightmap.GetLength(0);
 			int MY=heightmap.GetLength(1);
-			
-			
-			Voxel v = new Voxel();
-			v.Flags=VoxFlags.Solid;
 			
 			for(int x=0;x<MX;x++)
 			{
@@ -441,7 +484,7 @@ namespace OpenSim.Region.Framework.Scenes
 					int MZ=Convert.ToInt32(heightmap[x,y]);
 					for(int z=0;z<MZ;z++)
 					{
-						SetVoxel(x,y,z,v);
+						SetVoxel(x,y,z,0x01);
 					}
 				}
 			}
@@ -457,7 +500,7 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(int y=0;y<YScale;y++)
 					{
-						sb[i]=(Voxels[x,y,z].Flags&VoxFlags.Solid)==VoxFlags.Solid;
+						sb[i]=IsSolid(x,y,z);
 						i++;
 					}
 				}
@@ -483,7 +526,7 @@ namespace OpenSim.Region.Framework.Scenes
 		public byte[] ToBytes()
 		{
 			
-			byte[] o = new byte[XScale*YScale*ZScale*2];
+			byte[] o = new byte[XScale*YScale*ZScale];
 			int i =0;
 			for(int z=0;z<ZScale;z++)
 			{
@@ -494,16 +537,14 @@ namespace OpenSim.Region.Framework.Scenes
 						if(Voxels==null)
 						{
 							Console.WriteLine("Voxels == NULL!");
-							continue;
+							Voxels[x,y,z]=0x00;
 						}
 						if(Voxels[x,y,z]==null)
 						{
-							Voxels[x,y,z]=new Voxel();
+							Voxels[x,y,z]=0x00;
 						}
-						byte[] v = Voxels[x,y,z].asBytes();
-						o[i]=v[0];
-						o[i+1]=v[1];
-						i+=2;
+						o[i] = Voxels[x,y,z];
+						i++;
 					}
 				}
 			}
@@ -512,6 +553,9 @@ namespace OpenSim.Region.Framework.Scenes
 		
 		public void FromBytes(byte[] b)
 		{
+			long rfl=XScale*YScale*ZScale;
+			if(rfl != b.Length)
+				throw new IOException("Voxelmap is of size "+b.Length.ToString()+" when it's supposed to be "+rfl.ToString());
 			int i =0;
 			for(int z=0;z<ZScale;z++)
 			{
@@ -519,8 +563,8 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(int y=0;y<YScale;y++)
 					{
-						Voxels[x,y,z]=new Voxel(new byte[]{b[i],b[i+1]});
-						i+=2;
+						Voxels[x,y,z]=b[i];
+						i++;
 					}
 				}
 			}
@@ -528,9 +572,13 @@ namespace OpenSim.Region.Framework.Scenes
 		
 		private void WriteXML(XmlWriter w)
 		{
+			w.WriteStartElement("VoxMaterialMap");
+			XmlSerializer mm = new XmlSerializer(typeof(Dictionary<byte,VoxMaterial>));
+			mm.Serialize(w,this.MaterialTable);
+			w.WriteEndElement();
 			w.WriteStartElement("Voxels");
-			XmlSerializer xs = new XmlSerializer(typeof(byte[]));
-			xs.Serialize(w,ToBytes());
+			XmlSerializer vm = new XmlSerializer(typeof(byte[]));
+			vm.Serialize(w,ToBytes());
 			w.WriteEndElement();
 		}
 		public void LoadFromFile(string file)
@@ -544,6 +592,10 @@ namespace OpenSim.Region.Framework.Scenes
 					{
 						switch(tag.Name)
 						{
+							case "VoxMaterials":
+								NbtCompound c = (NbtCompound)tag;
+								LoadMatsFromNbt(c);
+								break;
 							case "Voxels":
 								NbtByteArray vba = (NbtByteArray)tag;
 								FromBytes(vba.Value);
@@ -553,11 +605,31 @@ namespace OpenSim.Region.Framework.Scenes
 				}
 			}
 		}
+		private void LoadMatsFromNbt(NbtCompound c)
+		{
+			foreach(NbtTag tag in c.Tags)
+			{
+				VoxMaterial m = new VoxMaterial();
+			}
+		}
 		public void SaveToFile(string file)
 		{
 			using(NbtFile rdr = new NbtFile())
 			{
 				rdr.RootTag=new NbtCompound();
+				NbtCompound cMats = new NbtCompound("VoxMaterials");
+				foreach(KeyValuePair<byte,VoxMaterial> mat in MaterialTable)
+				{
+					NbtCompound cMat = new NbtCompound(mat.Value.Name);
+					cMat.Tags.Add(new NbtByte(		"ID",		mat.Value.ID));
+					cMat.Tags.Add(new NbtInt(		"Type",		(int)mat.Value.Type));
+					cMat.Tags.Add(new NbtFloat(		"Density",	mat.Value.Density));
+					cMat.Tags.Add(new NbtInt(		"Deposit",	(int)mat.Value.Deposit));
+					cMat.Tags.Add(new NbtString(	"Texture",	mat.Value.Texture.ToString()));
+					cMat.Tags.Add(new NbtByte(		"Flags",	(byte)mat.Value.Flags));
+					cMats.Tags.Add(cMat);
+				}
+				rdr.RootTag.Tags.Add(cMats);
 				rdr.RootTag.Tags.Add(new NbtByteArray("Voxels",ToBytes()));
 				rdr.SaveFile(file);
 			}
@@ -575,11 +647,17 @@ namespace OpenSim.Region.Framework.Scenes
 
         private void ReadXml(XmlReader reader)
         {
+			reader.ReadStartElement("MaterialTable");
+			MatsFromXml(reader);
             reader.ReadStartElement("Voxels");
-            FromXml(reader);
+            VoxelsFromXml(reader);
         }
-
-        private void FromXml(XmlReader xmlReader)
+		private void MatsFromXml(XmlReader xmlReader)
+		{
+            XmlSerializer serializer = new XmlSerializer(typeof(Dictionary<byte,VoxMaterial>));
+            MaterialTable = (Dictionary<byte,VoxMaterial>)serializer.Deserialize(xmlReader);
+		}
+        private void VoxelsFromXml(XmlReader xmlReader)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(byte[]));
             byte[] dataArray = (byte[])serializer.Deserialize(xmlReader);
@@ -592,12 +670,8 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(int y=0;y<YScale;y++)
 					{
-	                    Voxel vox = new Voxel();
-						vox.Flags=(VoxFlags)dataArray[index];
-						vox.MaterialID=dataArray[index+1];
-	                    
-						index += 2;
-	                    Voxels[x, y, z] = vox;
+	                    Voxels[x, y, z] = dataArray[index];
+						index++;
 					}
                 }
             }
