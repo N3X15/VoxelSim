@@ -92,6 +92,10 @@ namespace OpenSim.Region.Framework.Scenes
 			YScale=y;
 			ZScale=z;
 			
+			VoxMaterial m = new VoxMaterial();
+			m.Flags=MatFlags.Solid;
+			AddMaterial(m);
+			
 			FillVoxels(new Vector3(0,0,0),new Vector3(x,y,z),AIR_VOXEL);
 		}
 		public VoxelChannel(uint x,uint y,uint z)
@@ -100,6 +104,10 @@ namespace OpenSim.Region.Framework.Scenes
 			XScale=(int)x;
 			YScale=(int)y;
 			ZScale=(int)z;
+			
+			VoxMaterial m = new VoxMaterial();
+			m.Flags=MatFlags.Solid;
+			AddMaterial(m);
 			
 			FillVoxels(new Vector3(0,0,0),new Vector3((int)x,(int)y,(int)z),AIR_VOXEL);
 		}
@@ -112,6 +120,11 @@ namespace OpenSim.Region.Framework.Scenes
 		{
 			// TODO: Implement.
 			return false;
+		}
+		public void AddMaterial(VoxMaterial butts)
+		{
+			cMID++;
+			MaterialTable.Add(cMID,butts);
 		}
 		public void SetVoxel(Vector3 pos, byte v)
 		{
@@ -373,9 +386,10 @@ namespace OpenSim.Region.Framework.Scenes
 					//Console.WriteLine();
 					for(int y=0;y<YScale;y++)
 					{
-						bool d1 = ((p1.GetValue(x,y,z)+1)/2.0)>0.5;
-						bool d2 = ((p2.GetValue(x,y,z)+1)/2.0)>0.5;
-						if(d1 || d2)
+						bool d1 = ((p1.GetValue(x,y,z)+1)/2.0)>/*1d-*/Math.Pow(((double)z/(double)ZH),4d);
+						bool d2 = ((p2.GetValue(x,y,z)+1)/2.0)>/*1d-*/Math.Pow(((double)z/(double)ZH),4d);
+						// XOR?
+						if (!(!d1 || !d2))
 						{
 							//Console.Write("#");
 							image.SetPixel(x,y,Color.FromArgb(255,intensity,intensity,intensity));
@@ -390,6 +404,21 @@ namespace OpenSim.Region.Framework.Scenes
 				Console.WriteLine("{0}% ({1}/{2}) of layers created...",(int)(((float)(z+1)/((float)ZH))*100f),z+1,ZH);
 			}
 			image.Save("terrain/GEN.png",System.Drawing.Imaging.ImageFormat.Png);
+			image.Dispose();
+			
+			image = new Bitmap(YScale,ZScale);
+			for(int y=0;y<XScale;y++)
+			{
+				//Console.WriteLine();
+				for(int z=0;z<ZScale;z++)
+				{
+					if(IsSolid(128,y,z))
+						image.SetPixel(y,ZScale-z-1,Color.FromArgb(255,255,255));
+					else
+						image.SetPixel(y,ZScale-z-1,Color.FromArgb(000,000,000));
+				}
+			}
+			image.Save("terrain/SLICE.png",System.Drawing.Imaging.ImageFormat.Png);
 			image.Dispose();
 			return this;
 		}
