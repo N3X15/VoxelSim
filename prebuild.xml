@@ -776,6 +776,7 @@
       <Reference name="Mono.Addins.dll"/>
       <Reference name="LibNbt.dll" />
       <Reference name="LibNoise.dll" />
+      <Reference name="NGif.dll" />
       <Files>
         <Match pattern="*.cs" recurse="true">
           <Exclude name="Tests" pattern="Tests" />

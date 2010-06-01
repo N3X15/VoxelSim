@@ -22,6 +22,9 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 					{
 						switch(tag.Name)
 						{
+							case "Materials":
+								vc.LoadMatsFromNbt(tag as NbtCompound);
+								break;
 							case "Voxels":
 								NbtByteArray vba = (NbtByteArray)tag;
 								vc.FromBytes(vba.Value);

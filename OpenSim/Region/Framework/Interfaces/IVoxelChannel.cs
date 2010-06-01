@@ -1,5 +1,6 @@
 using OpenMetaverse;
 using System;
+using System.Collections.Generic;
 
 namespace OpenSim.Region.Framework.Interfaces
 {
@@ -22,7 +23,7 @@ namespace OpenSim.Region.Framework.Interfaces
         /// <returns></returns>
         bool[] GetBoolsSerialised();
 		float[] GetFloatsSerialised();
-
+		
         double[,] GetDoubles();
 		
         bool Tainted(int x, int y, int z);

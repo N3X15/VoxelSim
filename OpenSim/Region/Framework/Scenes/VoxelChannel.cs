@@ -13,6 +13,7 @@ using LibNoise;
 using Math=System.Math;
 using VoxMaterial=OpenSim.Region.Framework.Scenes.VoxMaterial;
 using System.Drawing;
+using Gif.Components;
 namespace OpenSim.Region.Framework.Scenes
 {
 	public enum ReplaceMode
@@ -119,7 +120,7 @@ namespace OpenSim.Region.Framework.Scenes
 		public bool Tainted(int x,int y,int z)
 		{
 			// TODO: Implement.
-			return false;
+			return true;
 		}
 		public void AddMaterial(VoxMaterial butts)
 		{
@@ -340,8 +341,8 @@ namespace OpenSim.Region.Framework.Scenes
 			Perlin p2 = new Perlin();
 			p1.Seed=DateTime.Now.Millisecond;
 			p2.Seed=DateTime.Now.Millisecond+2;
-			Bitmap image = new Bitmap(XScale,YScale);
-			double freq=0.05;
+			Image image =  new Bitmap(XScale,YScale);
+			double freq=0.03;
 			double lacu=0.01;
 			double pers=0.01;
 			int octv=1;
@@ -373,26 +374,26 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(int y=0;y<YScale;y++)
 					{
-						image.SetPixel(x,y,Color.FromArgb(255,0,0));
+						(image as Bitmap).SetPixel(x,y,Color.FromArgb(255,0,0));
 					}
 				}
 			}
-			int ZH=Math.Min(ZScale,64);
+			int ZH=Math.Min(ZScale,100);
 			for(int z=0;z<ZH;z++)
 			{
-				int intensity=z*4;
+				int intensity=z*(255/ZH);
 				for(int x=0;x<XScale;x++)
 				{
 					//Console.WriteLine();
 					for(int y=0;y<YScale;y++)
 					{
-						bool d1 = ((p1.GetValue(x,y,z)+1)/2.0)>/*1d-*/Math.Pow(((double)z/(double)ZH),4d);
-						bool d2 = ((p2.GetValue(x,y,z)+1)/2.0)>/*1d-*/Math.Pow(((double)z/(double)ZH),4d);
+						bool d1 = ((p1.GetValue(x,y,z)+1)/2.0)>/*1d-*/Math.Pow(((double)z/(double)ZH),3d);
+						bool d2 = ((p2.GetValue(x,y,z)+1)/2.0)>/*1d-*/Math.Pow(((double)z/(double)ZH),3d);
 						// XOR?
 						if (!(!d1 || !d2))
 						{
 							//Console.Write("#");
-							image.SetPixel(x,y,Color.FromArgb(255,intensity,intensity,intensity));
+							(image as Bitmap).SetPixel(x,y,Color.FromArgb(255,intensity,intensity,intensity));
 							Voxels[x,y,z]=0x01;
 						} else {
 							//Console.Write(" ");
@@ -401,25 +402,40 @@ namespace OpenSim.Region.Framework.Scenes
 						}
 					}
 				}
-				Console.WriteLine("{0}% ({1}/{2}) of layers created...",(int)(((float)(z+1)/((float)ZH))*100f),z+1,ZH);
+				Console.CursorLeft=0;
+				Console.Write(" * {0}% ({1}/{2}) of layers created...",(int)(((float)(z+1)/((float)ZH))*100f),z+1,ZH);
 			}
+			Console.WriteLine();
 			image.Save("terrain/GEN.png",System.Drawing.Imaging.ImageFormat.Png);
 			image.Dispose();
+			AnimatedGifEncoder e = new AnimatedGifEncoder();
+			e.Start( "terrain/SLICE.gif" );
+			e.SetDelay(250);
+			//-1:no repeat,0:always repeat
 			
-			image = new Bitmap(YScale,ZScale);
-			for(int y=0;y<XScale;y++)
+			e.SetRepeat(0);
+
+			for(int x=0;x<XScale;x++)
 			{
-				//Console.WriteLine();
-				for(int z=0;z<ZScale;z++)
+				image = new Bitmap(YScale,ZScale);
+				for(int y=0;y<YScale;y++)
 				{
-					if(IsSolid(128,y,z))
-						image.SetPixel(y,ZScale-z-1,Color.FromArgb(255,255,255));
-					else
-						image.SetPixel(y,ZScale-z-1,Color.FromArgb(000,000,000));
+					//Console.WriteLine();
+					for(int z=0;z<ZScale;z++)
+					{
+						if(IsSolid(x,y,z))
+							(image as Bitmap).SetPixel(y,ZScale-z-1,Color.FromArgb(255,255,255));
+						else
+							(image as Bitmap).SetPixel(y,ZScale-z-1,Color.FromArgb(000,000,000));
+					}
 				}
+				Console.CursorLeft=0;
+				Console.Write(" * {0}% ({1}/{2}) frames added...",(int)(((float)(x+1)/((float)XScale))*100f),x+1,XScale);
+				e.AddFrame((Image)image.Clone());
+				image.Dispose();
 			}
-			image.Save("terrain/SLICE.png",System.Drawing.Imaging.ImageFormat.Png);
-			image.Dispose();
+			Console.WriteLine();
+			e.Finish();
 			return this;
 		}
 		public double[,] GetDoubles()
@@ -634,11 +650,25 @@ namespace OpenSim.Region.Framework.Scenes
 				}
 			}
 		}
-		private void LoadMatsFromNbt(NbtCompound c)
+		public void LoadMatsFromNbt(NbtCompound c)
 		{
 			foreach(NbtTag tag in c.Tags)
 			{
 				VoxMaterial m = new VoxMaterial();
+				m.Name=tag.Name;
+				foreach(NbtTag t in (tag as NbtCompound).Tags)
+				{
+					switch(t.Name)
+					{
+						case "ID":		m.ID = 						(t as NbtByte).Value; 	break;
+						case "Type":	m.Type=		(MaterialType)	(t as NbtInt).Value; 	break;
+						case "Density":	m.Density = 				(t as NbtFloat).Value; 	break;
+						case "Deposit":	m.Deposit = (DepositType)	(t as NbtInt).Value; 	break;
+						case "Texture": m.Texture = new UUID(		(t as NbtString).Value);break;
+						case "Flags":	m.Flags = 	(MatFlags)		(t as NbtByte).Value; 	break;
+					}
+				}
+				
 			}
 		}
 		public void SaveToFile(string file)

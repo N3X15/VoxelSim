@@ -33,10 +33,14 @@ using System.Net;
 using log4net;
 using Nini.Config;
 using OpenMetaverse;
+
 using OpenSim.Framework;
 using OpenSim.Region.CoreModules.Framework.InterfaceCommander;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using OpenSim.Framework.Servers.HttpServer;
+using OpenMetaverse.StructuredData;
+using Caps=OpenSim.Framework.Capabilities.Caps;
 
 namespace OpenSim.Region.CoreModules.World.Voxels
 {
@@ -108,10 +112,12 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                     UpdateRevertMap();
                 }
 
+				
                 m_scene.RegisterModuleInterface<VoxelModule>(this);
                 m_scene.EventManager.OnNewClient += EventManager_OnNewClient;
                 m_scene.EventManager.OnPluginConsole += EventManager_OnPluginConsole;
                 m_scene.EventManager.OnTerrainTick += EventManager_OnTerrainTick;
+				m_scene.EventManager.OnRegisterCaps += HandleM_sceneEventManagerOnRegisterCaps;
                 InstallInterfaces();
             }
 
@@ -119,6 +125,53 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             //LoadPlugins();
         }
 
+        void HandleM_sceneEventManagerOnRegisterCaps (UUID agentID, Caps caps)
+        {
+            string capsBase = "/CAPS/VOX/" + UUID.Random().ToString();
+        	caps.RegisterHandler("MatTable",new RestStreamHandler("POST",capsBase+"/GetMats/",HandleMatTableReq));
+        	caps.RegisterHandler("SetMaterial",new RestStreamHandler("POST",capsBase+"/SetMat/",HandleSetMatTableReq));
+        }
+
+		string HandleSetMatTableReq(string request, string path, string param,
+                                      OSHttpRequest req, OSHttpResponse res)
+		{
+			OSDMap input = (OSDMap)OSDParser.DeserializeLLSDXml(request);
+			VoxMaterial mat = new VoxMaterial();
+			mat.Name		= input["name"].AsString();
+			mat.Deposit		= (DepositType)input["deposit"].AsInteger();
+			mat.Density		= (float)input["density"].AsReal();
+			mat.Flags		= (MatFlags)input["flags"].AsBinary()[0];
+			mat.Texture		= input["texture"].AsUUID();
+			mat.Type		= (MaterialType)input["type"].AsBinary()[0];
+			if(input["id"].AsBinary()[0]==0x00) // 0x00=AIR_VOXEL, so we cannot set it.
+				(m_scene.Voxels as VoxelChannel).AddMaterial(mat);
+			else
+			{
+				byte id = input["id"].AsBinary()[0];
+				(m_scene.Voxels as VoxelChannel).MaterialTable[id]=mat;
+			}
+			return "OK";
+		}
+		string HandleMatTableReq(string request, string path, string param,
+                                      OSHttpRequest req, OSHttpResponse res)
+		{
+			OSDMap rval = new OSDMap();
+			foreach(KeyValuePair<byte,VoxMaterial> kv in (m_scene.Voxels as VoxelChannel).MaterialTable)
+			{
+				byte b = kv.Key;
+				VoxMaterial m = kv.Value;
+				OSDMap mat = new OSDMap();
+				mat.Add("density",	new OSDReal(m.Density));
+				mat.Add("deposit",	new OSDInteger((int)m.Deposit));
+				mat.Add("flags",	new OSDBinary(new byte[]{(byte)m.Flags}));
+				mat.Add("id", 		new OSDBinary(new byte[]{b}));
+				mat.Add("name",		new OSDString(m.Name));
+				mat.Add("texture",	new OSDUUID(m.Texture));
+				mat.Add("type",		new OSDBinary(new byte[]{(byte)m.Type}));
+				rval.Add(m.Name,mat);
+			}
+			return rval.ToString();
+		}
         public void RegionLoaded(Scene scene)
         {
         }
@@ -519,6 +572,53 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         {
             CheckForTerrainUpdates(false);
         }
+		
+        private void CheckForHeightmapUpdates(bool respectEstateSettings)
+        {
+            bool shouldTaint = false;
+            float[] serialised = m_channel.GetFloatsSerialised();
+            int x;
+            for (x = 0; x < m_channel.Width; x += Constants.TerrainPatchSize)
+            {
+                int y;
+                for (y = 0; y < m_channel.Height; y += Constants.TerrainPatchSize)
+                {
+                    if (m_channel.Tainted(x, y, 0))
+                    {
+                        // if we should respect the estate settings then
+                        // fixup and height deltas that don't respect them
+                        /*if (respectEstateSettings && LimitChannelChanges(x, y))
+                        {
+                            // this has been vetoed, so update
+                            // what we are going to send to the client
+                            serialised = m_channel.GetFloatsSerialised();
+                        }*/
+
+                        SendToClients(serialised, x, y);
+                        shouldTaint = true;
+                    }
+                }
+            }
+            if (shouldTaint)
+            {
+                m_tainted = true;
+            }
+        }
+        /// <summary>
+        /// Sends a copy of the current terrain to the scenes clients
+        /// </summary>
+        /// <param name="serialised">A copy of the terrain as a 1D float array of size w*h</param>
+        /// <param name="x">The patch corner to send</param>
+        /// <param name="y">The patch corner to send</param>
+        private void SendToClients(float[] serialised, int x, int y)
+        {
+            m_scene.ForEachClient(
+                delegate(IClientAPI controller)
+                    { controller.SendLayerData(
+                        x / Constants.TerrainPatchSize, y / Constants.TerrainPatchSize, serialised);
+                    }
+            );
+        }
 
         /// <summary>
         /// Checks to see if the terrain has been modified since last check.
@@ -530,6 +630,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         /// </summary>
         private void CheckForTerrainUpdates(bool respectEstateSettings)
         {
+			CheckForHeightmapUpdates(respectEstateSettings);
             bool shouldTaint = false;
             int[,,] serialised = m_channel.ToMaterialMap();
 			int z;
@@ -896,7 +997,8 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 		
 		private void InterfaceGenerate(Object[] args)
 		{
-			(m_scene.Voxels as VoxelChannel).Generate("default",args);
+			
+			m_scene.Voxels=(m_scene.Voxels as VoxelChannel).Generate("default");
 			TaintTerrain();
 		}
 
@@ -988,7 +1090,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
 			Command generateCommand=
 				new Command("generate",CommandIntentions.COMMAND_HAZARDOUS, InterfaceGenerate,"Generate terrain.");
-			generateCommand.AddArgument("Frequency","Hell if I know","Double");
+			generateCommand.AddArgument("Frequency","Perlin frequency","Double");
 			generateCommand.AddArgument("Lucunarity","Hell if I know","Double");
 			generateCommand.AddArgument("Persistance","Hell if I know","Double");
 			generateCommand.AddArgument("Octaves","Hell if I know","Integer");
