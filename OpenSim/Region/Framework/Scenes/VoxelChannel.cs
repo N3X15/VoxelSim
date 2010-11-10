@@ -2,6 +2,7 @@
 using System;
 using OpenMetaverse;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
@@ -22,17 +23,228 @@ namespace OpenSim.Region.Framework.Scenes
 		A_ONLY,
 		B_ONLY
 	}
+
+    // Provide a few common things to the terrain generator.
+    public class MaterialMap
+    {
+        private Dictionary<byte,VoxMaterial> mMaterials = new Dictionary<byte,VoxMaterial>();
+        private Dictionary<string,byte> mName2Byte = new Dictionary<string,byte>();
+        private byte index=0;
+        public MaterialMap()
+        {
+            Add("Air",new VoxMaterial());
+            Add("Rock",new VoxMaterial());
+            Add("Water",new VoxMaterial());
+            Add("Soil",new VoxMaterial());
+            Add("Grass",new VoxMaterial());
+            Add("Sand",new VoxMaterial());
+        }
+        
+        public VoxMaterial Air      { get { return mMaterials[0]; }}
+        public VoxMaterial Rock     { get { return mMaterials[1]; }}
+        public VoxMaterial Water    { get { return mMaterials[2]; }}
+        public VoxMaterial Soil     { get { return mMaterials[3]; }}
+        public VoxMaterial Grass    { get { return mMaterials[4]; }}
+        public VoxMaterial Sand     { get { return mMaterials[5]; }}
+
+        public VoxMaterial this[byte i]
+        {
+            get
+            {
+                if(mMaterials.ContainsKey(i))
+                    return mMaterials[i];
+                else
+                    return new VoxMaterial();
+            }
+            set
+            {
+                if(mMaterials.ContainsKey(i))
+                    mMaterials[i]=value;
+            }
+        }
+
+        public VoxMaterial this[string n]
+        {
+            get
+            {
+                if(mName2Byte.ContainsKey(n))
+                    return mMaterials[mName2Byte[n]];
+                else
+                    return new VoxMaterial();
+            }
+            set
+            {
+                if(mName2Byte.ContainsKey(n))
+                    mMaterials[mName2Byte[n]]=value;
+                else
+                    Add(n,value);
+            }
+        }
+
+        public void Add(string name, VoxMaterial mat)
+        {
+            mat.ID = index;
+            mMaterials.Add(mat.ID,mat);
+            mName2Byte.Add(name,mat.ID);
+            index++;
+        }
+
+        public void Remove(string name)
+        {
+            if(mName2Byte.ContainsKey(name))
+                mMaterials.Remove(mName2Byte[name]);
+            index--;
+        }
+
+        public void Remove(byte id)
+        {
+            if(mMaterials.ContainsKey(id))
+                mMaterials.Remove(id);
+            index--;
+        }
+    
+        internal void Serialize(ref XmlWriter w)
+        {
+ 	        w.WriteStartElement("materials");
+            w.WriteAttributeString("version","1");
+            foreach(KeyValuePair<byte,VoxMaterial> kvp in mMaterials)
+            {
+                w.WriteStartElement("material");
+                VoxMaterial mat = kvp.Value;
+                w.WriteAttributeString("id",mat.ID.ToString());
+                w.WriteAttributeString("name",mat.Name.ToString());
+                w.WriteAttributeString("flags",mat.Flags.ToString());
+                w.WriteAttributeString("density",mat.Density.ToString());
+                w.WriteAttributeString("deposit",mat.Deposit.ToString());
+                w.WriteAttributeString("texture",mat.Texture.ToString());
+                w.WriteAttributeString("type",mat.Type.ToString());
+                w.WriteEndElement();
+            }
+            w.WriteEndElement();
+        }
+
+        internal void Deserialize(ref XmlElement doc)
+        {
+            int version = 0;
+            if(!int.TryParse(doc.GetAttribute("version"),out version))
+                return;
+
+            if(version>1)
+                return;
+
+            foreach(XmlElement material in doc)
+            {
+                VoxMaterial mat = new VoxMaterial();
+                mat.ID = byte.Parse(material.GetAttribute("id"));
+                mat.Name = material.GetAttribute("name");
+                mat.Flags = (MatFlags)Enum.Parse(typeof(MatFlags),material.GetAttribute("flags"));
+                mat.Density = float.Parse(material.GetAttribute("density"));
+                mat.Deposit = (DepositType)Enum.Parse(typeof(DepositType),material.GetAttribute("deposit"));
+                mat.Texture = UUID.Parse(material.GetAttribute("texture"));
+                mat.Type = (MaterialType)Enum.Parse(typeof(MaterialType),material.GetAttribute("type"));
+
+                if(mat.ID>index)
+                {
+                    index=mat.ID;
+                    index++;
+                }
+
+                mMaterials.Add(mat.ID,mat);
+                mName2Byte.Add(mat.Name,mat.ID);
+            }
+        }
+    
+        internal void Deserialize(XmlTextReader reader)
+        {
+            bool keepreading=true;
+            while(keepreading)
+            {
+                reader.Read();
+                if(reader.Name.Equals("material") && reader.NodeType.Equals(XmlNodeType.Element))
+                {
+                    VoxMaterial mat = new VoxMaterial();
+                    mat.ID = (byte)reader.ReadContentAsInt();
+                    mat.Name = reader.ReadContentAsString();
+                    mat.Flags = (MatFlags)Enum.Parse(typeof(MatFlags),reader.ReadContentAsString());
+                    mat.Density = reader.ReadContentAsFloat();
+                    mat.Deposit = (DepositType)Enum.Parse(typeof(DepositType),reader.ReadContentAsString());
+                    mat.Texture = UUID.Parse(reader.ReadContentAsString());
+                    mat.Type = (MaterialType)Enum.Parse(typeof(MaterialType),reader.ReadContentAsString());
+
+                    if(mat.ID>index)
+                    {
+                        index=mat.ID;
+                        index++;
+                    }
+
+                    mMaterials.Add(mat.ID,mat);
+                    mName2Byte.Add(mat.Name,mat.ID);
+                }
+            }
+        }
+    
+        internal NbtTag ToNBT()
+        {
+            NbtCompound mt = new NbtCompound("MaterialsTable");
+			foreach(KeyValuePair<byte,VoxMaterial> mat in mMaterials)
+			{
+				NbtCompound cMat = new NbtCompound(mat.Value.Name);
+				cMat.Tags.Add(new NbtByte(		"ID",		mat.Value.ID));
+				cMat.Tags.Add(new NbtInt(		"Type",		(int)mat.Value.Type));
+				cMat.Tags.Add(new NbtFloat(		"Density",	mat.Value.Density));
+				cMat.Tags.Add(new NbtInt(		"Deposit",	(int)mat.Value.Deposit));
+				cMat.Tags.Add(new NbtString(	"Texture",	mat.Value.Texture.ToString()));
+				cMat.Tags.Add(new NbtByte(		"Flags",	(byte)mat.Value.Flags));
+				mt.Tags.Add(cMat);
+			}
+            return mt;
+        }
+
+    
+        internal void FromNbt(NbtCompound c)
+        {
+			foreach(NbtTag tag in c.Tags)
+			{
+				VoxMaterial m = new VoxMaterial();
+				m.Name=tag.Name;
+				foreach(NbtTag t in (tag as NbtCompound).Tags)
+				{
+					switch(t.Name)
+					{
+						case "ID":		m.ID = 						(t as NbtByte).Value; 	break;
+						case "Type":	m.Type=		(MaterialType)	(t as NbtInt).Value; 	break;
+						case "Density":	m.Density = 				(t as NbtFloat).Value; 	break;
+						case "Deposit":	m.Deposit = (DepositType)	(t as NbtInt).Value; 	break;
+						case "Texture": m.Texture = new UUID(		(t as NbtString).Value);break;
+						case "Flags":	m.Flags = 	(MatFlags)		(t as NbtByte).Value; 	break;
+					}
+				}
+				mMaterials.Add(m.ID,m);
+                mName2Byte.Add(m.Name,m.ID);
+                if(m.ID>index)
+                {
+                    index=m.ID;
+                    index++;
+                }
+
+			}
+        }
+    }
+
+    public interface ITerrainGenerator
+    {
+        void Initialize(int SizeX,int SizeY,int SizeZ, MaterialMap matmap);
+        void Generate(ref VoxelChannel vox,Hashtable settings);
+    }
 	public class VoxelChannel:IVoxelChannel
 	{
 		// 256x256x256 = 16,777,216 Byte = 16 Megabyte (MB)!
-		public byte[,,] Voxels;
-		/// <summary>
-		/// VoxMaterial ID
-		/// </summary>
-		private byte cMID=0x00;
+        public byte[] Voxels;
+
 		public const byte AIR_VOXEL=0x00;
 		
-		public Dictionary<byte,VoxMaterial> MaterialTable = new Dictionary<byte, VoxMaterial>();
+        public MaterialMap mMaterials = new MaterialMap();
+        public Dictionary<string, ITerrainGenerator> TerrainGenerators = new Dictionary<string,ITerrainGenerator>();
 		
 		public int XScale {get; protected set;}
 		public int YScale {get; protected set;}
@@ -40,26 +252,20 @@ namespace OpenSim.Region.Framework.Scenes
 		
 		public bool IsSolid(int x,int y,int z)
 		{
-			byte v = Voxels[x,y,z];
+			byte v = GetVoxel(x,y,z);
 			
 			if(v==AIR_VOXEL) return false;
 			
-			if(!MaterialTable.ContainsKey(v)) 
-				return false;
-			
-			return (MaterialTable[v].Flags & MatFlags.Solid)==MatFlags.Solid;
+			return (mMaterials[v].Flags & MatFlags.Solid)==MatFlags.Solid;
 		}
 		public int this[int x,int y,int z]
 		{
 			get{
-				return (int)Voxels[x,y,z];
-			}
+				return (int)GetVoxel(x,y,z);
+            }
 			set
 			{
-				int v = value;
-				if(v>255) v=255;
-				if(v<0) v=0;
-				Voxels[x,y,z]=(byte)v;
+				SetVoxel(x,y,z,(byte)value);
 			}
 		}
 		public int Height
@@ -88,7 +294,7 @@ namespace OpenSim.Region.Framework.Scenes
 		/// </param>
 		public VoxelChannel(int x,int y,int z)
 		{
-			Voxels = new byte[x,y,z];
+			Voxels = new byte[x*y*z];
 			XScale=x;
 			YScale=y;
 			ZScale=z;
@@ -101,7 +307,7 @@ namespace OpenSim.Region.Framework.Scenes
 		}
 		public VoxelChannel(uint x,uint y,uint z)
 		{
-			Voxels = new byte[(int)x,(int)y,(int)z];
+			Voxels = new byte[x*y*z];
 			XScale=(int)x;
 			YScale=(int)y;
 			ZScale=(int)z;
@@ -124,17 +330,22 @@ namespace OpenSim.Region.Framework.Scenes
 		}
 		public void AddMaterial(VoxMaterial butts)
 		{
-			cMID++;
-			MaterialTable.Add(cMID,butts);
+			mMaterials.Add(butts.Name,butts);
 		}
 		public void SetVoxel(Vector3 pos, byte v)
 		{
 			if(!inGrid(pos)) return;
-			int x,y,z;
-			x=(int)Math.Round(pos.X);
-			y=(int)Math.Round(pos.Y);
-			z=(int)Math.Round(pos.Z);
-			Voxels[x,y,z]=v;
+
+			int px=(int)Math.Round(pos.X);
+			int py=(int)Math.Round(pos.Y);
+			int z=(int)Math.Round(pos.Z);
+
+			int X = px / 16;
+			int Y = py / 16;
+
+			int x = (px >> 4) & 0xf;
+			int y = (py >> 4) & 0xf;
+			Voxels[y * ZScale + x * ZScale * XScale + z]=v;
 		}
 		
 		public IVoxelChannel MakeCopy()
@@ -155,19 +366,21 @@ namespace OpenSim.Region.Framework.Scenes
 		public byte GetVoxel(Vector3 pos)
 		{
 			if(!inGrid(pos)) return AIR_VOXEL;
-			int x,y,z;
-			x=(int)Math.Round(pos.X);
-			y=(int)Math.Round(pos.Y);
-			z=(int)Math.Round(pos.Z);
-			return Voxels[x,y,z];
+
+			int px=(int)Math.Round(pos.X);
+			int py=(int)Math.Round(pos.Y);
+			int z=(int)Math.Round(pos.Z);
+
+			int X = px / 16;
+			int Y = py / 16;
+
+			int x = (px >> 4) & 0xf;
+			int y = (py >> 4) & 0xf;
+			return Voxels[py * ZScale + px * ZScale * XScale + z];
 		}
 		public byte GetVoxel(int x,int y,int z)
 		{
-			if(!inGrid(new Vector3(x,y,z))) return AIR_VOXEL;
-			byte v = Voxels[x,y,z];
-			if(v==null)
-				v=AIR_VOXEL;
-			return v;
+			return GetVoxel(new Vector3(x,y,z));
 		}
 		
 		public void MoveVoxel(Vector3 from, Vector3 to)
@@ -201,7 +414,7 @@ namespace OpenSim.Region.Framework.Scenes
 					{
 						bool As=a.IsSolid(x,y,z);
 						bool Bs=b.IsSolid(x,y,z);
-						if(As && As)
+						if(As && Bs)
 						{
 							a.SetVoxel(x,y,z,b.GetVoxel(x,y,z));
 						}
@@ -309,23 +522,7 @@ namespace OpenSim.Region.Framework.Scenes
 				for(int y=0;y<YScale;y++)
 				{
 					float ch = 0;
-					for(int z=0;z<ZScale;z++)
-					{
-						// If Voxel is Solid
-						if(Voxels==null)
-						{
-							Console.WriteLine("Voxels == NULL!");
-							continue;
-						}
-						if(Voxels[x,y,z]==null)
-						{
-							Voxels[x,y,z]=AIR_VOXEL;
-						}
-						if(IsSolid(x,y,z))
-						{
-							ch=Math.Max(z,ch);
-						}
-					}
+					ch=(float)GetHeightAt(x,y);
 					sf.Add(ch);
 				}
 			}
@@ -394,11 +591,11 @@ namespace OpenSim.Region.Framework.Scenes
 						{
 							//Console.Write("#");
 							(image as Bitmap).SetPixel(x,y,Color.FromArgb(255,intensity,intensity,intensity));
-							Voxels[x,y,z]=0x01;
+							SetVoxel(x,y,z,0x01);
 						} else {
 							//Console.Write(" ");
 							//image.SetPixel(x,y,Color.FromArgb(255,0,0,0));
-							Voxels[x,y,z]=AIR_VOXEL;
+							SetVoxel(x,y,z,AIR_VOXEL);
 						}
 					}
 				}
@@ -451,7 +648,7 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(int z=0;z<ZScale;z++)
 					{
-						a(Voxels[x,y,z],x,y,z);
+						a(GetVoxel(x,y,z),x,y,z);
 					}
 				}
 			}
@@ -514,7 +711,7 @@ namespace OpenSim.Region.Framework.Scenes
 			for(int x=0;x<XScale;x++)
 				for(int y=0;y<YScale;y++)
 					for(int z=0;z<ZScale;z++)
-						map[x,y,z]=(int)Voxels[x,y,z];
+						map[x,y,z]=(int)GetVoxel(x,y,z);
 			return map;
 		}
 		public void ImportHeightmap(float[,] heightmap)
@@ -582,13 +779,13 @@ namespace OpenSim.Region.Framework.Scenes
 						if(Voxels==null)
 						{
 							Console.WriteLine("Voxels == NULL!");
-							Voxels[x,y,z]=0x00;
+							this[x,y,z]=0x00;
 						}
-						if(Voxels[x,y,z]==null)
+						if(this[x,y,z]==null)
 						{
-							Voxels[x,y,z]=0x00;
+							this[x,y,z]=0x00;
 						}
-						o[i] = Voxels[x,y,z];
+						o[i] = (byte)this[x,y,z];
 						i++;
 					}
 				}
@@ -608,7 +805,7 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(int y=0;y<YScale;y++)
 					{
-						Voxels[x,y,z]=b[i];
+						this[x,y,z]=b[i];
 						i++;
 					}
 				}
@@ -617,9 +814,8 @@ namespace OpenSim.Region.Framework.Scenes
 		
 		private void WriteXML(XmlWriter w)
 		{
-			w.WriteStartElement("VoxMaterialMap");
-			XmlSerializer mm = new XmlSerializer(typeof(Dictionary<byte,VoxMaterial>));
-			mm.Serialize(w,this.MaterialTable);
+			w.WriteStartElement("MaterialMap");
+            mMaterials.Serialize(ref w);
 			w.WriteEndElement();
 			w.WriteStartElement("Voxels");
 			XmlSerializer vm = new XmlSerializer(typeof(byte[]));
@@ -637,9 +833,9 @@ namespace OpenSim.Region.Framework.Scenes
 					{
 						switch(tag.Name)
 						{
-							case "VoxMaterials":
+							case "MaterialTable":
 								NbtCompound c = (NbtCompound)tag;
-								LoadMatsFromNbt(c);
+								mMaterials.FromNbt(c);
 								break;
 							case "Voxels":
 								NbtByteArray vba = (NbtByteArray)tag;
@@ -650,45 +846,13 @@ namespace OpenSim.Region.Framework.Scenes
 				}
 			}
 		}
-		public void LoadMatsFromNbt(NbtCompound c)
-		{
-			foreach(NbtTag tag in c.Tags)
-			{
-				VoxMaterial m = new VoxMaterial();
-				m.Name=tag.Name;
-				foreach(NbtTag t in (tag as NbtCompound).Tags)
-				{
-					switch(t.Name)
-					{
-						case "ID":		m.ID = 						(t as NbtByte).Value; 	break;
-						case "Type":	m.Type=		(MaterialType)	(t as NbtInt).Value; 	break;
-						case "Density":	m.Density = 				(t as NbtFloat).Value; 	break;
-						case "Deposit":	m.Deposit = (DepositType)	(t as NbtInt).Value; 	break;
-						case "Texture": m.Texture = new UUID(		(t as NbtString).Value);break;
-						case "Flags":	m.Flags = 	(MatFlags)		(t as NbtByte).Value; 	break;
-					}
-				}
-				
-			}
-		}
 		public void SaveToFile(string file)
 		{
 			using(NbtFile rdr = new NbtFile())
 			{
-				rdr.RootTag=new NbtCompound();
+				rdr.RootTag=new NbtCompound("__ROOT__");
 				NbtCompound cMats = new NbtCompound("VoxMaterials");
-				foreach(KeyValuePair<byte,VoxMaterial> mat in MaterialTable)
-				{
-					NbtCompound cMat = new NbtCompound(mat.Value.Name);
-					cMat.Tags.Add(new NbtByte(		"ID",		mat.Value.ID));
-					cMat.Tags.Add(new NbtInt(		"Type",		(int)mat.Value.Type));
-					cMat.Tags.Add(new NbtFloat(		"Density",	mat.Value.Density));
-					cMat.Tags.Add(new NbtInt(		"Deposit",	(int)mat.Value.Deposit));
-					cMat.Tags.Add(new NbtString(	"Texture",	mat.Value.Texture.ToString()));
-					cMat.Tags.Add(new NbtByte(		"Flags",	(byte)mat.Value.Flags));
-					cMats.Tags.Add(cMat);
-				}
-				rdr.RootTag.Tags.Add(cMats);
+				rdr.RootTag.Tags.Add(mMaterials.ToNBT());
 				rdr.RootTag.Tags.Add(new NbtByteArray("Voxels",ToBytes()));
 				rdr.SaveFile(file);
 			}
@@ -704,18 +868,13 @@ namespace OpenSim.Region.Framework.Scenes
             sr.Close();
         }
 
-        private void ReadXml(XmlReader reader)
+        private void ReadXml(XmlTextReader reader)
         {
 			reader.ReadStartElement("MaterialTable");
-			MatsFromXml(reader);
+			mMaterials.Deserialize(reader);
             reader.ReadStartElement("Voxels");
             VoxelsFromXml(reader);
         }
-		private void MatsFromXml(XmlReader xmlReader)
-		{
-            XmlSerializer serializer = new XmlSerializer(typeof(Dictionary<byte,VoxMaterial>));
-            MaterialTable = (Dictionary<byte,VoxMaterial>)serializer.Deserialize(xmlReader);
-		}
         private void VoxelsFromXml(XmlReader xmlReader)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(byte[]));
@@ -729,13 +888,58 @@ namespace OpenSim.Region.Framework.Scenes
 				{
 					for(int y=0;y<YScale;y++)
 					{
-	                    Voxels[x, y, z] = dataArray[index];
+	                    this[x, y, z] = dataArray[index];
 						index++;
 					}
                 }
             }
         }
+
+        public byte[] GetChunk(int x, int y)
+        {
+            NbtFile file = new NbtFile();
+            file.RootTag = new NbtCompound("__ROOT__");
+            file.RootTag.Tags.Add(new NbtInt("x", x));
+            file.RootTag.Tags.Add(new NbtInt("y", y));
+            file.RootTag.Tags.Add(new NbtInt("z", 0));
+            file.RootTag.Tags.Add(new NbtByteArray("c", GetChunkData(x,y)));
+            byte[] endresult;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                file.SaveFile(ms,true);
+                endresult= ms.ToArray();
+            }
+            return endresult;
+        }
 		
-		//
-	}
+		//16x16x128 = 32768 = 32K
+        // I think 64K would be OK if asked.
+        public static readonly int CHUNK_SIZE_X = 16;
+        public static readonly int CHUNK_SIZE_Y = 16;
+        public static readonly int CHUNK_SIZE_Z = 128;
+        public byte[] GetChunkData(int X, int Y, int Z=0)
+        {
+            byte[] d = new byte[CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z];
+            for(int x=0;x<CHUNK_SIZE_X;++x)
+            {   
+                for(int y=0;y<CHUNK_SIZE_Y;++y)
+                {
+                    for (int z = 0; z < CHUNK_SIZE_Z; ++z)
+                    {
+                        SetChunkBlock(ref d, GetVoxel(x + (X * CHUNK_SIZE_X), y + (Y * CHUNK_SIZE_Y), z), x, y, z);
+                    }
+                }
+            }
+            return d;
+        }
+
+        public void SetChunkBlock(ref byte[] chunk, byte type, int x, int y, int z)
+        {
+            chunk[y * ZScale + x * ZScale * XScale + z] = type;
+        }
+        public byte GetChunkBlock(ref byte[] chunk, int x, int y, int z)
+        {
+            chunk[y * ZScale + x * ZScale * XScale + z] = type;
+        }
+    }
 }

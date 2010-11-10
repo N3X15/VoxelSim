@@ -307,7 +307,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
             lock (m_rootAgents)
             {
                 m_rootAgents.Remove(AgentId);
-                if(m_rootAgents.Count == 0)
+                if (m_rootAgents.Count == 0)
                     StopThread();
             }
         }
@@ -324,7 +324,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
             if (threadrunning) return;
             threadrunning = true;
 
-            m_log.Debug("[WORLD MAP]: Starting remote MapItem request thread");
+//            m_log.Debug("[WORLD MAP]: Starting remote MapItem request thread");
 
             Watchdog.StartThread(process, "MapItemRequestThread", ThreadPriority.BelowNormal, true);
         }
@@ -805,7 +805,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                     imgstream = new MemoryStream();
 
                     // non-async because we know we have the asset immediately.
-                    AssetBase mapasset = m_scene.AssetService.Get(m_scene.RegionInfo.lastMapUUID.ToString());
+                    AssetBase mapasset = m_scene.AssetService.Get(m_scene.RegionInfo.RegionSettings.TerrainImageID.ToString());
 
                     // Decode image to System.Drawing.Image
                     if (OpenJPEG.DecodeToImage(mapasset.Data, out managedImage, out image))
@@ -1000,43 +1000,30 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
             return responsemap;
         }
 
-        public void RegenerateMaptile(byte[] data)
+        public void GenerateMaptile()
         {
-            // Overwrites the local Asset cache with new maptile data
-            // Assets are single write, this causes the asset server to ignore this update,
-            // but the local asset cache does not
+            // Cannot create a map for a nonexistant heightmap
+            if (m_scene.Heightmap == null)
+                return;
+            
+            //create a texture asset of the terrain
+            IMapImageGenerator terrain = m_scene.RequestModuleInterface<IMapImageGenerator>();
+            if (terrain == null)
+                return;
 
-            // this is on purpose!  The net result of this is the region always has the most up to date
-            // map tile while protecting the (grid) asset database from bloat caused by a new asset each
-            // time a mapimage is generated!
-
+            byte[] data = terrain.WriteJpeg2000Image();
+            if (data == null)
+                return;
+            
             UUID lastMapRegionUUID = m_scene.RegionInfo.RegionSettings.TerrainImageID;
 
-            int lastMapRefresh = 0;
-            int twoDays = 172800;
-            int RefreshSeconds = twoDays;
-
-            try
-            {
-                lastMapRefresh = Convert.ToInt32(m_scene.RegionInfo.lastMapRefresh);
-            }
-            catch (ArgumentException)
-            {
-            }
-            catch (FormatException)
-            {
-            }
-            catch (OverflowException)
-            {
-            }
-
-            m_log.Debug("[MAPTILE]: STORING MAPTILE IMAGE");
+            m_log.Debug("[WORLDMAP]: STORING MAPTILE IMAGE");
 
             m_scene.RegionInfo.RegionSettings.TerrainImageID = UUID.Random();
 
             AssetBase asset = new AssetBase(
                 m_scene.RegionInfo.RegionSettings.TerrainImageID,
-                "terrainImage_" + m_scene.RegionInfo.RegionID.ToString() + "_" + lastMapRefresh.ToString(),
+                "terrainImage_" + m_scene.RegionInfo.RegionID.ToString(),
                 (sbyte)AssetType.Texture,
                 m_scene.RegionInfo.RegionID.ToString());
             asset.Data = data;

@@ -44,7 +44,7 @@ namespace OpenSim.Services.InventoryService
                 LogManager.GetLogger(
                 MethodBase.GetCurrentMethod().DeclaringType);
 
-        protected IXInventoryData m_Database;
+        protected new IXInventoryData m_Database;
 
         public HGInventoryService(IConfigSource config)
             : base(config)
@@ -108,13 +108,13 @@ namespace OpenSim.Services.InventoryService
             // Warp! Root folder for travelers
             XInventoryFolder[] folders = m_Database.GetFolders(
                     new string[] { "agentID", "folderName"},
-                    new string[] { principalID.ToString(), "Suitcase" });
+                    new string[] { principalID.ToString(), "My Suitcase" });
 
             if (folders.Length > 0)
                 return ConvertToOpenSim(folders[0]);
             
             // make one
-            XInventoryFolder suitcase = CreateFolder(principalID, UUID.Zero, (int)AssetType.Folder, "Suitcase");
+            XInventoryFolder suitcase = CreateFolder(principalID, UUID.Zero, (int)AssetType.Folder, "My Suitcase");
             return ConvertToOpenSim(suitcase);
         }
 

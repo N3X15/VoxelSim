@@ -36,6 +36,8 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
 {
     public class UserAccountCache
     {
+        private const double CACHE_EXPIRATION_SECONDS = 120000.0; // 33 hours!
+
         private static readonly ILog m_log =
                 LogManager.GetLogger(
                 MethodBase.GetCurrentMethod().DeclaringType);
@@ -44,20 +46,18 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.UserAccounts
 
         public UserAccountCache()
         {
-            // Warning: the size values are a bit fuzzy. What matters
-            // most for this cache is the count value (128 entries).
             m_UUIDCache = new ExpiringCache<UUID, UserAccount>();
-            m_NameCache = new ExpiringCache<string, UUID>(); // this one is unbound
+            m_NameCache = new ExpiringCache<string, UUID>(); 
         }
 
         public void Cache(UUID userID, UserAccount account)
         {
             // Cache even null accounts
-            m_UUIDCache.AddOrUpdate(userID, account, DateTime.Now + TimeSpan.FromMinutes(2.0d));
+            m_UUIDCache.AddOrUpdate(userID, account, CACHE_EXPIRATION_SECONDS);
             if (account != null)
-                m_NameCache.AddOrUpdate(account.Name, account.PrincipalID, DateTime.Now + TimeSpan.FromMinutes(2.0d));
+                m_NameCache.AddOrUpdate(account.Name, account.PrincipalID, CACHE_EXPIRATION_SECONDS);
 
-            m_log.DebugFormat("[USER CACHE]: cached user {0}", userID);
+            //m_log.DebugFormat("[USER CACHE]: cached user {0}", userID);
         }
 
         public UserAccount Get(UUID userID, out bool inCache)

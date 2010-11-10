@@ -92,6 +92,17 @@ namespace OpenSim.Framework
         public static FireAndForgetMethod FireAndForgetMethod = FireAndForgetMethod.SmartThreadPool;
 
         /// <summary>
+        /// Gets the name of the directory where the current running executable
+        /// is located
+        /// </summary>
+        /// <returns>Filesystem path to the directory containing the current
+        /// executable</returns>
+        public static string ExecutingDirectory()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
+
+        /// <summary>
         /// Linear interpolates B<->C using percent A
         /// </summary>
         /// <param name="a"></param>
@@ -1171,6 +1182,16 @@ namespace OpenSim.Framework
 
         }
 
+        public static uint ConvertAccessLevelToMaturity(byte maturity)
+        {
+            if (maturity <= 13)
+                return 0;
+            else if (maturity <= 21)
+                return 1;
+            else
+                return 2;
+        }
+
         /// <summary>
         /// Produces an OSDMap from its string representation on a stream
         /// </summary>
@@ -1483,6 +1504,50 @@ namespace OpenSim.Framework
             {
                 m_log.Debug(stackFrame.GetMethod().DeclaringType + "." + stackFrame.GetMethod().Name); // write method name
             }
+        }
+
+        /// <summary>
+        /// Gets the client IP address
+        /// </summary>
+        /// <param name="xff"></param>
+        /// <returns></returns>
+        public static IPEndPoint GetClientIPFromXFF(string xff)
+        {
+            if (xff == string.Empty)
+                return null;
+
+            string[] parts = xff.Split(new char[] { ',' });
+            if (parts.Length > 0)
+            {
+                try
+                {
+                    return new IPEndPoint(IPAddress.Parse(parts[0]), 0);
+                }
+                catch (Exception e)
+                {
+                    m_log.WarnFormat("[UTIL]: Exception parsing XFF header {0}: {1}", xff, e.Message);
+                }
+            }
+
+            return null;
+        }
+
+        public static string GetCallerIP(Hashtable req)
+        {
+            if (req.ContainsKey("headers"))
+            {
+                try
+                {
+                    Hashtable headers = (Hashtable)req["headers"];
+                    if (headers.ContainsKey("remote_addr") && headers["remote_addr"] != null)
+                        return headers["remote_addr"].ToString();
+                }
+                catch (Exception e)
+                {
+                    m_log.WarnFormat("[UTIL]: exception in GetCallerIP: {0}", e.Message);
+                }
+            }
+            return string.Empty;
         }
 
     }

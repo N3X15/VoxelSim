@@ -34,7 +34,7 @@ using log4net;
 using Nini.Config;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.CoreModules.World.Serialiser;
-//using OpenSim.Region.CoreModules.World.Terrain;
+using OpenSim.Region.CoreModules.World.Voxels;
 using OpenSim.Region.Framework.Scenes;
 using PumaCode.SvnDotNet.AprSharp;
 using PumaCode.SvnDotNet.SubversionSharp;

@@ -37,7 +37,7 @@ using OpenSim.Region.Framework.Interfaces;
 
 namespace OpenSim.Data.MSSQL
 {
-    public class MSSQLEstateData : IEstateDataStore
+    public class MSSQLEstateStore : IEstateDataStore
     {
         private const string _migrationStore = "EstateStore";
 
@@ -49,6 +49,15 @@ namespace OpenSim.Data.MSSQL
         private Dictionary<string, FieldInfo> _FieldMap = new Dictionary<string, FieldInfo>();
 
         #region Public methods
+
+        public MSSQLEstateStore()
+        {
+        }
+
+        public MSSQLEstateStore(string connectionString)
+        {
+            Initialise(connectionString);
+        }
 
         /// <summary>
         /// Initialises the estatedata class.

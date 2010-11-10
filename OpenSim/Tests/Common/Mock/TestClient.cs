@@ -94,7 +94,7 @@ namespace OpenSim.Tests.Common.Mock
 
         public event DeRezObject OnDeRezObject;
         public event Action<IClientAPI> OnRegionHandShakeReply;
-        public event GenericCall2 OnRequestWearables;
+        public event GenericCall1 OnRequestWearables;
         public event GenericCall1 OnCompleteMovementToRegion;
         public event UpdateAgent OnPreAgentUpdate;
         public event UpdateAgent OnAgentUpdate;
@@ -519,6 +519,11 @@ namespace OpenSim.Tests.Common.Mock
 
         }
 
+        public void SendGenericMessage(string method, List<string> message)
+        {
+
+        }
+
         public void SendGenericMessage(string method, List<byte[]> message)
         {
 
@@ -613,7 +618,11 @@ namespace OpenSim.Tests.Common.Mock
         {
         }
 
-        public virtual void SendTeleportLocationStart()
+        public virtual void SendTeleportStart(uint flags)
+        {
+        }
+
+        public void SendTeleportProgress(uint flags, string message)
         {
         }
 
@@ -625,19 +634,7 @@ namespace OpenSim.Tests.Common.Mock
         {
         }
 
-        public virtual void SendAvatarData(SendAvatarData data)
-        {
-        }
-
-        public virtual void SendAvatarTerseUpdate(SendAvatarTerseData data)
-        {
-        }
-
         public virtual void SendCoarseLocationUpdate(List<UUID> users, List<Vector3> CoarseLocations)
-        {
-        }
-
-        public virtual void AttachObject(uint localID, Quaternion rotation, byte attachPoint, UUID ownerID)
         {
         }
 
@@ -645,15 +642,15 @@ namespace OpenSim.Tests.Common.Mock
         {
         }
 
-        public virtual void SendPrimitiveToClient(SendPrimitiveData data)
+        public void SendAvatarDataImmediate(ISceneEntity avatar)
         {
         }
 
-        public virtual void SendPrimTerseUpdate(SendPrimitiveTerseData data)
+        public void SendPrimUpdate(ISceneEntity entity, PrimUpdateFlags updateFlags)
         {
         }
 
-        public virtual void ReprioritizeUpdates(StateUpdateTypes type, UpdatePriorityHandler handler)
+        public void ReprioritizeUpdates()
         {
         }
 
@@ -1221,6 +1218,10 @@ namespace OpenSim.Tests.Common.Mock
         }
 
         public void SendTextBoxRequest(string message, int chatChannel, string objectname, string ownerFirstName, string ownerLastName, UUID objectId)
+        {
+        }
+
+        public void StopFlying(ISceneEntity presence)
         {
         }
     }

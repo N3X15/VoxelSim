@@ -54,7 +54,8 @@ namespace OpenSim.Services.PresenceService
         public bool LoginAgent(string userID, UUID sessionID,
                 UUID secureSessionID)
         {
-            PresenceData[] d = m_Database.Get("UserID", userID);
+            //PresenceData[] d = m_Database.Get("UserID", userID);
+            //m_Database.Get("UserID", userID);
 
             PresenceData data = new PresenceData();
 
@@ -87,7 +88,7 @@ namespace OpenSim.Services.PresenceService
 
         public bool ReportAgent(UUID sessionID, UUID regionID)
         {
-            m_log.DebugFormat("[PRESENCE SERVICE]: ReportAgent with session {0} in region {1}", sessionID, regionID);
+//            m_log.DebugFormat("[PRESENCE SERVICE]: ReportAgent with session {0} in region {1}", sessionID, regionID);
             try
             {
                 PresenceData pdata = m_Database.Get(sessionID);

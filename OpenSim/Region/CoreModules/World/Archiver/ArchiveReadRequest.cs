@@ -38,7 +38,6 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Framework.Serialization;
 using OpenSim.Framework.Serialization.External;
-
 //using OpenSim.Region.CoreModules.World.Terrain;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
@@ -52,6 +51,12 @@ namespace OpenSim.Region.CoreModules.World.Archiver
     public class ArchiveReadRequest
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        
+        /// <summary>
+        /// The maximum major version of OAR that we can read.  Minor versions shouldn't need a max number since version
+        /// bumps here should be compatible.
+        /// </summary>
+        public static int MAX_MAJOR_VERSION = 0;
 
         protected Scene m_scene;
         protected Stream m_loadStream;
@@ -79,7 +84,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
 
             try
             {
-                m_loadStream = new GZipStream(GetStream(loadPath), CompressionMode.Decompress);
+                m_loadStream = new GZipStream(ArchiveHelpers.GetStream(loadPath), CompressionMode.Decompress);
             }
             catch (EntryPointNotFoundException e)
             {
@@ -244,8 +249,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                 // to the same scene (when this is possible).
                 sceneObject.ResetIDs();
 
-
-                foreach (SceneObjectPart part in sceneObject.Children.Values)
+                foreach (SceneObjectPart part in sceneObject.Parts)
                 {
                     if (!ResolveUserUuid(part.CreatorID))
                         part.CreatorID = m_scene.RegionInfo.EstateSettings.EstateOwner;
@@ -473,83 +477,15 @@ namespace OpenSim.Region.CoreModules.World.Archiver
         }
 
         /// <summary>
-        /// Resolve path to a working FileStream
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        private Stream GetStream(string path)
-        {
-            if (File.Exists(path))
-            {
-                return new FileStream(path, FileMode.Open, FileAccess.Read);
-            }
-            else
-            {
-                try
-                {
-                    Uri uri = new Uri(path);
-                    if (uri.Scheme == "file")
-                    {
-                        return new FileStream(uri.AbsolutePath, FileMode.Open, FileAccess.Read);
-                    }
-                    else
-                    {
-                        if (uri.Scheme != "http")
-                            throw new Exception(String.Format("Unsupported URI scheme ({0})", path));
-
-                        // OK, now we know we have an HTTP URI to work with
-
-                        return URIFetch(uri);
-                    }
-                }
-                catch (UriFormatException)
-                {
-                    // In many cases the user will put in a plain old filename that cannot be found so assume that
-                    // this is the problem rather than confusing the issue with a UriFormatException
-                    throw new Exception(String.Format("Cannot find file {0}", path));
-                }
-            }
-        }
-
-        private static Stream URIFetch(Uri uri)
-        {
-            HttpWebRequest request  = (HttpWebRequest)WebRequest.Create(uri);
-
-            // request.Credentials = credentials;
-
-            request.ContentLength = 0;
-            request.KeepAlive     = false;
-
-            WebResponse response = request.GetResponse();
-            Stream file = response.GetResponseStream();
-
-            // justincc: gonna ignore the content type for now and just try anything
-            //if (response.ContentType != "application/x-oar")
-            //    throw new Exception(String.Format("{0} does not identify an OAR file", uri.ToString()));
-
-            if (response.ContentLength == 0)
-                throw new Exception(String.Format("{0} returned an empty file", uri.ToString()));
-
-            // return new BufferedStream(file, (int) response.ContentLength);
-            return new BufferedStream(file, 1000000);
-        }
-
-        /// <summary>
         /// Load oar control file
         /// </summary>
         /// <param name="path"></param>
         /// <param name="data"></param>
-        private void LoadControlFile(string path, byte[] data)
+        protected void LoadControlFile(string path, byte[] data)
         {
-            //Create the XmlNamespaceManager.
-            NameTable nt = new NameTable();
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(nt);
-
-            // Create the XmlParserContext.
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
             XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.None);
-
-            XmlTextReader xtr 
-                = new XmlTextReader(Encoding.ASCII.GetString(data), XmlNodeType.Document, context);
+            XmlTextReader xtr = new XmlTextReader(Encoding.ASCII.GetString(data), XmlNodeType.Document, context);
 
             RegionSettings currentRegionSettings = m_scene.RegionInfo.RegionSettings;
 
@@ -561,6 +497,22 @@ namespace OpenSim.Region.CoreModules.World.Archiver
             {
                 if (xtr.NodeType == XmlNodeType.Element) 
                 {
+                    if (xtr.Name.ToString() == "archive")
+                    {
+                        int majorVersion = int.Parse(xtr["major_version"]);
+                        int minorVersion = int.Parse(xtr["minor_version"]);
+                        string version = string.Format("{0}.{1}", majorVersion, minorVersion);
+                        
+                        if (majorVersion > MAX_MAJOR_VERSION)
+                        {
+                            throw new Exception(
+                                string.Format(
+                                    "The OAR you are trying to load has major version number of {0} but this version of OpenSim can only load OARs with major version number {1} and below",
+                                    majorVersion, MAX_MAJOR_VERSION));
+                        }
+                        
+                        m_log.InfoFormat("[ARCHIVER]: Loading OAR with version {0}", version);
+                    }
                     if (xtr.Name.ToString() == "datetime") 
                     {
                         int value;
@@ -572,7 +524,6 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                         currentRegionSettings.LoadedCreationID = xtr.ReadElementContentAsString();
                     }
                 }
-
             }
             
             currentRegionSettings.Save();

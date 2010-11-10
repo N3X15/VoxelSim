@@ -135,8 +135,8 @@ namespace OpenSim.ApplicationPlugins.Rest.Regions
                 // check for {terrain,stats,prims}
                 switch (comps[1].ToLower())
                 {
-                //case "terrain":
-                //    return RegionTerrain(httpResponse, scene);
+                case "terrain":
+                    return RegionTerrain(httpResponse, scene);
 
                 case "stats":
                     return RegionStats(httpResponse, scene);
@@ -179,16 +179,16 @@ namespace OpenSim.ApplicationPlugins.Rest.Regions
                            "GET", "too many parameters {0}", param);
         }
         #endregion GET methods
-/*
+
         protected string RegionTerrain(OSHttpResponse httpResponse, Scene scene)
         {
             httpResponse.SendChunked = true;
-            httpResponse.ContentType = "text/xml";
+            httpResponse.ContentType = "application/binary";
 
-            return scene.Voxels.SaveToXmlString();
+            return scene.Voxels.SaveToVox();
             //return Failure(httpResponse, OSHttpStatusCode.ServerErrorNotImplemented,
             //               "GET", "terrain not implemented");
-        }*/
+        }
 
         protected string RegionStats(OSHttpResponse httpResponse, Scene scene)
         {

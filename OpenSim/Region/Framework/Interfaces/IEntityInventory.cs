@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Collections;
 using OpenMetaverse;
 using OpenSim.Framework;
+using OpenSim.Region.Framework.Scenes;
 
 namespace OpenSim.Region.Framework.Interfaces
 {
@@ -55,6 +56,15 @@ namespace OpenSim.Region.Framework.Interfaces
         /// 
         /// <param name="linkNum">Link number for the part</param>
         void ResetInventoryIDs();
+
+        /// <summary>
+        /// Reset parent object UUID for all the items in the prim's inventory.
+        /// </summary>
+        /// 
+        /// If this method is called and there are inventory items, then we regard the inventory as having changed.
+        /// 
+        /// <param name="linkNum">Link number for the part</param>
+        void ResetObjectID();
 
         /// <summary>
         /// Change every item in this inventory to a new owner.
@@ -153,6 +163,17 @@ namespace OpenSim.Region.Framework.Interfaces
         /// If no inventory item has that name then an empty list is returned.
         /// </returns>
         IList<TaskInventoryItem> GetInventoryItems(string name);
+        
+        /// <summary>
+        /// Get the scene object referenced by an inventory item.
+        /// </summary>
+        /// 
+        /// This is returned in a 'rez ready' state.  That is, name, description, permissions and other details have
+        /// been adjusted to reflect the part and item from which it originates.
+        /// 
+        /// <param name="item"></param>
+        /// <returns>The scene object.  Null if the scene object asset couldn't be found</returns>
+        SceneObjectGroup GetRezReadySceneObject(TaskInventoryItem item);
 
         /// <summary>
         /// Update an existing inventory item.
@@ -188,7 +209,7 @@ namespace OpenSim.Region.Framework.Interfaces
         /// Backup the inventory to the given data store
         /// </summary>
         /// <param name="datastore"></param>
-        void ProcessInventoryBackup(IRegionDataStore datastore);
+        void ProcessInventoryBackup(ISimulationDataService datastore);
 
         uint MaskEffectivePermissions();
 

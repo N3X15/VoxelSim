@@ -32,7 +32,6 @@ using log4net;
 using Nini.Config;
 using OpenMetaverse;
 using OpenSim.Framework;
-
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
@@ -82,6 +81,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
             scene.EventManager.OnNewClient += OnNewClient;
             scene.EventManager.OnClientClosed += ClientLoggedOut;
             scene.EventManager.OnIncomingInstantMessage += OnGridInstantMessage;
+            scene.EventManager.OnSetRootAgentScene += OnSetRootAgentScene;
         }
 
         public void RegionLoaded(Scene scene)
@@ -91,16 +91,16 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                 m_TransferModule = m_Scenelist[0].RequestModuleInterface<IMessageTransferModule>();
                 if (m_TransferModule == null)
                 {
-                    m_log.Error("[INVENTORY TRANSFER] No Message transfer module found, transfers will be local only");
+                    m_log.Error("[INVENTORY TRANSFER]: No Message transfer module found, transfers will be local only");
                     m_Enabled = false;
 
                     m_Scenelist.Clear();
                     scene.EventManager.OnNewClient -= OnNewClient;
                     scene.EventManager.OnClientClosed -= ClientLoggedOut;
                     scene.EventManager.OnIncomingInstantMessage -= OnGridInstantMessage;
+                    scene.EventManager.OnSetRootAgentScene -= OnSetRootAgentScene;
                 }
             }
-
         }
 
         public void RemoveRegion(Scene scene)
@@ -108,6 +108,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
             scene.EventManager.OnNewClient -= OnNewClient;
             scene.EventManager.OnClientClosed -= ClientLoggedOut;
             scene.EventManager.OnIncomingInstantMessage -= OnGridInstantMessage;
+            scene.EventManager.OnSetRootAgentScene -= OnSetRootAgentScene;
             m_Scenelist.Remove(scene);
         }
 
@@ -136,6 +137,11 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
             // Inventory giving is conducted via instant message
             client.OnInstantMessage += OnInstantMessage;
         }
+        
+        protected void OnSetRootAgentScene(UUID id, Scene scene)
+        {
+            m_AgentRegions[id] = scene;
+        }
 
         private Scene FindClientScene(UUID agentId)
         {
@@ -145,10 +151,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                 {
                     ScenePresence presence = scene.GetScenePresence(agentId);
                     if (presence != null)
-                    {
-                        if (!presence.IsChildAgent)
-                            return scene;
-                    }
+                        return scene;
                 }
             }
             return null;
@@ -156,19 +159,24 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
 
         private void OnInstantMessage(IClientAPI client, GridInstantMessage im)
         {
-            m_log.InfoFormat("OnInstantMessage {0}", im.dialog);
+//            m_log.DebugFormat(
+//                "[INVENTORY TRANSFER]: {0} IM type received from {1}", 
+//                (InstantMessageDialog)im.dialog, client.Name);
+          
             Scene scene = FindClientScene(client.AgentId);
 
             if (scene == null) // Something seriously wrong here.
                 return;
 
-
-
             if (im.dialog == (byte) InstantMessageDialog.InventoryOffered)
             {
                 //m_log.DebugFormat("Asset type {0}", ((AssetType)im.binaryBucket[0]));
-                
-                ScenePresence user = scene.GetScenePresence(new UUID(im.toAgentID));
+
+                if (im.binaryBucket.Length < 17) // Invalid
+                    return;
+            
+                UUID receipientID = new UUID(im.toAgentID);
+                ScenePresence user = scene.GetScenePresence(receipientID);
                 UUID copyID;
 
                 // First byte is the asset type
@@ -178,12 +186,12 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                 {
                     UUID folderID = new UUID(im.binaryBucket, 1);
                     
-                    m_log.DebugFormat("[AGENT INVENTORY]: Inserting original folder {0} "+
+                    m_log.DebugFormat("[INVENTORY TRANSFER]: Inserting original folder {0} "+
                             "into agent {1}'s inventory",
                             folderID, new UUID(im.toAgentID));
                     
                     InventoryFolderBase folderCopy 
-                        = scene.GiveInventoryFolder(new UUID(im.toAgentID), client.AgentId, folderID, UUID.Zero);
+                        = scene.GiveInventoryFolder(receipientID, client.AgentId, folderID, UUID.Zero);
                     
                     if (folderCopy == null)
                     {
@@ -199,20 +207,22 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                     im.binaryBucket[0] = (byte)AssetType.Folder;
                     Array.Copy(copyIDBytes, 0, im.binaryBucket, 1, copyIDBytes.Length);
                     
-                    if (user != null && !user.IsChildAgent)
+                    if (user != null)
                     {
                         user.ControllingClient.SendBulkUpdateInventory(folderCopy);
                     }
+
+                    // HACK!!
+                    im.imSessionID = folderID.Guid;
                 }
                 else
                 {
                     // First byte of the array is probably the item type
                     // Next 16 bytes are the UUID
-                    m_log.Info("OnInstantMessage - giving item");
 
                     UUID itemID = new UUID(im.binaryBucket, 1);
 
-                    m_log.DebugFormat("[AGENT INVENTORY]: Inserting item {0} "+
+                    m_log.DebugFormat("[INVENTORY TRANSFER]: (giving) Inserting item {0} "+
                             "into agent {1}'s inventory",
                             itemID, new UUID(im.toAgentID));
 
@@ -229,29 +239,32 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                     copyID = itemCopy.ID;
                     Array.Copy(copyID.GetBytes(), 0, im.binaryBucket, 1, 16);
                     
-                    if (user != null && !user.IsChildAgent)
+                    if (user != null)
                     {
                         user.ControllingClient.SendBulkUpdateInventory(itemCopy);
                     }
+
+                    // HACK!!
+                    im.imSessionID = itemID.Guid;
                 }
 
                 // Send the IM to the recipient. The item is already
                 // in their inventory, so it will not be lost if
                 // they are offline.
                 //
-                if (user != null && !user.IsChildAgent)
+                if (user != null)
                 {
-                    // And notify. Transaction ID is the item ID. We get that
-                    // same ID back on the reply so we know what to act on
-                    //
                     user.ControllingClient.SendInstantMessage(im);
-
                     return;
                 }
                 else
                 {
                     if (m_TransferModule != null)
-                        m_TransferModule.SendInstantMessage(im, delegate(bool success) {});
+                        m_TransferModule.SendInstantMessage(im, delegate(bool success) 
+                        {
+                            if (!success)
+                                client.SendAlertMessage("User not online. Inventory has been saved");
+                        });
                 }
             }
             else if (im.dialog == (byte) InstantMessageDialog.InventoryAccepted)
@@ -274,18 +287,14 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                 // inventory is loaded. Courtesy of the above bulk update,
                 // It will have been pushed to the client, too
                 //
-                
-                //CachedUserInfo userInfo =
-                //        scene.CommsManager.UserProfileCacheService.
-                //        GetUserDetails(client.AgentId);
                 IInventoryService invService = scene.InventoryService;
 
                 InventoryFolderBase trashFolder =
                     invService.GetFolderForType(client.AgentId, AssetType.TrashFolder);
-                
-                UUID inventoryEntityID = new UUID(im.imSessionID); // The inventory item/folder, back from it's trip
 
-                InventoryItemBase item = new InventoryItemBase(inventoryEntityID, client.AgentId);
+                UUID inventoryID = new UUID(im.imSessionID); // The inventory item/folder, back from it's trip
+
+                InventoryItemBase item = new InventoryItemBase(inventoryID, client.AgentId);
                 item = invService.GetItem(item);
                 InventoryFolderBase folder = null;
                 
@@ -301,7 +310,7 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                 }
                 else
                 {
-                    folder = new InventoryFolderBase(inventoryEntityID, client.AgentId);
+                    folder = new InventoryFolderBase(inventoryID, client.AgentId);
                     folder = invService.GetFolder(folder);
                     
                     if (folder != null & trashFolder != null)
@@ -338,11 +347,6 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
                         m_TransferModule.SendInstantMessage(im, delegate(bool success) {});
                 }
             }
-        }
-
-        public void SetRootAgentScene(UUID agentID, Scene scene)
-        {
-            m_AgentRegions[agentID] = scene;
         }
 
         public bool NeedSceneCacheClear(UUID agentID, Scene scene)
@@ -417,90 +421,18 @@ namespace OpenSim.Region.CoreModules.Avatar.Inventory.Transfer
         {
             // Check if this is ours to handle
             //
-            m_log.Info("OnFridInstantMessage");
-            if (msg.dialog != (byte) InstantMessageDialog.InventoryOffered)
-                return;
-
-            if (msg.binaryBucket.Length < 17) // Invalid
-                return;
-
             Scene scene = FindClientScene(new UUID(msg.toAgentID));
+
+            if (scene == null)
+                return;
 
             // Find agent to deliver to
             //
             ScenePresence user = scene.GetScenePresence(new UUID(msg.toAgentID));
 
-            if (user == null) // Shouldn't happen
-            {
-                m_log.Debug("[INVENTORY TRANSFER] Can't find recipient");
-                return;
-            }
+            // Just forward to local handling
+            OnInstantMessage(user.ControllingClient, msg);
 
-            //CachedUserInfo userInfo =
-            //        scene.CommsManager.UserProfileCacheService.
-            //        GetUserDetails(user.ControllingClient.AgentId);
-
-            //if (userInfo == null)
-            //{
-            //    m_log.Debug("[INVENTORY TRANSFER] Can't find user info of recipient");
-            //    return;
-            //}
-
-            AssetType assetType = (AssetType)msg.binaryBucket[0];
-            IInventoryService invService = scene.InventoryService;
-
-            if (AssetType.Folder == assetType)
-            {
-                UUID folderID = new UUID(msg.binaryBucket, 1);
-                InventoryFolderBase folder = new InventoryFolderBase();
-
-                folder.ID = folderID;
-                folder.Owner = user.ControllingClient.AgentId;
-
-                // Fetch from service
-                //
-                folder = invService.GetFolder(folder);
-                if (folder == null)
-                {
-                    m_log.Debug("[INVENTORY TRANSFER] Can't find folder to give");
-                    return;
-                }
-
-                user.ControllingClient.SendBulkUpdateInventory(folder);
-
-                               //// This unelegant, slow kludge is to reload the folders and
-                               //// items. Since a folder give can transfer subfolders and
-                               //// items, this is the easiest way to pull that stuff in
-                               ////
-                               //userInfo.DropInventory();
-                               //userInfo.FetchInventory();
-
-                // Deliver message
-                //
-                user.ControllingClient.SendInstantMessage(msg);
-            }
-            else
-            {
-                UUID itemID = new UUID(msg.binaryBucket, 1);
-                InventoryItemBase item = new InventoryItemBase(itemID, user.ControllingClient.AgentId);
-
-                // Fetch from service
-                //
-                item = invService.GetItem(item);
-                if (item == null)
-                {
-                    m_log.Debug("[INVENTORY TRANSFER] Can't find item to give");
-                    return;
-                }
-
-                // Update item to viewer (makes it appear in proper folder)
-                //
-                user.ControllingClient.SendBulkUpdateInventory(item);
-
-                // Deliver message
-                //
-                user.ControllingClient.SendInstantMessage(msg);
-            }
         }
     }
 }

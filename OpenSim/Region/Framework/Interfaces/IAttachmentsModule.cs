@@ -44,7 +44,7 @@ namespace OpenSim.Region.Framework.Interfaces
         /// <param name="rot"></param>
         /// <param name="silent"></param>
         void AttachObject(
-            IClientAPI remoteClient, uint objectLocalID, uint AttachmentPt, Quaternion rot, bool silent);
+            IClientAPI remoteClient, uint objectLocalID, uint AttachmentPt, bool silent);
 
         /// <summary>
         /// Attach an object to an avatar.
@@ -55,9 +55,9 @@ namespace OpenSim.Region.Framework.Interfaces
         /// <param name="rot"></param>
         /// <param name="attachPos"></param>
         /// <param name="silent"></param>
-        /// <returns>true if the object was successfully attached, false otherwise</returns>        
+        /// <returns>true if the object was successfully attached, false otherwise</returns>
         bool AttachObject(
-            IClientAPI remoteClient, uint objectLocalID, uint AttachmentPt, Quaternion rot, Vector3 attachPos, bool silent);
+            IClientAPI remoteClient, SceneObjectGroup grp, uint AttachmentPt, bool silent);
 
         /// <summary>
         /// Rez an attachment from user inventory and change inventory status to match.
@@ -109,17 +109,6 @@ namespace OpenSim.Region.Framework.Interfaces
         /// <param name="itemID"></param>
         /// <param name="remoteClient"></param>
         void DetachSingleAttachmentToGround(UUID itemID, IClientAPI remoteClient);
-            
-        /// <summary>
-        /// Update the user inventory to the attachment of an item
-        /// </summary>
-        /// <param name="att"></param>
-        /// <param name="remoteClient"></param>
-        /// <param name="itemID"></param>
-        /// <param name="AttachmentPt"></param>
-        /// <returns></returns>
-        UUID SetAttachmentInventoryStatus(
-            SceneObjectGroup att, IClientAPI remoteClient, UUID itemID, uint AttachmentPt);
 
         /// <summary>
         /// Update the user inventory to show a detach.
@@ -131,5 +120,13 @@ namespace OpenSim.Region.Framework.Interfaces
         /// A <see cref="IClientAPI"/>
         /// </param>
         void ShowDetachInUserInventory(UUID itemID, IClientAPI remoteClient);
+        
+        /// <summary>
+        /// Update the position of an attachment
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="sog"></param>
+        /// <param name="pos"></param>
+        void UpdateAttachmentPosition(IClientAPI client, SceneObjectGroup sog, Vector3 pos);
     }
 }

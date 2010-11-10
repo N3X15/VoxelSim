@@ -133,7 +133,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.RegionReady
                 m_firstEmptyCompileQueue = false;
                 m_oarFileLoading = false;
 
-                m_scene.Backup();
+                m_scene.Backup(false);
 
                 c.From = "RegionReady";
                 if (m_lastOarLoadedOk) 
@@ -146,6 +146,7 @@ namespace OpenSim.Region.OptionalModules.Scripting.RegionReady
                 c.Position = new Vector3(((int)Constants.RegionSize * 0.5f), ((int)Constants.RegionSize * 0.5f), 30);
                 c.Sender = null;
                 c.SenderUUID = UUID.Zero;
+                c.Scene = m_scene;
 
                 m_log.InfoFormat("[RegionReady]: Region \"{0}\" is ready: \"{1}\" on channel {2}",
                                  m_scene.RegionInfo.RegionName, c.Message, m_channelNotify);

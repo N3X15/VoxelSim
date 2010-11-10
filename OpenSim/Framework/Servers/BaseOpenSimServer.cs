@@ -37,6 +37,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Core;
 using log4net.Repository;
+using OpenSim.Framework;
 using OpenSim.Framework.Console;
 using OpenSim.Framework.Servers;
 using OpenSim.Framework.Servers.HttpServer;
@@ -234,26 +235,19 @@ namespace OpenSim.Framework.Servers
         protected string GetThreadsReport()
         {
             StringBuilder sb = new StringBuilder();
+            Watchdog.ThreadWatchdogInfo[] threads = Watchdog.GetThreads();
 
-            ProcessThreadCollection threads = ThreadTracker.GetThreads();
-            if (threads == null)
+            sb.Append(threads.Length + " threads are being tracked:" + Environment.NewLine);
+            foreach (Watchdog.ThreadWatchdogInfo twi in threads)
             {
-                sb.Append("OpenSim thread tracking is only enabled in DEBUG mode.");
+                Thread t = twi.Thread;
+                
+                sb.Append(
+                    "ID: " + t.ManagedThreadId + ", Name: " + t.Name + ", TimeRunning: " 
+                    + "Pri: " + t.Priority + ", State: " + t.ThreadState);
+                sb.Append(Environment.NewLine);
             }
-            else
-            {
-                sb.Append(threads.Count + " threads are being tracked:" + Environment.NewLine);
-                foreach (ProcessThread t in threads)
-                {
-                    sb.Append("ID: " + t.Id + ", TotalProcessorTime: " + t.TotalProcessorTime + ", TimeRunning: " +
-                        (DateTime.Now - t.StartTime) + ", Pri: " + t.CurrentPriority + ", State: " + t.ThreadState);
-                    if (t.ThreadState == System.Diagnostics.ThreadState.Wait)
-                        sb.Append(", Reason: " + t.WaitReason + Environment.NewLine);
-                    else
-                        sb.Append(Environment.NewLine);
 
-                }
-            }
             int workers = 0, ports = 0, maxWorkers = 0, maxPorts = 0;
             ThreadPool.GetAvailableThreads(out workers, out ports);
             ThreadPool.GetMaxThreads(out maxWorkers, out maxPorts);
@@ -286,7 +280,11 @@ namespace OpenSim.Framework.Servers
 
             EnhanceVersionInformation();
             
-            m_log.Info("[STARTUP]: Version: " + m_version + "\n");
+            m_log.Info("[STARTUP]: OpenSimulator version: " + m_version + Environment.NewLine);
+            // clr version potentially is more confusing than helpful, since it doesn't tell us if we're running under Mono/MS .NET and
+            // the clr version number doesn't match the project version number under Mono.
+            //m_log.Info("[STARTUP]: Virtual machine runtime version: " + Environment.Version + Environment.NewLine);
+            m_log.Info("[STARTUP]: Operating system version: " + Environment.OSVersion + Environment.NewLine);
             
             StartupSpecific();
             

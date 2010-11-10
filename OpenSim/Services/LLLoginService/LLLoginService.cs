@@ -73,6 +73,8 @@ namespace OpenSim.Services.LLLoginService
         protected int m_MinLoginLevel;
         protected string m_GatekeeperURL;
         protected bool m_AllowRemoteSetLoginLevel;
+        protected string m_MapTileURL;
+        protected string m_SearchURL;
 
         IConfig m_LoginServerConfig;
 
@@ -100,7 +102,9 @@ namespace OpenSim.Services.LLLoginService
             m_AllowRemoteSetLoginLevel = m_LoginServerConfig.GetBoolean("AllowRemoteSetLoginLevel", false);
             m_MinLoginLevel = m_LoginServerConfig.GetInt("MinLoginLevel", 0);
             m_GatekeeperURL = m_LoginServerConfig.GetString("GatekeeperURI", string.Empty);
-
+            m_MapTileURL = m_LoginServerConfig.GetString("MapTileURL", string.Empty);
+            m_SearchURL = m_LoginServerConfig.GetString("SearchURL", string.Empty);
+            
             // These are required; the others aren't
             if (accountService == string.Empty || authService == string.Empty)
                 throw new Exception("LoginService is missing service specifications");
@@ -204,11 +208,14 @@ namespace OpenSim.Services.LLLoginService
             return response;
         }
 
-        public LoginResponse Login(string firstName, string lastName, string passwd, string startLocation, UUID scopeID, string clientVersion, IPEndPoint clientIP)
+        public LoginResponse Login(string firstName, string lastName, string passwd, string startLocation, UUID scopeID, 
+            string clientVersion, string channel, string mac, string id0, IPEndPoint clientIP)
         {
             bool success = false;
             UUID session = UUID.Random();
 
+            m_log.InfoFormat("[LLOGIN SERVICE]: Login request for {0} {1} from {2} with user agent {3} starting in {4}", 
+                firstName, lastName, clientIP.Address.ToString(), clientVersion, startLocation);
             try
             {
                 //
@@ -302,7 +309,7 @@ namespace OpenSim.Services.LLLoginService
                 {
                     // something went wrong, make something up, so that we don't have to test this anywhere else
                     guinfo = new GridUserInfo();
-                    guinfo.LastPosition = guinfo.HomePosition = new Vector3(128, 128, 30);               
+                    guinfo.LastPosition = guinfo.HomePosition = new Vector3(128, 128, 30);
                 }
                 
                 //
@@ -323,23 +330,25 @@ namespace OpenSim.Services.LLLoginService
                 //
                 // Get the avatar
                 //
-                AvatarData avatar = null;
+                AvatarAppearance avatar = null;
                 if (m_AvatarService != null)
                 {
-                    avatar = m_AvatarService.GetAvatar(account.PrincipalID);
+                    avatar = m_AvatarService.GetAppearance(account.PrincipalID);
                 }
 
                 //
                 // Instantiate/get the simulation interface and launch an agent at the destination
                 //
                 string reason = string.Empty;
-                AgentCircuitData aCircuit = LaunchAgentAtGrid(gatekeeper, destination, account, avatar, session, secureSession, position, where, clientVersion, clientIP, out where, out reason);
-
+                GridRegion dest;
+                AgentCircuitData aCircuit = LaunchAgentAtGrid(gatekeeper, destination, account, avatar, session, secureSession, position, where, 
+                    clientVersion, channel, mac, id0, clientIP, out where, out reason, out dest);
+                destination = dest;
                 if (aCircuit == null)
                 {
                     m_PresenceService.LogoutAgent(session);
                     m_log.InfoFormat("[LLOGIN SERVICE]: Login failed, reason: {0}", reason);
-                    return LLFailedLoginResponse.AuthorizationProblem;
+                    return new LLFailedLoginResponse("key", reason, "false");
 
                 }
                 // Get Friends list 
@@ -354,7 +363,7 @@ namespace OpenSim.Services.LLLoginService
                 // Finally, fill out the response and return it
                 //
                 LLLoginResponse response = new LLLoginResponse(account, aCircuit, guinfo, destination, inventorySkel, friendsList, m_LibraryService,
-                    where, startLocation, position, lookAt, gestures, m_WelcomeMessage, home, clientIP);
+                    where, startLocation, position, lookAt, gestures, m_WelcomeMessage, home, clientIP, m_MapTileURL, m_SearchURL);
 
                 m_log.DebugFormat("[LLOGIN SERVICE]: All clear. Sending login response to client.");
                 return response;
@@ -592,8 +601,9 @@ namespace OpenSim.Services.LLLoginService
             }
         }
 
-        protected AgentCircuitData LaunchAgentAtGrid(GridRegion gatekeeper, GridRegion destination, UserAccount account, AvatarData avatar,
-            UUID session, UUID secureSession, Vector3 position, string currentWhere, string viewer, IPEndPoint clientIP, out string where, out string reason)
+        protected AgentCircuitData LaunchAgentAtGrid(GridRegion gatekeeper, GridRegion destination, UserAccount account, AvatarAppearance avatar,
+            UUID session, UUID secureSession, Vector3 position, string currentWhere, string viewer, string channel, string mac, string id0,
+            IPEndPoint clientIP, out string where, out string reason, out GridRegion dest)
         {
             where = currentWhere;
             ISimulationService simConnector = null;
@@ -633,7 +643,7 @@ namespace OpenSim.Services.LLLoginService
             if (m_UserAgentService == null && simConnector != null)
             {
                 circuitCode = (uint)Util.RandomClass.Next(); ;
-                aCircuit = MakeAgent(destination, account, avatar, session, secureSession, circuitCode, position, viewer);
+                aCircuit = MakeAgent(destination, account, avatar, session, secureSession, circuitCode, position, clientIP.Address.ToString(), viewer, channel, mac, id0);
                 success = LaunchAgentDirectly(simConnector, destination, aCircuit, out reason);
                 if (!success && m_GridService != null)
                 {
@@ -658,7 +668,7 @@ namespace OpenSim.Services.LLLoginService
             if (m_UserAgentService != null)
             {
                 circuitCode = (uint)Util.RandomClass.Next(); ;
-                aCircuit = MakeAgent(destination, account, avatar, session, secureSession, circuitCode, position, viewer);
+                aCircuit = MakeAgent(destination, account, avatar, session, secureSession, circuitCode, position, clientIP.Address.ToString(), viewer, channel, mac, id0);
                 success = LaunchAgentIndirectly(gatekeeper, destination, aCircuit, clientIP, out reason);
                 if (!success && m_GridService != null)
                 {
@@ -679,7 +689,7 @@ namespace OpenSim.Services.LLLoginService
                     }
                 }
             }
-
+            dest = destination;
             if (success)
                 return aCircuit;
             else
@@ -687,13 +697,14 @@ namespace OpenSim.Services.LLLoginService
         }
 
         private AgentCircuitData MakeAgent(GridRegion region, UserAccount account, 
-            AvatarData avatar, UUID session, UUID secureSession, uint circuit, Vector3 position, string viewer)
+            AvatarAppearance avatar, UUID session, UUID secureSession, uint circuit, Vector3 position, 
+            string ipaddress, string viewer, string channel, string mac, string id0)
         {
             AgentCircuitData aCircuit = new AgentCircuitData();
 
             aCircuit.AgentID = account.PrincipalID;
             if (avatar != null)
-                aCircuit.Appearance = avatar.ToAvatarAppearance(account.PrincipalID);
+                aCircuit.Appearance = new AvatarAppearance(avatar);
             else
                 aCircuit.Appearance = new AvatarAppearance(account.PrincipalID);
 
@@ -708,7 +719,11 @@ namespace OpenSim.Services.LLLoginService
             aCircuit.SecureSessionID = secureSession;
             aCircuit.SessionID = session;
             aCircuit.startpos = position;
+            aCircuit.IPAddress = ipaddress;
             aCircuit.Viewer = viewer;
+            aCircuit.Channel = channel;
+            aCircuit.Mac = mac;
+            aCircuit.Id0 = id0;
             SetServiceURLs(aCircuit, account);
 
             return aCircuit;
@@ -748,14 +763,8 @@ namespace OpenSim.Services.LLLoginService
         private bool LaunchAgentIndirectly(GridRegion gatekeeper, GridRegion destination, AgentCircuitData aCircuit, IPEndPoint clientIP, out string reason)
         {
             m_log.Debug("[LLOGIN SERVICE] Launching agent at " + destination.RegionName);
-            if (m_UserAgentService.LoginAgentToGrid(aCircuit, gatekeeper, destination, out reason))
-            {
-                // We may need to do this at some point,
-                // so leaving it here in comments.
-                //IPAddress addr = NetworkUtil.GetIPFor(clientIP.Address, destination.ExternalEndPoint.Address);
-                m_UserAgentService.SetClientToken(aCircuit.SessionID, /*addr.Address.ToString() */ clientIP.Address.ToString());
+            if (m_UserAgentService.LoginAgentToGrid(aCircuit, gatekeeper, destination, clientIP, out reason))
                 return true;
-            }
             return false;
         }
 

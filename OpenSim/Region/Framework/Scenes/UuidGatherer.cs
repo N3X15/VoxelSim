@@ -121,10 +121,13 @@ namespace OpenSim.Region.Framework.Scenes
 //            m_log.DebugFormat(
 //                "[ASSET GATHERER]: Getting assets for object {0}, {1}", sceneObject.Name, sceneObject.UUID);
 
-            foreach (SceneObjectPart part in sceneObject.GetParts())
+            SceneObjectPart[] parts = sceneObject.Parts;
+            for (int i = 0; i < parts.Length; i++)
             {
-                //m_log.DebugFormat(
-                //    "[ARCHIVER]: Getting part {0}, {1} for object {2}", part.Name, part.UUID, sceneObject.UUID);
+                SceneObjectPart part = parts[i];
+
+//                m_log.DebugFormat(
+//                    "[ARCHIVER]: Getting part {0}, {1} for object {2}", part.Name, part.UUID, sceneObject.UUID);
 
                 try
                 {
@@ -155,7 +158,9 @@ namespace OpenSim.Region.Framework.Scenes
                     // Now analyze this prim's inventory items to preserve all the uuids that they reference
                     foreach (TaskInventoryItem tii in taskDictionary.Values)
                     {
-                        //m_log.DebugFormat("[ARCHIVER]: Analysing item asset type {0}", tii.Type);
+//                        m_log.DebugFormat(
+//                            "[ARCHIVER]: Analysing item {0} asset type {1} in {2} {3}", 
+//                            tii.Name, tii.Type, part.Name, part.UUID);
 
                         if (!assetUuids.ContainsKey(tii.AssetID))
                             GatherAssetUuids(tii.AssetID, (AssetType)tii.Type, assetUuids);
@@ -286,9 +291,16 @@ namespace OpenSim.Region.Framework.Scenes
             }
         }
 
+        /// <summary>
+        /// Get the asset uuid associated with a gesture
+        /// </summary>
+        /// <param name="gestureUuid"></param>
+        /// <param name="assetUuids"></param>
         protected void GetGestureAssetUuids(UUID gestureUuid, IDictionary<UUID, AssetType> assetUuids)
         {
             AssetBase assetBase = GetAsset(gestureUuid);
+            if (null == assetBase)
+                return;
 
             MemoryStream ms = new MemoryStream(assetBase.Data);
             StreamReader sr = new StreamReader(ms);

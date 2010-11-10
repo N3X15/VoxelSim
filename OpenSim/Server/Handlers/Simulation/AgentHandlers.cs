@@ -52,6 +52,8 @@ namespace OpenSim.Server.Handlers.Simulation
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private ISimulationService m_SimulationService;
 
+        protected bool m_Proxy = false;
+
         public AgentHandler() { }
 
         public AgentHandler(ISimulationService sim)
@@ -61,13 +63,13 @@ namespace OpenSim.Server.Handlers.Simulation
 
         public Hashtable Handler(Hashtable request)
         {
-            m_log.Debug("[CONNECTION DEBUGGING]: AgentHandler Called");
-
-            m_log.Debug("---------------------------");
-            m_log.Debug(" >> uri=" + request["uri"]);
-            m_log.Debug(" >> content-type=" + request["content-type"]);
-            m_log.Debug(" >> http-method=" + request["http-method"]);
-            m_log.Debug("---------------------------\n");
+//            m_log.Debug("[CONNECTION DEBUGGING]: AgentHandler Called");
+//
+//            m_log.Debug("---------------------------");
+//            m_log.Debug(" >> uri=" + request["uri"]);
+//            m_log.Debug(" >> content-type=" + request["content-type"]);
+//            m_log.Debug(" >> http-method=" + request["http-method"]);
+//            m_log.Debug("---------------------------\n");
 
             Hashtable responsedata = new Hashtable();
             responsedata["content_type"] = "text/html";
@@ -178,10 +180,30 @@ namespace OpenSim.Server.Handlers.Simulation
 
             resp["reason"] = OSD.FromString(reason);
             resp["success"] = OSD.FromBoolean(result);
+            // Let's also send out the IP address of the caller back to the caller (HG 1.5)
+            resp["your_ip"] = OSD.FromString(GetCallerIP(request));
 
             // TODO: add reason if not String.Empty?
             responsedata["int_response_code"] = HttpStatusCode.OK;
             responsedata["str_response_string"] = OSDParser.SerializeJsonString(resp);
+        }
+
+        private string GetCallerIP(Hashtable request)
+        {
+            if (!m_Proxy)
+                return Util.GetCallerIP(request);
+
+            // We're behind a proxy
+            Hashtable headers = (Hashtable)request["headers"];
+            if (headers.ContainsKey("X-Forwarded-For") && headers["X-Forwarded-For"] != null)
+            {
+                IPEndPoint ep = Util.GetClientIPFromXFF((string)headers["X-Forwarded-For"]);
+                if (ep != null)
+                    return ep.Address.ToString();
+            }
+
+            // Oops
+            return Util.GetCallerIP(request);
         }
 
         // subclasses can override this
@@ -272,7 +294,7 @@ namespace OpenSim.Server.Handlers.Simulation
             //responsedata["str_response_string"] = OSDParser.SerializeJsonString(resp); ??? instead
         }
 
-        // subclasses cab override this
+        // subclasses can override this
         protected virtual bool UpdateAgent(GridRegion destination, AgentData agent)
         {
             return m_SimulationService.UpdateAgent(destination, agent);
@@ -280,6 +302,16 @@ namespace OpenSim.Server.Handlers.Simulation
 
         protected virtual void DoAgentGet(Hashtable request, Hashtable responsedata, UUID id, UUID regionID)
         {
+            if (m_SimulationService == null)
+            {
+                m_log.Debug("[AGENT HANDLER]: Agent GET called. Harmless but useless.");
+                responsedata["content_type"] = "application/json";
+                responsedata["int_response_code"] = HttpStatusCode.NotImplemented;
+                responsedata["str_response_string"] = string.Empty;
+
+                return;
+            }
+
             GridRegion destination = new GridRegion();
             destination.RegionID = regionID;
 
@@ -342,6 +374,7 @@ namespace OpenSim.Server.Handlers.Simulation
         {
             m_SimulationService.ReleaseAgent(regionID, id, "");
         }
+
     }
 
 }

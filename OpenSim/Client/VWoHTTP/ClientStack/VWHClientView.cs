@@ -245,7 +245,7 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
         public event TeleportLandmarkRequest OnTeleportLandmarkRequest = delegate { };
         public event DeRezObject OnDeRezObject = delegate { };
         public event Action<IClientAPI> OnRegionHandShakeReply = delegate { };
-        public event GenericCall2 OnRequestWearables = delegate { };
+        public event GenericCall1 OnRequestWearables = delegate { };
         public event GenericCall1 OnCompleteMovementToRegion = delegate { };
         public event UpdateAgent OnPreAgentUpdate;
         public event UpdateAgent OnAgentUpdate = delegate { };
@@ -510,12 +510,11 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
             throw new System.NotImplementedException();
         }
 
-        public void SendGenericMessage(string method, List<byte[]> message)
+        public void SendGenericMessage(string method, List<string> message)
         {
-            throw new System.NotImplementedException();
         }
 
-        public void SendLayerData(float[] map)
+        public void SendGenericMessage(string method, List<byte[]> message)
         {
             throw new System.NotImplementedException();
         }
@@ -580,7 +579,12 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
             throw new System.NotImplementedException();
         }
 
-        public void SendTeleportLocationStart()
+        public void SendTeleportStart(uint flags)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SendTeleportProgress(uint flags, string message)
         {
             throw new System.NotImplementedException();
         }
@@ -595,22 +599,7 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
             throw new System.NotImplementedException();
         }
 
-        public void SendAvatarData(SendAvatarData data)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void SendAvatarTerseUpdate(SendAvatarTerseData data)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public void SendCoarseLocationUpdate(List<UUID> users, List<Vector3> CoarseLocations)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void AttachObject(uint localID, Quaternion rotation, byte attachPoint, UUID ownerID)
         {
             throw new System.NotImplementedException();
         }
@@ -620,17 +609,17 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
             throw new System.NotImplementedException();
         }
 
-        public void SendPrimitiveToClient(SendPrimitiveData data)
+        public void SendAvatarDataImmediate(ISceneEntity avatar)
         {
             throw new System.NotImplementedException();
         }
 
-        public void SendPrimTerseUpdate(SendPrimitiveTerseData data)
+        public void SendPrimUpdate(ISceneEntity entity, PrimUpdateFlags updateFlags)
         {
             throw new System.NotImplementedException();
         }
 
-        public void ReprioritizeUpdates(StateUpdateTypes type, UpdatePriorityHandler handler)
+        public void ReprioritizeUpdates()
         {
             throw new System.NotImplementedException();
         }
@@ -1223,6 +1212,10 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
         }
 
         public void SendTextBoxRequest(string message, int chatChannel, string objectname, string ownerFirstName, string ownerLastName, UUID objectId)
+        {
+        }
+
+        public void StopFlying(ISceneEntity presence)
         {
         }
     }

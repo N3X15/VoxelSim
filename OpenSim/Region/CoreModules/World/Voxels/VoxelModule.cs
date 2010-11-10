@@ -41,11 +41,19 @@ using OpenSim.Region.Framework.Scenes;
 using OpenSim.Framework.Servers.HttpServer;
 using OpenMetaverse.StructuredData;
 using Caps=OpenSim.Framework.Capabilities.Caps;
+using System.Web;
+using System.Collections.Specialized;
 
 namespace OpenSim.Region.CoreModules.World.Voxels
 {
     public class VoxelModule : INonSharedRegionModule, ICommandableModule, IVoxelModule
     {
+
+        private static readonly string m_GetChunkCap = "9001";
+        private static readonly string m_GetMaterialsCap = "9002";
+        private static readonly string m_UploadMaterialsCap = "9003";
+        private static readonly string m_UploadHeightmapCap = "9004";
+
         /// <summary>
         /// A standard set of terrain brushes and effects recognised by viewers
         /// </summary>
@@ -69,6 +77,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         private VoxelChannel m_revert;
         private Scene m_scene;
         private volatile bool m_tainted;
+        private volatile bool[,] m_changedChunks;
         private readonly UndoStack<VoxelUndoState> m_undo = new UndoStack<VoxelUndoState>(5);
 
         #region ICommandableModule Members
@@ -127,8 +136,9 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
         void HandleM_sceneEventManagerOnRegisterCaps (UUID agentID, Caps caps)
         {
-            string capsBase = "/CAPS/VOX/" + UUID.Random().ToString();
+            string capsBase = "/CAPS/VOX/";
         	caps.RegisterHandler("MatTable",new RestStreamHandler("POST",capsBase+"/GetMats/",HandleMatTableReq));
+            caps.RegisterHandler("VoxelChunk", new RestStreamHandler("POST", capsBase + "/GetChunk/", HandleMatTableReq));
         	caps.RegisterHandler("SetMaterial",new RestStreamHandler("POST",capsBase+"/SetMat/",HandleSetMatTableReq));
         }
 
@@ -148,30 +158,111 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 			else
 			{
 				byte id = input["id"].AsBinary()[0];
-				(m_scene.Voxels as VoxelChannel).MaterialTable[id]=mat;
+				(m_scene.Voxels as VoxelChannel).mMaterials[id]=mat;
 			}
 			return "OK";
 		}
-		string HandleMatTableReq(string request, string path, string param,
+
+
+        private void SendChunk(OSHttpRequest request, OSHttpResponse response, int X, int Y)
+        {
+            string range = request.Headers.GetOne("Range");
+            //m_log.DebugFormat("[GETTEXTURE]: Range {0}", range);
+            byte[] chunk = m_scene.Voxels.GetChunk(X, Y);
+            if (!String.IsNullOrEmpty(range))
+            {
+                // Range request
+                int start, end;
+                if (TryParseRange(range, out start, out end))
+                {
+                    // Before clamping start make sure we can satisfy it in order to avoid
+                    // sending back the last byte instead of an error status
+                    if (start >= chunk.Length)
+                    {
+                        response.StatusCode = (int)System.Net.HttpStatusCode.RequestedRangeNotSatisfiable;
+                        return;
+                    }
+
+                    end = Utils.Clamp(end, 0, chunk.Length - 1);
+                    start = Utils.Clamp(start, 0, end);
+                    int len = end - start + 1;
+
+                    //m_log.Debug("Serving " + start + " to " + end + " of " + texture.Data.Length + " bytes for texture " + texture.ID);
+
+                    if (len < chunk.Length)
+                        response.StatusCode = (int)System.Net.HttpStatusCode.PartialContent;
+
+                    response.ContentLength = len;
+                    response.ContentType = "application/octet-stream";
+                    response.AddHeader("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, chunk.Length));
+
+                    response.Body.Write(chunk, start, len);
+                }
+                else
+                {
+                    m_log.Warn("Malformed Range header: " + range);
+                    response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+                }
+            }
+            else
+            {
+                // Full content request
+                response.ContentLength = chunk.Length;
+                response.ContentType = "application/octet-stream";
+                response.Body.Write(chunk, 0, chunk.Length);
+            }
+        }
+
+        private bool TryParseRange(string header, out int start, out int end)
+        {
+            if (header.StartsWith("bytes="))
+            {
+                string[] rangeValues = header.Substring(6).Split('-');
+                if (rangeValues.Length == 2)
+                {
+                    if (Int32.TryParse(rangeValues[0], out start) && Int32.TryParse(rangeValues[1], out end))
+                        return true;
+                }
+            }
+
+            start = end = 0;
+            return false;
+        }
+        string HandleMatTableReq(string request, string path, string param,
                                       OSHttpRequest req, OSHttpResponse res)
-		{
-			OSDMap rval = new OSDMap();
-			foreach(KeyValuePair<byte,VoxMaterial> kv in (m_scene.Voxels as VoxelChannel).MaterialTable)
-			{
-				byte b = kv.Key;
-				VoxMaterial m = kv.Value;
-				OSDMap mat = new OSDMap();
-				mat.Add("density",	new OSDReal(m.Density));
-				mat.Add("deposit",	new OSDInteger((int)m.Deposit));
-				mat.Add("flags",	new OSDBinary(new byte[]{(byte)m.Flags}));
-				mat.Add("id", 		new OSDBinary(new byte[]{b}));
-				mat.Add("name",		new OSDString(m.Name));
-				mat.Add("texture",	new OSDUUID(m.Texture));
-				mat.Add("type",		new OSDBinary(new byte[]{(byte)m.Type}));
-				rval.Add(m.Name,mat);
-			}
-			return rval.ToString();
-		}
+        {
+            return (m_scene.Voxels as VoxelChannel).mMaterials.ToString();
+        }
+        string HandleVoxelChunkReq(string request, string path, string param,
+                                      OSHttpRequest httpRequest, OSHttpResponse httpResponse)
+        {
+            // Try to parse the texture ID from the request URL
+            NameValueCollection query = HttpUtility.ParseQueryString(httpRequest.Url.Query);
+            int X, Y,Z=0;
+            if (!int.TryParse(query.GetOne("x"), out X) ||
+                !int.TryParse(query.GetOne("y"), out Y))
+            {
+                httpResponse.StatusCode = 404;
+                httpResponse.Send();
+                return null;
+            }
+            if (X < 0 ||
+                X > m_scene.Voxels.Width / VoxelChannel.CHUNK_SIZE_X ||
+                Y < 0 ||
+                Y > m_scene.Voxels.Length / VoxelChannel.CHUNK_SIZE_Y ||
+                Z < 0 ||
+                Z > m_scene.Voxels.Height / VoxelChannel.CHUNK_SIZE_Z)
+            {
+                httpResponse.StatusCode = 404;
+                httpResponse.Send();
+                return null;
+            }
+
+            SendChunk(httpRequest, httpResponse, X, Y);
+
+            httpResponse.Send();
+            return null;
+        }
         public void RegionLoaded(Scene scene)
         {
         }
@@ -472,7 +563,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             for (int z = 0; z < m_channel.Height; z++)
                 for (int x = 0; x < m_channel.Width; x++)
                 	for (int y = 0; y < m_channel.Height; y++)
-                    	m_revert.Voxels[x, y, z] = m_channel.Voxels[x, y, z];
+                    	m_revert[x, y, z] = m_channel[x, y, z];
         }
 /*
         /// <summary>
@@ -524,6 +615,61 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
                 // Clients who look at the map will never see changes after they looked at the map, so i've commented this out.
                 //m_scene.CreateTerrainTexture(true);
+            }
+
+            List<VoxelUpdate> FineChanges = new List<VoxelUpdate>();
+            List<ChunkUpdate> ChunkChanges = new List<ChunkUpdate>();
+
+            // NumVoxelsPerChunk/4 = Maximum fine changes PER UPDATE allowed.
+            int MaxFineChangesAllowed = (VoxelChannel.CHUNK_SIZE_X*VoxelChannel.CHUNK_SIZE_Y*VoxelChannel.CHUNK_SIZE_Z)/4;
+            int NumFineChanges=0;
+            
+            // For each chunk...
+            for(int cx=0;cx<(m_channel.Width/VoxelChannel.CHUNK_SIZE_X);cx++)
+            {
+                for (int cy = 0; cy < (m_channel.Length / VoxelChannel.CHUNK_SIZE_Y); cy++)
+                {
+                    // Get voxels in each chunk...
+                    byte[] data_a = m_channel.GetChunkData(cx, cy);
+                    byte[] data_b = m_revert.GetChunkData(cx, cy);
+
+                    // Compare
+                    for (int x = 0; x < VoxelChannel.CHUNK_SIZE_X; x++)
+                    {
+                        for (int y = 0; y < VoxelChannel.CHUNK_SIZE_Y; y++)
+                        {
+                            for (int z = 0; z < VoxelChannel.CHUNK_SIZE_Z; z++)
+                            {
+                                // Compare newest voxel with revert map voxel
+                                byte a = m_channel.GetChunkBlock(ref data_a, x, y, z);
+                                if(a != m_channel.GetChunkBlock(ref data_b, x, y, z))
+                                {
+                                    // Too many fine updates?
+                                    NumFineChanges++;
+                                    if (NumFineChanges > MaxFineChangesAllowed)
+                                    {
+                                        // Clear fine updates, reset counter, and add a coarse update.
+                                        FineChanges.Clear();
+                                        NumFineChanges = 0;
+                                        ChunkUpdate cu = new ChunkUpdate();
+                                        cu.X=cx;
+                                        cu.Y=cy;
+                                        cu.Z=0;
+                                        ChunkChanges.Add(cu);
+                                    } else {
+                                        // Otherwise, add a fine update.
+                                        VoxelUpdate vu = new VoxelUpdate();
+                                        vu.X=x;
+                                        vu.Y=y;
+                                        vu.Z=z;
+                                        vu.Type=a;
+                                        FineChanges.Add(vu);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -676,19 +822,19 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 {
                     double requestedHeight = m_channel.GetHeightAt(x, y);
                     double bakedHeight = m_revert.GetHeightAt(x, y);
-					byte MyVoxel=m_channel.Voxels[x,y,z];
-					byte BakedVoxel=m_revert.Voxels[x,y,z];
+					int MyVoxel=m_channel[x,y,z];
+					int BakedVoxel=m_revert[x,y,z];
                 
 					double requestedDelta = requestedHeight - bakedHeight;
 
                     if (requestedDelta > maxDelta)
                     {
-                        m_channel.SetVoxel(x, y, z, BakedVoxel);
+                        m_channel.SetVoxel(x, y, z, (byte)BakedVoxel);
                         changesLimited = true;
                     }
                     else if (requestedDelta < minDelta)
                     {
-                        m_channel.SetVoxel(x, y, z, BakedVoxel);
+                        m_channel.SetVoxel(x, y, z, (byte)BakedVoxel);
                         changesLimited = true;
                     }
                 }

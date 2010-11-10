@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Contributors, http://opensimulator.org/
  * See CONTRIBUTORS.TXT for a full list of copyright holders.
  *
@@ -54,7 +54,7 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
             get { return m_assMapper; }
         }
 
-        private bool m_Initialized = false;
+//        private bool m_Initialized = false;
 
         #region INonSharedRegionModule
 
@@ -119,13 +119,28 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
         ///
         /// DeleteToInventory
         ///
-        public override UUID DeleteToInventory(DeRezAction action, UUID folderID, SceneObjectGroup objectGroup, IClientAPI remoteClient)
+        public override UUID DeleteToInventory(DeRezAction action, UUID folderID, List<SceneObjectGroup> objectGroups, IClientAPI remoteClient)
         {
-            UUID assetID = base.DeleteToInventory(action, folderID, objectGroup, remoteClient);
+            UUID ret = UUID.Zero;
+
+            // HACK: Only works for lists of length one.
+            // Intermediate version, just to make things compile
+            foreach (SceneObjectGroup g in objectGroups)
+                ret = DeleteToInventory(action, folderID, g, remoteClient);
+            
+            return ret;
+        }
+
+        // DO NOT OVERRIDE THE BASE METHOD
+        public new virtual UUID DeleteToInventory(DeRezAction action, UUID folderID,
+                SceneObjectGroup objectGroup, IClientAPI remoteClient)
+        {
+            UUID assetID = base.DeleteToInventory(action, folderID, new List<SceneObjectGroup>() {objectGroup}, remoteClient);
 
             if (!assetID.Equals(UUID.Zero))
             {
-                UploadInventoryItem(remoteClient.AgentId, assetID, "", 0);
+                if (remoteClient != null)
+                    UploadInventoryItem(remoteClient.AgentId, assetID, "", 0);
             }
             else
                 m_log.Debug("[HGScene]: Scene.Inventory did not create asset");
@@ -178,9 +193,7 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
                 m_assMapper.Post(item.AssetID, receiver, userAssetServer);
         }
 
-        #endregion
-
-        public bool IsForeignUser(UUID userID, out string assetServerURL)
+        public override bool IsForeignUser(UUID userID, out string assetServerURL)
         {
             assetServerURL = string.Empty;
             UserAccount account = null;
@@ -202,6 +215,19 @@ namespace OpenSim.Region.CoreModules.Framework.InventoryAccess
             }
 
             return false;
+        }
+
+        #endregion
+
+        protected override InventoryItemBase GetItem(UUID agentID, UUID itemID)
+        {
+            InventoryItemBase item = base.GetItem(agentID, itemID);
+
+            string userAssetServer = string.Empty;
+            if (IsForeignUser(agentID, out userAssetServer))
+                m_assMapper.Get(item.AssetID, agentID, userAssetServer);
+
+            return item;
         }
     }
 }

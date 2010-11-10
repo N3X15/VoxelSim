@@ -28,11 +28,12 @@
 using System;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
+using OpenSim.Framework;
 using OpenMetaverse;
 
 namespace OpenSim.Region.Framework.Scenes
 {
-    public abstract class EntityBase
+    public abstract class EntityBase : ISceneEntity
     {
         /// <summary>
         /// The scene to which this entity belongs
@@ -68,6 +69,7 @@ namespace OpenSim.Region.Framework.Scenes
         public bool IsDeleted
         {
             get { return m_isDeleted; }
+            set { m_isDeleted = value; }
         }
         protected bool m_isDeleted;
 
@@ -129,8 +131,6 @@ namespace OpenSim.Region.Framework.Scenes
         {
             return (EntityBase) MemberwiseClone();
         }
-
-        public abstract void SetText(string text, Vector3 color, double alpha);
     }
 
     //Nested Classes

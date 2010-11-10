@@ -67,7 +67,6 @@ namespace OpenSim.Data
     /// really want is the assembly of your database class.
     ///
     /// </summary>
-
     public class Migration
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -123,7 +122,7 @@ namespace OpenSim.Data
             int ver = FindVersion(_conn, "migrations");
             if (ver <= 0)   // -1 = no table, 0 = no version record
             {
-                if( ver < 0 )
+                if (ver < 0)
                     ExecuteScript("create table migrations(name varchar(100), version int)");
                 InsertVersion("migrations", 1);
             }
@@ -146,7 +145,14 @@ namespace OpenSim.Data
                 foreach (string sql in script)
                 {
                     cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch(Exception e)
+                    {
+                        throw new Exception(e.Message + " in SQL: " + sql);
+                    }
                 }
             }
         }
@@ -166,8 +172,6 @@ namespace OpenSim.Data
             ExecuteScript(_conn, script);
         }
 
-
-
         public void Update()
         {
             InitMigrationsTable();
@@ -179,8 +183,8 @@ namespace OpenSim.Data
                 return;
 
             // to prevent people from killing long migrations.
-            m_log.InfoFormat("[MIGRATIONS] Upgrading {0} to latest revision {1}.", _type, migrations.Keys[migrations.Count - 1]);
-            m_log.Info("[MIGRATIONS] NOTE: this may take a while, don't interupt this process!");
+            m_log.InfoFormat("[MIGRATIONS]: Upgrading {0} to latest revision {1}.", _type, migrations.Keys[migrations.Count - 1]);
+            m_log.Info("[MIGRATIONS]: NOTE - this may take a while, don't interrupt this process!");
 
             foreach (KeyValuePair<int, string[]> kvp in migrations)
             {
@@ -199,10 +203,9 @@ namespace OpenSim.Data
                 }
                 catch (Exception e)
                 {
-                    m_log.DebugFormat("[MIGRATIONS] Cmd was {0}", kvp.Value.ToString());
-                    m_log.DebugFormat("[MIGRATIONS]: An error has occurred in the migration {0}.\n This may mean you could see errors trying to run OpenSim. If you see database related errors, you will need to fix the issue manually. Migration aborted.", e.Message);
+                    m_log.DebugFormat("[MIGRATIONS]: Cmd was {0}", e.Message.Replace("\n", " "));
+                    m_log.Debug("[MIGRATIONS]: An error has occurred in the migration.  If you're running OpenSim for the first time then you can probably safely ignore this, since certain migration commands attempt to fetch data out of old tables.  However, if you're using an existing database and you see database related errors while running OpenSim then you will need to fix these problems manually. Continuing.");
                     ExecuteScript("ROLLBACK;");
-                    return;
                 }
 
                 if (version == 0)
@@ -285,7 +288,7 @@ namespace OpenSim.Data
             SortedList<int, string[]> migrations = new SortedList<int, string[]>();
 
             string[] names = _assem.GetManifestResourceNames();
-            if( names.Length == 0 )     // should never happen
+            if (names.Length == 0)     // should never happen
                 return migrations;
 
             Array.Sort(names);  // we want all the migrations ordered
@@ -294,7 +297,7 @@ namespace OpenSim.Data
             Match m = null;
             string sFile = Array.FindLast(names, nm => { m = _match_new.Match(nm); return m.Success; });  // ; nm.StartsWith(sPrefix, StringComparison.InvariantCultureIgnoreCase
 
-            if( (m != null) && !String.IsNullOrEmpty(sFile) )
+            if ((m != null) && !String.IsNullOrEmpty(sFile))
             {
                 /* The filename should be '<StoreName>.migrations[.NNN]' where NNN
                  * is the last version number defined in the file. If the '.NNN' part is recognized, the code can skip
@@ -309,7 +312,7 @@ namespace OpenSim.Data
 
                 if (m.Groups.Count > 1 && int.TryParse(m.Groups[1].Value, out nLastVerFound))
                 {
-                    if( nLastVerFound <= after )
+                    if (nLastVerFound <= after)
                         goto scan_old_style;
                 }
 
@@ -326,7 +329,7 @@ namespace OpenSim.Data
                         sb.Length = 0;
                     }
 
-                    if ( (nVersion > 0) && (nVersion > after) && (script.Count > 0) && !migrations.ContainsKey(nVersion))   // script to the versioned script list
+                    if ((nVersion > 0) && (nVersion > after) && (script.Count > 0) && !migrations.ContainsKey(nVersion))   // script to the versioned script list
                     {
                         migrations[nVersion] = script.ToArray();
                     }
@@ -342,7 +345,7 @@ namespace OpenSim.Data
                         string sLine = resourceReader.ReadLine();
                         nLineNo++;
 
-                        if( String.IsNullOrEmpty(sLine) || sLine.StartsWith("#") )  // ignore a comment or empty line
+                        if (String.IsNullOrEmpty(sLine) || sLine.StartsWith("#"))  // ignore a comment or empty line
                             continue;
 
                         if (sLine.Trim().Equals(":GO", StringComparison.InvariantCultureIgnoreCase))
@@ -389,7 +392,7 @@ scan_old_style:
                 if (m.Success)
                 {
                     int version = int.Parse(m.Groups[1].ToString());
-                    if ( (version > after) && !migrations.ContainsKey(version) )
+                    if ((version > after) && !migrations.ContainsKey(version))
                     {
                         using (Stream resource = _assem.GetManifestResourceStream(s))
                         {
@@ -404,9 +407,8 @@ scan_old_style:
             }
             
             if (migrations.Count < 1) 
-            {
-                m_log.InfoFormat("[MIGRATIONS]: {0} up to date, no migrations to apply", _type);
-            }
+                m_log.DebugFormat("[MIGRATIONS]: {0} data tables already up to date at revision {1}", _type, after);
+            
             return migrations;
         }
     }

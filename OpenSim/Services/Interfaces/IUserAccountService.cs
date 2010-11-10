@@ -29,6 +29,8 @@ using System;
 using System.Collections.Generic;
 using OpenMetaverse;
 
+using OpenSim.Framework;
+
 namespace OpenSim.Services.Interfaces
 {
     public class UserAccount
@@ -50,7 +52,7 @@ namespace OpenSim.Services.Interfaces
             LastName = lastName;
             Email = email;
             ServiceURLs = new Dictionary<string, object>();
-            // Created = ???
+            Created = Util.UnixTimeSinceEpoch();
         }
 
         public string FirstName;
@@ -91,7 +93,7 @@ namespace OpenSim.Services.Interfaces
                 UserTitle = kvp["UserTitle"].ToString();
 
             if (kvp.ContainsKey("Created"))
-                Convert.ToInt32(kvp["Created"].ToString());
+                Created = Convert.ToInt32(kvp["Created"].ToString());
             if (kvp.ContainsKey("ServiceURLs") && kvp["ServiceURLs"] != null)
             {
                 ServiceURLs = new Dictionary<string, object>();

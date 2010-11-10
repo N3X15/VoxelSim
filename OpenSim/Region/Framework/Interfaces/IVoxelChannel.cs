@@ -38,5 +38,7 @@ namespace OpenSim.Region.Framework.Interfaces
 		
 		bool IsInsideTerrain(Vector3 pos);
 		Vector3 FindNearestAirVoxel(Vector3 subject, bool ForAvatar);
-	}
+
+        byte[] GetChunk(int X, int Y);
+    }
 }

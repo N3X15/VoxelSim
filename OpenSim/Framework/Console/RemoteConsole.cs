@@ -44,6 +44,7 @@ namespace OpenSim.Framework.Console
     {
         public int last;
         public long lastLineSeen;
+        public bool newConnection = true;
     }
 
     // A console that uses REST interfaces
@@ -106,7 +107,14 @@ namespace OpenSim.Framework.Console
 
         public override string ReadLine(string p, bool isCommand, bool e)
         {
+            if (isCommand)
+                Output("+++"+p);
+            else
+                Output("-++"+p);
+
             m_DataEvent.WaitOne();
+
+            string cmdinput;
 
             lock (m_InputData)
             {
@@ -116,29 +124,30 @@ namespace OpenSim.Framework.Console
                     return "";
                 }
 
-                string cmdinput = m_InputData[0];
+                cmdinput = m_InputData[0];
                 m_InputData.RemoveAt(0);
                 if (m_InputData.Count == 0)
                     m_DataEvent.Reset();
 
-                if (isCommand)
-                {
-                    string[] cmd = Commands.Resolve(Parser.Parse(cmdinput));
-
-                    if (cmd.Length != 0)
-                    {
-                        int i;
-
-                        for (i=0 ; i < cmd.Length ; i++)
-                        {
-                            if (cmd[i].Contains(" "))
-                                cmd[i] = "\"" + cmd[i] + "\"";
-                        }
-                        return String.Empty;
-                    }
-                }
-                return cmdinput;
             }
+
+            if (isCommand)
+            {
+                string[] cmd = Commands.Resolve(Parser.Parse(cmdinput));
+
+                if (cmd.Length != 0)
+                {
+                    int i;
+
+                    for (i=0 ; i < cmd.Length ; i++)
+                    {
+                        if (cmd[i].Contains(" "))
+                            cmd[i] = "\"" + cmd[i] + "\"";
+                    }
+                    return String.Empty;
+                }
+            }
+            return cmdinput;
         }
 
         private void DoExpire()
@@ -279,7 +288,7 @@ namespace OpenSim.Framework.Console
 
             reply["str_response_string"] = xmldoc.InnerXml;
             reply["int_response_code"] = 200;
-            reply["content_type"] = "text/plain";
+            reply["content_type"] = "text/xml";
 
             return reply;
         }
@@ -308,7 +317,7 @@ namespace OpenSim.Framework.Console
                     return reply;
             }
 
-            if (post["COMMAND"] == null || post["COMMAND"].ToString() == String.Empty)
+            if (post["COMMAND"] == null)
                 return reply;
 
             lock (m_InputData)
@@ -334,7 +343,7 @@ namespace OpenSim.Framework.Console
 
             reply["str_response_string"] = xmldoc.InnerXml;
             reply["int_response_code"] = 200;
-            reply["content_type"] = "text/plain";
+            reply["content_type"] = "text/xml";
 
             return reply;
         }
@@ -415,6 +424,12 @@ namespace OpenSim.Framework.Console
             xmldoc.AppendChild(xmlnode);
             XmlElement rootElement = xmldoc.CreateElement("", "ConsoleSession",
                     "");
+
+            if (c.newConnection)
+            {
+                c.newConnection = false;
+                Output("+++" + DefaultPrompt);
+            }
 
             lock (m_Scrollback)
             {

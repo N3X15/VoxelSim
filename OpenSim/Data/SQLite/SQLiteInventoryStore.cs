@@ -30,7 +30,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using log4net;
-using Mono.Data.Sqlite;
+#if CSharpSqlite
+    using Community.CsharpSqlite.Sqlite;
+#else
+    using Mono.Data.Sqlite;
+#endif
 using OpenMetaverse;
 using OpenSim.Framework;
 
@@ -731,12 +735,12 @@ namespace OpenSim.Data.SQLite
          **********************************************************************/
 
         protected void CreateDataSetMapping(IDataAdapter da, string tableName)
-        {       
+        {
             ITableMapping dbMapping = da.TableMappings.Add(tableName, tableName);
             foreach (DataColumn col in ds.Tables[tableName].Columns)
-            {       
+            {
                 dbMapping.ColumnMappings.Add(col.ColumnName, col.ColumnName);
-            }       
+            }
         }
 
         /// <summary>

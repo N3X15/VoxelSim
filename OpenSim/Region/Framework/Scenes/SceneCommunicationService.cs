@@ -70,7 +70,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <summary>
         /// A user will arrive shortly, set up appropriate credentials so it can connect
         /// </summary>
-        public event ExpectUserDelegate OnExpectUser;
+//        public event ExpectUserDelegate OnExpectUser;
 
         /// <summary>
         /// A Prim will arrive shortly
@@ -80,7 +80,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <summary>
         /// A new prim has arrived
         /// </summary>
-        public event PrimCrossing OnPrimCrossingIntoRegion;
+//        public event PrimCrossing OnPrimCrossingIntoRegion;
 
         ///// <summary>
         ///// A New Region is up and available
@@ -90,7 +90,7 @@ namespace OpenSim.Region.Framework.Scenes
         /// <summary>
         /// We have a child agent for this avatar and we're getting a status update about it
         /// </summary>
-        public event ChildAgentUpdate OnChildAgentUpdate;
+//        public event ChildAgentUpdate OnChildAgentUpdate;
         //public event RemoveKnownRegionsFromAvatarList OnRemoveKnownRegionFromAvatar;
 
         /// <summary>
@@ -182,23 +182,16 @@ namespace OpenSim.Region.Framework.Scenes
         {
             //m_log.Info("[INTER]: " + debugRegionName + ": SceneCommunicationService: Sending InterRegion Notification that region is up " + region.RegionName);
 
-            for (int x = (int)region.RegionLocX - 1; x <= region.RegionLocX + 1; x++)
+            List<GridRegion> neighbours = m_scene.GridService.GetNeighbours(m_scene.RegionInfo.ScopeID, m_scene.RegionInfo.RegionID);
+            m_log.DebugFormat("[INTERGRID]: Informing {0} neighbours that this region is up", neighbours.Count);
+            foreach (GridRegion n in neighbours)
             {
-                for (int y = (int)region.RegionLocY - 1; y <= region.RegionLocY + 1; y++)
-                {
-                    if (!((x == region.RegionLocX) && (y == region.RegionLocY))) // skip this region
-                    {
-                        ulong handle = Utils.UIntsToLong((uint)x * Constants.RegionSize, (uint)y * Constants.RegionSize);
-                        InformNeighbourThatRegionUpDelegate d = InformNeighboursThatRegionIsUpAsync;
-
-                        d.BeginInvoke(neighbourService, region, handle,
-                                      InformNeighborsThatRegionisUpCompleted,
-                                      d);
-                    }
-                }
+                InformNeighbourThatRegionUpDelegate d = InformNeighboursThatRegionIsUpAsync;
+                d.BeginInvoke(neighbourService, region, n.RegionHandle,
+                              InformNeighborsThatRegionisUpCompleted,
+                              d);
             }
         }
-
 
         public delegate void SendChildAgentDataUpdateDelegate(AgentPosition cAgentData, ulong regionHandle);
 

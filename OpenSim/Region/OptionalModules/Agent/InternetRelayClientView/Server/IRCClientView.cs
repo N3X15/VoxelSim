@@ -375,8 +375,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         private void IRC_SendNamesReply()
         {
-            List<EntityBase> users = m_scene.Entities.GetAllByType<ScenePresence>();
-
+            EntityBase[] users = m_scene.Entities.GetAllByType<ScenePresence>();
             foreach (EntityBase user in users)
             {
                 SendServerCommand("353 " + m_nick + " = " + IrcRegionName + " :" + user.Name.Replace(" ", ""));
@@ -386,8 +385,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         private void IRC_SendWhoReply()
         {
-            List<EntityBase> users = m_scene.Entities.GetAllByType<ScenePresence>();
-
+            EntityBase[] users = m_scene.Entities.GetAllByType<ScenePresence>();
             foreach (EntityBase user in users)
             {
                 /*SendServerCommand(String.Format("352 {0} {1} {2} {3} {4} {5} :0 {6}", IrcRegionName,
@@ -415,11 +413,11 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
 
         private void IRC_SendReplyUsers()
         {
-            List<EntityBase> users = m_scene.Entities.GetAllByType<ScenePresence>();
+            EntityBase[] users = m_scene.Entities.GetAllByType<ScenePresence>();
 
             SendServerCommand("392 :UserID   Terminal  Host");
 
-            if (users.Count == 0)
+            if (users.Length == 0)
             {
                 SendServerCommand("395 :Nobody logged in");
                 return;
@@ -678,7 +676,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         public event TeleportLandmarkRequest OnTeleportLandmarkRequest;
         public event DeRezObject OnDeRezObject;
         public event Action<IClientAPI> OnRegionHandShakeReply;
-        public event GenericCall2 OnRequestWearables;
+        public event GenericCall1 OnRequestWearables;
         public event GenericCall1 OnCompleteMovementToRegion;
         public event UpdateAgent OnPreAgentUpdate;
         public event UpdateAgent OnAgentUpdate;
@@ -901,7 +899,7 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             Scene scene = (Scene)Scene;
             AvatarAppearance appearance;
             scene.GetAvatarAppearance(this, out appearance);
-            OnSetAppearance(appearance.Texture, (byte[])appearance.VisualParams.Clone());
+            OnSetAppearance(this, appearance.Texture, (byte[])appearance.VisualParams.Clone());
         }
 
         public void SendRegionHandshake(RegionInfo regionInfo, RegionHandshakeArgs args)
@@ -963,6 +961,11 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         public void SendInstantMessage(GridInstantMessage im)
         {
             // TODO
+        }
+
+        public void SendGenericMessage(string method, List<string> message)
+        {
+
         }
 
         public void SendGenericMessage(string method, List<byte[]> message)
@@ -1034,9 +1037,13 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             
         }
 
-        public void SendTeleportLocationStart()
+        public void SendTeleportStart(uint flags)
         {
             
+        }
+
+        public void SendTeleportProgress(uint flags, string message)
+        {
         }
 
         public void SendMoneyBalance(UUID transaction, bool success, byte[] description, int balance)
@@ -1049,52 +1056,32 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             
         }
 
-        public void SendAvatarData(SendAvatarData data)
-        {
-            
-        }
-
-        public void SendAvatarTerseUpdate(SendAvatarTerseData data)
-        {
-            
-        }
-
         public void SendCoarseLocationUpdate(List<UUID> users, List<Vector3> CoarseLocations)
         {
             
         }
 
-        public void AttachObject(uint localID, Quaternion rotation, byte attachPoint, UUID ownerID)
+        public void SendAvatarDataImmediate(ISceneEntity avatar)
         {
-            
+
         }
 
-        public void SetChildAgentThrottle(byte[] throttle)
+        public void SendPrimUpdate(ISceneEntity entity, PrimUpdateFlags updateFlags)
         {
-            
+
         }
 
-        public void SendPrimitiveToClient(SendPrimitiveData data)
+        public void ReprioritizeUpdates()
         {
-            
+
         }
 
-        public void SendPrimTerseUpdate(SendPrimitiveTerseData data)
-        {
-            
-        }
-
-        public void ReprioritizeUpdates(StateUpdateTypes type, UpdatePriorityHandler handler)
+        public void FlushPrimUpdates()
         {
 
         }
 
         public void SendInventoryFolderDetails(UUID ownerID, UUID folderID, List<InventoryItemBase> items, List<InventoryFolderBase> folders, int version, bool fetchFolders, bool fetchItems)
-        {
-            
-        }
-
-        public void FlushPrimUpdates()
         {
             
         }
@@ -1424,6 +1411,11 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
             
         }
 
+        public virtual void SetChildAgentThrottle(byte[] throttle)
+        {
+
+        }
+
         public byte[] GetThrottlesPacked(float multiplier)
         {
             return new byte[0];
@@ -1687,6 +1679,10 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         }
 
         public void SendTextBoxRequest(string message, int chatChannel, string objectname, string ownerFirstName, string ownerLastName, UUID objectId)
+        {
+        }
+
+        public void StopFlying(ISceneEntity presence)
         {
         }
     }

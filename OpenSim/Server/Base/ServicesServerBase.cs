@@ -85,11 +85,13 @@ namespace OpenSim.Server.Base
             argvConfig.AddSwitch("Startup", "logfile", "l");
             argvConfig.AddSwitch("Startup", "inifile", "i");
             argvConfig.AddSwitch("Startup", "prompt",  "p");
+            argvConfig.AddSwitch("Startup", "logconfig", "g");
 
             // Automagically create the ini file name
             //
             string fileName = Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
             string iniFile = fileName + ".ini";
+            string logConfig = null;
 
             IConfig startupConfig = argvConfig.Configs["Startup"];
             if (startupConfig != null)
@@ -100,6 +102,9 @@ namespace OpenSim.Server.Base
                 //
                 // Check if a prompt was given on the command line
                 prompt = startupConfig.GetString("prompt", prompt);
+                //
+                // Check for a Log4Net config file on the command line
+                logConfig =startupConfig.GetString("logconfig",logConfig);
             }
 
             // Find out of the file name is a URI and remote load it
@@ -171,7 +176,15 @@ namespace OpenSim.Server.Base
             OpenSimAppender consoleAppender = null;
             FileAppender fileAppender = null;
 
-            XmlConfigurator.Configure();
+            if (logConfig != null)
+            {
+                FileInfo cfg = new FileInfo(logConfig);
+                XmlConfigurator.Configure(cfg);
+            }
+            else
+            {
+                XmlConfigurator.Configure();
+            }
 
             ILoggerRepository repository = LogManager.GetRepository();
             IAppender[] appenders = repository.GetAppenders();
@@ -207,11 +220,12 @@ namespace OpenSim.Server.Base
             {
                 if (startupConfig != null)
                 {
-
-                    fileName = startupConfig.GetString("logfile", fileName+".log");
-                    fileName = Path.GetFullPath(Path.Combine(".", fileName));
-                    fileAppender.File = fileName;
-                    fileAppender.ActivateOptions();
+                    string cfgFileName = startupConfig.GetString("logfile", null);
+                    if (cfgFileName != null)
+                    {
+                        fileAppender.File = cfgFileName;
+                        fileAppender.ActivateOptions();
+                    }
                 }
             }
 
@@ -230,10 +244,21 @@ namespace OpenSim.Server.Base
                     "shutdown",
                     "Quit the application", HandleQuit);
 
+            // Register a command to read other commands from a file
+            MainConsole.Instance.Commands.AddCommand("base", false, "command-script",
+                                          "command-script <script>",
+                                          "Run a command script from file", HandleScript);
+
+
             // Allow derived classes to perform initialization that
             // needs to be done after the console has opened
             //
             Initialise();
+        }
+
+        public bool Running
+        {
+            get { return m_Running; }
         }
 
         public virtual int Run()
@@ -253,6 +278,41 @@ namespace OpenSim.Server.Base
             m_Running = false;
             m_log.Info("[CONSOLE] Quitting");
         }
+
+        protected virtual void HandleScript(string module, string[] parms)
+        {
+            if (parms.Length != 2)
+            {
+                return;
+            }
+            RunCommandScript(parms[1]);
+        }
+
+        /// <summary>
+        /// Run an optional startup list of commands
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void RunCommandScript(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                m_log.Info("[COMMANDFILE]: Running " + fileName);
+
+                using (StreamReader readFile = File.OpenText(fileName))
+                {
+                    string currentCommand;
+                    while ((currentCommand = readFile.ReadLine()) != null)
+                    {
+                        if (currentCommand != String.Empty)
+                        {
+                            m_log.Info("[COMMANDFILE]: Running '" + currentCommand + "'");
+                            MainConsole.Instance.RunCommand(currentCommand);
+                        }
+                    }
+                }
+            }
+        }
+
 
         protected virtual void ReadConfig()
         {

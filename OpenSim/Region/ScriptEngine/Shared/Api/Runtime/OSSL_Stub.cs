@@ -41,6 +41,7 @@ using rotation = OpenSim.Region.ScriptEngine.Shared.LSL_Types.Quaternion;
 using key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_List = OpenSim.Region.ScriptEngine.Shared.LSL_Types.list;
 using LSL_String = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
+using LSL_Key = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLString;
 using LSL_Float = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLFloat;
 using LSL_Integer = OpenSim.Region.ScriptEngine.Shared.LSL_Types.LSLInteger;
 
@@ -105,6 +106,21 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
 //        {
 //            return m_OSSL_Functions.osWindParamGet(plugin, param);
 //        }
+
+        public void osParcelJoin(vector pos1, vector pos2)
+        {
+            m_OSSL_Functions.osParcelJoin(pos1,pos2);
+        }
+
+        public void osParcelSubdivide(vector pos1, vector pos2)
+        {
+            m_OSSL_Functions.osParcelSubdivide(pos1, pos2);
+        }
+        
+        public void osParcelSetDetails(vector pos, LSL_List rules)
+        {
+            m_OSSL_Functions.osParcelSetDetails(pos,rules);
+        }
 
         public double osList2Double(LSL_Types.list src, int index)
         {
@@ -662,6 +678,29 @@ namespace OpenSim.Region.ScriptEngine.Shared.ScriptBase
         public void osCauseHealing(string avatar, double healing)
         {
             m_OSSL_Functions.osCauseHealing(avatar, healing);
+        }
+        public LSL_List osGetPrimitiveParams(LSL_Key prim, LSL_List rules)
+        {
+            return m_OSSL_Functions.osGetPrimitiveParams(prim, rules);
+        }
+        public void osSetPrimitiveParams(LSL_Key prim, LSL_List rules)
+        {
+            m_OSSL_Functions.osSetPrimitiveParams(prim, rules);
+        }
+
+        public void osSetProjectionParams(bool projection, LSL_Key texture, double fov, double focus, double amb)
+        {
+            m_OSSL_Functions.osSetProjectionParams(projection, texture, fov, focus, amb);
+        }
+
+        public void osSetProjectionParams(LSL_Key prim, bool projection, LSL_Key texture, double fov, double focus, double amb)
+        {
+            m_OSSL_Functions.osSetProjectionParams(prim, projection, texture, fov, focus, amb);
+        }
+
+        public LSL_List osGetAvatarList()
+        {
+            return m_OSSL_Functions.osGetAvatarList();
         }
     }
 }

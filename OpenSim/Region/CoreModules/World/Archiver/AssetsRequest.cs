@@ -188,7 +188,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                     m_log.ErrorFormat(
                         "[ARCHIVER]: (... {0} more not shown)", uuids.Count - MAX_UUID_DISPLAY_ON_TIMEOUT);
 
-                m_log.Error("[ARCHIVER]: OAR save aborted.");
+                m_log.Error("[ARCHIVER]: OAR save aborted.  PLEASE DO NOT USE THIS OAR, IT WILL BE INCOMPLETE.");
             }
             catch (Exception e)
             {
@@ -239,7 +239,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver
                                                            
                     if (asset != null)
                     {
-//                        m_log.DebugFormat("[ARCHIVER]: Recording asset {0} as found", id);
+//                        m_log.DebugFormat("[ARCHIVER]: Writing asset {0}", id);
                         m_foundAssetUuids.Add(asset.FullID);
                         m_assetsArchiver.WriteAsset(asset);
                     }

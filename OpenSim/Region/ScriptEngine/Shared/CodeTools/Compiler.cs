@@ -32,7 +32,7 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using Microsoft.CSharp;
-using Microsoft.JScript;
+//using Microsoft.JScript;
 using Microsoft.VisualBasic;
 using log4net;
 using OpenSim.Region.Framework.Interfaces;
@@ -72,7 +72,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
         private Dictionary<string, enumCompileType> LanguageMapping = new Dictionary<string, enumCompileType>(StringComparer.CurrentCultureIgnoreCase);
 
         private string FilePrefix;
-        private string ScriptEnginesPath = "ScriptEngines";
+        private string ScriptEnginesPath = null;
         // mapping between LSL and C# line/column numbers
         private ICodeConverter LSL_Converter;
 
@@ -82,7 +82,7 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 
         private static CSharpCodeProvider CScodeProvider = new CSharpCodeProvider();
         private static VBCodeProvider VBcodeProvider = new VBCodeProvider();
-        private static JScriptCodeProvider JScodeProvider = new JScriptCodeProvider();
+//        private static JScriptCodeProvider JScodeProvider = new JScriptCodeProvider();
         private static CSharpCodeProvider YPcodeProvider = new CSharpCodeProvider(); // YP is translated into CSharp
         private static YP2CSConverter YP_Converter = new YP2CSConverter();
 
@@ -95,7 +95,8 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
 
         public Compiler(IScriptEngine scriptEngine)
         {
-            m_scriptEngine = scriptEngine;
+            m_scriptEngine = scriptEngine;;
+            ScriptEnginesPath = scriptEngine.ScriptEnginePath;
             ReadConfig();
         }
 
@@ -398,9 +399,9 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                 case enumCompileType.vb:
                     compileScript = CreateVBCompilerScript(compileScript);
                     break;
-                case enumCompileType.js:
-                    compileScript = CreateJSCompilerScript(compileScript);
-                    break;
+//                case enumCompileType.js:
+//                    compileScript = CreateJSCompilerScript(compileScript);
+//                    break;
                 case enumCompileType.yp:
                     compileScript = CreateYPCompilerScript(compileScript);
                     break;
@@ -423,16 +424,16 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
             }
         }
 
-        private static string CreateJSCompilerScript(string compileScript)
-        {
-            compileScript = String.Empty +
-                "import OpenSim.Region.ScriptEngine.Shared; import System.Collections.Generic;\r\n" +
-                "package SecondLife {\r\n" +
-                "class Script extends OpenSim.Region.ScriptEngine.Shared.ScriptBase.ScriptBaseClass { \r\n" +
-                compileScript +
-                "} }\r\n";
-            return compileScript;
-        }
+//        private static string CreateJSCompilerScript(string compileScript)
+//        {
+//            compileScript = String.Empty +
+//                "import OpenSim.Region.ScriptEngine.Shared; import System.Collections.Generic;\r\n" +
+//                "package SecondLife {\r\n" +
+//                "class Script extends OpenSim.Region.ScriptEngine.Shared.ScriptBase.ScriptBaseClass { \r\n" +
+//                compileScript +
+//                "} }\r\n";
+//            return compileScript;
+//        }
 
         private static string CreateCSCompilerScript(string compileScript)
         {
@@ -583,10 +584,10 @@ namespace OpenSim.Region.ScriptEngine.Shared.CodeTools
                         }
                     } while (!complete);
                     break;
-                case enumCompileType.js:
-                    results = JScodeProvider.CompileAssemblyFromSource(
-                        parameters, Script);
-                    break;
+//                case enumCompileType.js:
+//                    results = JScodeProvider.CompileAssemblyFromSource(
+//                        parameters, Script);
+//                    break;
                 case enumCompileType.yp:
                     results = YPcodeProvider.CompileAssemblyFromSource(
                         parameters, Script);

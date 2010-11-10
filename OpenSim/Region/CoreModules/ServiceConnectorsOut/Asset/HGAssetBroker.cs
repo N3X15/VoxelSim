@@ -41,7 +41,7 @@ using OpenMetaverse;
 namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
 {
     public class HGAssetBroker :
-            ISharedRegionModule, IAssetService, IHyperAssetService
+            ISharedRegionModule, IAssetService
     {
         private static readonly ILog m_log =
                 LogManager.GetLogger(
@@ -150,7 +150,6 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             m_aScene = scene;
 
             scene.RegisterModuleInterface<IAssetService>(this);
-            scene.RegisterModuleInterface<IHyperAssetService>(this);
         }
 
         public void RemoveRegion(Scene scene)
@@ -220,11 +219,8 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             else
                 asset = m_GridService.Get(id);
 
-            if (asset != null)
-            {
-                if (m_Cache != null)
-                    m_Cache.Cache(asset);
-            }
+            if (m_Cache != null)
+                m_Cache.Cache(asset);
 
             return asset;
         }
@@ -274,18 +270,10 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             }
 
             if (IsHG(id))
-                asset = m_HGService.Get(id);
+                return m_HGService.GetData(id);
             else
-                asset = m_GridService.Get(id);
+                return m_GridService.GetData(id);
 
-            if (asset != null)
-            {
-                if (m_Cache != null)
-                    m_Cache.Cache(asset);
-                return asset.Data;
-            }
-
-            return null;
         }
 
         public bool Get(string id, Object sender, AssetRetrieved handler)
@@ -305,7 +293,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             {
                 return m_HGService.Get(id, sender, delegate (string assetID, Object s, AssetBase a)
                 {
-                    if (a != null && m_Cache != null)
+                    if (m_Cache != null)
                         m_Cache.Cache(a);
                     handler(assetID, s, a);
                 });
@@ -314,7 +302,7 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             {
                 return m_GridService.Get(id, sender, delegate (string assetID, Object s, AssetBase a)
                 {
-                    if (a != null && m_Cache != null)
+                    if (m_Cache != null)
                         m_Cache.Cache(a);
                     handler(assetID, s, a);
                 });
@@ -332,12 +320,30 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
                 m_Cache.Cache(asset);
 
             if (asset.Temporary || asset.Local)
+            {
+                if (m_Cache != null)
+                    m_Cache.Cache(asset);
                 return asset.ID;
+            }
 
+            string id = string.Empty;
             if (IsHG(asset.ID))
-                return m_HGService.Store(asset);
+                id = m_HGService.Store(asset);
             else
-                return m_GridService.Store(asset);
+                id = m_GridService.Store(asset);
+
+            if (id != String.Empty)
+            {
+                // Placing this here, so that this work with old asset servers that don't send any reply back
+                // SynchronousRestObjectRequester returns somethins that is not an empty string
+                if (id != null)
+                    asset.ID = id;
+
+                if (m_Cache != null)
+                    m_Cache.Cache(asset);
+            }
+            return id;
+
         }
 
         public bool UpdateContent(string id, byte[] data)
@@ -364,10 +370,16 @@ namespace OpenSim.Region.CoreModules.ServiceConnectorsOut.Asset
             if (m_Cache != null)
                 m_Cache.Expire(id);
 
+            bool result = false;
             if (IsHG(id))
-                return m_HGService.Delete(id);
+                result = m_HGService.Delete(id);
             else
-                return m_GridService.Delete(id);
+                result = m_GridService.Delete(id);
+
+            if (result && m_Cache != null)
+                m_Cache.Expire(id);
+
+            return result;
         }
 
         #region IHyperAssetService

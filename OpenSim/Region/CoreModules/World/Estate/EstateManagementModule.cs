@@ -343,7 +343,6 @@ namespace OpenSim.Region.CoreModules.World.Estate
                         {
                             if (!s.IsChildAgent)
                             {
-                                s.ControllingClient.SendTeleportLocationStart();
                                 m_scene.TeleportClientHome(user, s.ControllingClient);
                             }
                         }
@@ -478,7 +477,6 @@ namespace OpenSim.Region.CoreModules.World.Estate
                 ScenePresence s = m_scene.GetScenePresence(prey);
                 if (s != null)
                 {
-                    s.ControllingClient.SendTeleportLocationStart(); 
                     m_scene.TeleportClientHome(prey, s.ControllingClient);
                 }
             }
@@ -498,7 +496,6 @@ namespace OpenSim.Region.CoreModules.World.Estate
                     // Also make sure they are actually in the region
                     if (p != null && !p.IsChildAgent)
                     {
-                        p.ControllingClient.SendTeleportLocationStart();
                         m_scene.TeleportClientHome(p.UUID, p.ControllingClient);
                     }
                 }
@@ -673,6 +670,7 @@ namespace OpenSim.Region.CoreModules.World.Estate
            args.useEstateSun = m_scene.RegionInfo.RegionSettings.UseEstateSun;
            args.waterHeight = (float)m_scene.RegionInfo.RegionSettings.WaterHeight;
            args.simName = m_scene.RegionInfo.RegionName;
+           args.regionType = m_scene.RegionInfo.RegionType;
 
            remote_client.SendRegionInfoToEstateMenu(args);
         }
@@ -684,6 +682,9 @@ namespace OpenSim.Region.CoreModules.World.Estate
 
         private void HandleLandStatRequest(int parcelID, uint reportType, uint requestFlags, string filter, IClientAPI remoteClient)
         {
+            if (!m_scene.Permissions.CanIssueEstateCommand(remoteClient.AgentId, false))
+                return;
+
             Dictionary<uint, float> SceneData = new Dictionary<uint,float>();
             List<UUID> uuidNameLookupList = new List<UUID>();
 

@@ -29,7 +29,11 @@ using System;
 using System.Data;
 using System.Reflection;
 using System.Collections.Generic;
-using Mono.Data.Sqlite;
+#if CSharpSqlite
+    using Community.CsharpSqlite.Sqlite;
+#else
+    using Mono.Data.Sqlite;
+#endif
 using log4net;
 using OpenMetaverse;
 using OpenSim.Framework;
@@ -66,11 +70,19 @@ namespace OpenSim.Data.SQLite
 
         public bool StoreFolder(XInventoryFolder folder)
         {
+            if (folder.folderName.Length > 64)
+                folder.folderName = folder.folderName.Substring(0, 64);
+
             return m_Folders.Store(folder);
         }
 
         public bool StoreItem(XInventoryItem item)
         {
+            if (item.inventoryName.Length > 64)
+                item.inventoryName = item.inventoryName.Substring(0, 64);
+            if (item.inventoryDescription.Length > 128)
+                item.inventoryDescription = item.inventoryDescription.Substring(0, 128);
+
             return m_Items.Store(item);
         }
 
