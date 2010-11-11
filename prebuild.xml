@@ -1441,6 +1441,7 @@
 		  <!-- VoxelSim: These must be excluded or the compile WILL fail. -->
           <Exclude name="Terrain" pattern="World/Terrain/*.cs" />
         </Match>
+        <Match buildAction="EmbeddedResource" path="Resources" pattern="*.addin.xml" recurse="true"/>
       </Files>
     </Project>
 

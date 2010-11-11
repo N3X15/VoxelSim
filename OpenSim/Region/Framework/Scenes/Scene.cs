@@ -1675,7 +1675,7 @@ namespace OpenSim.Region.Framework.Scenes
             {
                 Voxels.Load(RegionInfo.RegionID.ToString());  	
             }
-            catch (IOException e)
+            catch (IOException)
             {
 				m_log.Info("[TERRAIN]: No default terrain. Generating a new terrain.");
                 Voxels = (new VoxelChannel(sz,sz,256)).Generate("default");
