@@ -1003,7 +1003,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
         public void GenerateMaptile()
         {
             // Cannot create a map for a nonexistant heightmap
-            if (m_scene.Heightmap == null)
+            if (m_scene.Voxels == null)
                 return;
             
             //create a texture asset of the terrain

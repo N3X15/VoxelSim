@@ -1053,40 +1053,7 @@ namespace OpenSim.Region.ClientStack.LindenUDP
         {
             Util.FireAndForget(DoSendLayerData, map);
         }
-		
-		public virtual void SendVoxelData(int[,,] map)
-		{
-			Util.FireAndForget(DoSendVoxels, map);
-		}
-				
-		public void DoSendVoxels(object o)
-		{
-			int x,y,z;
-			int[,,] voxels = (int[,,])o;
-			for(z=0;z<voxels.GetLength(2);z++)
-			{
-				VoxelLayerPacket vlp = (VoxelLayerPacket)PacketPool.Instance.GetPacket(PacketType.VoxelLayer);
-				vlp.LayerData.Z=(uint)z;
-				List<VoxelLayerPacket.VoxelDataBlock> vlbs = new List<VoxelLayerPacket.VoxelDataBlock>();
-				for(x=0;x<voxels.GetLength(0);x++)
-				{
-					for(y=0;y<voxels.GetLength(1);y++)
-					{
-						if(voxels[x,y,z]>-1)
-						{
-							VoxelLayerPacket.VoxelDataBlock vlb = new VoxelLayerPacket.VoxelDataBlock();
-							vlb.X=(uint)x;
-							vlb.Y=(uint)z;
-							vlb.Material=(uint)voxels[x,y,z];
-							vlbs.Add(vlb);
-						}
-					}
-				}
-				vlp.VoxelData=vlbs.ToArray();
-				OutPacket(vlp,ThrottleOutPacketType.Land);
-			}
-			
-		}
+
         /// <summary>
         /// Send terrain layer information to the client.
         /// </summary>
@@ -11985,8 +11952,28 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             //        AbsolutePosition, Velocity, Vector3.Zero, m_bodyRot, new Vector4(0,0,1,AbsolutePosition.Z - 0.5f), m_uuid, null, GetUpdatePriority(ControllingClient)));
 
         }
+		
+		// VOXELSIM:  Notify client that a voxel has changed. (Fine update)
+        public void SendVoxelUpdate(int x, int y, int z, byte type) 
+        {
+            VoxelUpdatePacket p = new VoxelUpdatePacket();
+            p.VoxelData.X = (uint)x;
+            p.VoxelData.Y = (uint)y;
+            p.VoxelData.Z = (uint)z;
+            p.VoxelData.Material = type;
 
-        public void SendVoxelUpdate(int x, int y, int z, byte type) { }
-        public void SendChunkUpdate(int x, int y, int z) { }
+            OutPacket(p, ThrottleOutPacketType.Land);
+        }
+
+		// Notify a client that a chunk has changed (Coarse Update)
+        public void SendChunkUpdate(int x, int y, int z) 
+        {
+            ChunkUpdatePacket p = new ChunkUpdatePacket();
+            p.ChunkData.X = (uint)x;
+            p.ChunkData.Y = (uint)y;
+            p.ChunkData.Z = (uint)z;
+
+            OutPacket(p, ThrottleOutPacketType.Land);
+        }
     }
 }

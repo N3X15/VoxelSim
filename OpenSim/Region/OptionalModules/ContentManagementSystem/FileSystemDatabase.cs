@@ -48,7 +48,7 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Region.CoreModules.World.Serialiser;
-using OpenSim.Region.CoreModules.World.Terrain;
+using OpenSim.Region.CoreModules.World.Voxels;
 using OpenSim.Region.Physics.Manager;
 
 using log4net;
@@ -122,7 +122,7 @@ namespace OpenSim.Region.OptionalModules.ContentManagement
         public string GetRegionObjectHeightMap(UUID regionid)
         {
             String filename = m_repodir + Slash.DirectorySeparatorChar + regionid +
-                Slash.DirectorySeparatorChar + "heightmap.r32";
+                Slash.DirectorySeparatorChar + "terrain.osvox";
             FileStream fs = new FileStream(filename, FileMode.Open);
             StreamReader sr = new StreamReader(fs);
             String result = sr.ReadToEnd();
@@ -134,7 +134,7 @@ namespace OpenSim.Region.OptionalModules.ContentManagement
         public string GetRegionObjectHeightMap(UUID regionid, int revision)
         {
             String filename = m_repodir + Slash.DirectorySeparatorChar + regionid +
-                Slash.DirectorySeparatorChar + "heightmap.r32";
+                Slash.DirectorySeparatorChar + "terrain.osvox";
             FileStream fs = new FileStream(filename, FileMode.Open);
             StreamReader sr = new StreamReader(fs);
             String result = sr.ReadToEnd();

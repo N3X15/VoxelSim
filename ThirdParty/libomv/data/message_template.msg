@@ -8989,7 +8989,7 @@ version 2.0
 {
 	VoxelUpdate Low 911 NotTrusted Unencoded
 	{
-		VoxelData		Variable
+		VoxelData		Single
 		{	X			U32	}
 		{	Y			U32	}
 		{	Z			U32	}
@@ -9004,7 +9004,7 @@ version 2.0
 {
 	ChunkUpdate Low 912 NotTrusted Unencoded
 	{
-		ChunkData		Variable
+		ChunkData		Single
 		{	X			U32	}
 		{	Y			U32	}
 		{	Z			U32	}

@@ -306,7 +306,7 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
 
             float waterHeight = (float)settings.WaterHeight;
 
-            double[,] hm = m_scene.Heightmap.GetDoubles();
+            double[,] hm = m_scene.Voxels.GetDoubles();
 
             for (int x = 0; x < (int)Constants.RegionSize; x++)
             {

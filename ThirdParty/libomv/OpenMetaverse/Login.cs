@@ -144,7 +144,6 @@ namespace OpenMetaverse
             options.Add("login-flags");
             options.Add("global-textures");
             options.Add("adult_compliant");
-            options.Add("voxels");
 
             this.Options = options.ToArray();
             this.MethodName = "login_to_simulator";

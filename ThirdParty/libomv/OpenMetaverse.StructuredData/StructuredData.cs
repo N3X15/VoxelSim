@@ -121,8 +121,6 @@ namespace OpenMetaverse.StructuredData
         public static OSD FromDate(DateTime value) { return new OSDDate(value); }
         public static OSD FromUri(Uri value) { return new OSDUri(value); }
         public static OSD FromBinary(byte[] value) { return new OSDBinary(value); }
-        public static OSD FromBinary(long value) { return new OSDBinary(value); }
-        public static OSD FromBinary(ulong value) { return new OSDBinary(value); }
 
         public static OSD FromVector2(Vector2 value)
         {
@@ -297,6 +295,52 @@ namespace OpenMetaverse.StructuredData
             }
         }
 
+        #region Implicit Conversions
+
+        public static implicit operator OSD(bool value) { return new OSDBoolean(value); }
+        public static implicit operator OSD(int value) { return new OSDInteger(value); }
+        public static implicit operator OSD(uint value) { return new OSDInteger((int)value); }
+        public static implicit operator OSD(short value) { return new OSDInteger((int)value); }
+        public static implicit operator OSD(ushort value) { return new OSDInteger((int)value); }
+        public static implicit operator OSD(sbyte value) { return new OSDInteger((int)value); }
+        public static implicit operator OSD(byte value) { return new OSDInteger((int)value); }
+        public static implicit operator OSD(long value) { return new OSDBinary(value); }
+        public static implicit operator OSD(ulong value) { return new OSDBinary(value); }
+        public static implicit operator OSD(double value) { return new OSDReal(value); }
+        public static implicit operator OSD(float value) { return new OSDReal(value); }
+        public static implicit operator OSD(string value) { return new OSDString(value); }
+        public static implicit operator OSD(UUID value) { return new OSDUUID(value); }
+        public static implicit operator OSD(DateTime value) { return new OSDDate(value); }
+        public static implicit operator OSD(Uri value) { return new OSDUri(value); }
+        public static implicit operator OSD(byte[] value) { return new OSDBinary(value); }
+        public static implicit operator OSD(Vector2 value) { return OSD.FromVector2(value); }
+        public static implicit operator OSD(Vector3 value) { return OSD.FromVector3(value); }
+        public static implicit operator OSD(Vector3d value) { return OSD.FromVector3d(value); }
+        public static implicit operator OSD(Vector4 value) { return OSD.FromVector4(value); }
+        public static implicit operator OSD(Quaternion value) { return OSD.FromQuaternion(value); }
+        public static implicit operator OSD(Color4 value) { return OSD.FromColor4(value); }
+
+        public static implicit operator bool(OSD value) { return value.AsBoolean(); }
+        public static implicit operator int(OSD value) { return value.AsInteger(); }
+        public static implicit operator uint(OSD value) { return value.AsUInteger(); }
+        public static implicit operator long(OSD value) { return value.AsLong(); }
+        public static implicit operator ulong(OSD value) { return value.AsULong(); }
+        public static implicit operator double(OSD value) { return value.AsReal(); }
+        public static implicit operator float(OSD value) { return (float)value.AsReal(); }
+        public static implicit operator string(OSD value) { return value.AsString(); }
+        public static implicit operator UUID(OSD value) { return value.AsUUID(); }
+        public static implicit operator DateTime(OSD value) { return value.AsDate(); }
+        public static implicit operator Uri(OSD value) { return value.AsUri(); }
+        public static implicit operator byte[](OSD value) { return value.AsBinary(); }
+        public static implicit operator Vector2(OSD value) { return value.AsVector2(); }
+        public static implicit operator Vector3(OSD value) { return value.AsVector3(); }
+        public static implicit operator Vector3d(OSD value) { return value.AsVector3d(); }
+        public static implicit operator Vector4(OSD value) { return value.AsVector4(); }
+        public static implicit operator Quaternion(OSD value) { return value.AsQuaternion(); }
+        public static implicit operator Color4(OSD value) { return value.AsColor4(); }
+
+        #endregion Implicit Conversions
+
         /// <summary>
         /// Uses reflection to create an SDMap from all of the SD
         /// serializable types in an object
@@ -355,7 +399,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDBoolean : OSD
+    public sealed class OSDBoolean : OSD
     {
         private bool value;
 
@@ -381,7 +425,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDInteger : OSD
+    public sealed class OSDInteger : OSD
     {
         private int value;
 
@@ -407,7 +451,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDReal : OSD
+    public sealed class OSDReal : OSD
     {
         private double value;
 
@@ -474,7 +518,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDString : OSD
+    public sealed class OSDString : OSD
     {
         private string value;
 
@@ -578,7 +622,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDUUID : OSD
+    public sealed class OSDUUID : OSD
     {
         private UUID value;
 
@@ -599,7 +643,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDDate : OSD
+    public sealed class OSDDate : OSD
     {
         private DateTime value;
 
@@ -653,7 +697,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDUri : OSD
+    public sealed class OSDUri : OSD
     {
         private Uri value;
 
@@ -664,7 +708,18 @@ namespace OpenMetaverse.StructuredData
             this.value = value;
         }
 
-        public override string AsString() { return value != null ? value.ToString() : String.Empty; }
+        public override string AsString()
+        {
+            if (value != null)
+            {
+                if (value.IsAbsoluteUri)
+                    return value.AbsoluteUri;
+                else
+                    return value.ToString();
+            }
+            return string.Empty;
+        }
+
         public override Uri AsUri() { return value; }
         public override byte[] AsBinary() { return Encoding.UTF8.GetBytes(AsString()); }
         public override string ToString() { return AsString(); }
@@ -673,7 +728,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDBinary : OSD
+    public sealed class OSDBinary : OSD
     {
         private byte[] value;
 
@@ -775,7 +830,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDMap : OSD, IDictionary<string, OSD>
+    public sealed class OSDMap : OSD, IDictionary<string, OSD>
     {
         private Dictionary<string, OSD> value;
 
@@ -803,7 +858,7 @@ namespace OpenMetaverse.StructuredData
 
         public override string ToString()
         {
-            return OSDParser.SerializeLLSDNotationFormatted(this);
+            return OSDParser.SerializeJsonString(this, true);
         }
 
         #region IDictionary Implementation
@@ -893,7 +948,7 @@ namespace OpenMetaverse.StructuredData
     /// <summary>
     /// 
     /// </summary>
-    public class OSDArray : OSD, IList<OSD>
+    public sealed class OSDArray : OSD, IList<OSD>
     {
         private List<OSD> value;
 
@@ -1035,7 +1090,7 @@ namespace OpenMetaverse.StructuredData
 
         public override string ToString()
         {
-            return OSDParser.SerializeLLSDNotationFormatted(this);
+            return OSDParser.SerializeJsonString(this, true);
         }
 
         #region IList Implementation
@@ -1066,12 +1121,6 @@ namespace OpenMetaverse.StructuredData
         public void Add(OSD llsd)
         {
             value.Add(llsd);
-        }
-
-        public void Add(string str)
-        {
-            // This is so common that we throw a little helper in here
-            value.Add(OSD.FromString(str));
         }
 
         public void Clear()
@@ -1120,31 +1169,47 @@ namespace OpenMetaverse.StructuredData
 
     public partial class OSDParser
     {
-        const string LLSD_BINARY_HEADER = "<?LLSD/Binary?>";
+        const string LLSD_BINARY_HEADER = "<? llsd/binary ?>";
         const string LLSD_XML_HEADER = "<llsd>";
         const string LLSD_XML_ALT_HEADER = "<?xml";
-        const string LLSD_XML_ALT2_HEADER = "<?LLSD/XML?>";
+        const string LLSD_XML_ALT2_HEADER = "<? llsd/xml ?>";
 
         public static OSD Deserialize(byte[] data)
         {
-            string header = Encoding.ASCII.GetString(data, 0, data.Length >= 14 ? 14 : data.Length);
+            string header = Encoding.ASCII.GetString(data, 0, data.Length >= 17 ? 17 : data.Length);
 
-            if (header.StartsWith(LLSD_BINARY_HEADER))
+            if (header.StartsWith(LLSD_BINARY_HEADER, StringComparison.InvariantCultureIgnoreCase))
+            {
                 return DeserializeLLSDBinary(data);
-            else if (header.StartsWith(LLSD_XML_HEADER) || header.StartsWith(LLSD_XML_ALT_HEADER) || header.StartsWith(LLSD_XML_ALT2_HEADER))
+            }
+            else if (header.StartsWith(LLSD_XML_HEADER, StringComparison.InvariantCultureIgnoreCase) ||
+                header.StartsWith(LLSD_XML_ALT_HEADER, StringComparison.InvariantCultureIgnoreCase) ||
+                header.StartsWith(LLSD_XML_ALT2_HEADER, StringComparison.InvariantCultureIgnoreCase))
+            {
                 return DeserializeLLSDXml(data);
+            }
             else
+            {
                 return DeserializeJson(Encoding.UTF8.GetString(data));
+            }
         }
 
         public static OSD Deserialize(string data)
         {
-            if (data.StartsWith(LLSD_BINARY_HEADER))
+            if (data.StartsWith(LLSD_BINARY_HEADER, StringComparison.InvariantCultureIgnoreCase))
+            {
                 return DeserializeLLSDBinary(Encoding.UTF8.GetBytes(data));
-            else if (data.StartsWith(LLSD_XML_HEADER) || data.StartsWith(LLSD_XML_ALT_HEADER) || data.StartsWith(LLSD_XML_ALT2_HEADER))
+            }
+            else if (data.StartsWith(LLSD_XML_HEADER, StringComparison.InvariantCultureIgnoreCase) ||
+                data.StartsWith(LLSD_XML_ALT_HEADER, StringComparison.InvariantCultureIgnoreCase) ||
+                data.StartsWith(LLSD_XML_ALT2_HEADER, StringComparison.InvariantCultureIgnoreCase))
+            {
                 return DeserializeLLSDXml(data);
+            }
             else
+            {
                 return DeserializeJson(data);
+            }
         }
 
         public static OSD Deserialize(Stream stream)

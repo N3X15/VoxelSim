@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace OpenMetaverse.Rendering
 {
@@ -75,6 +76,21 @@ namespace OpenMetaverse.Rendering
         }
 
         public FacetedMesh GenerateFacetedMesh(Primitive prim, DetailLevel lod)
+        {
+            Path path = GeneratePath();
+            Profile profile = GenerateProfile();
+
+            FacetedMesh mesh = new FacetedMesh();
+            mesh.Prim = prim;
+            mesh.Path = path;
+            mesh.Profile = profile;
+            mesh.Faces = GenerateFaces(prim);
+
+            return mesh;
+        }
+
+        // BROKEN, REPLACE WHEN LIBOMV HAS THEIR SHIT STRAIGHT
+        public FacetedMesh GenerateFacetedSculptMesh(Primitive prim, Bitmap bmp, DetailLevel lod)
         {
             Path path = GeneratePath();
             Profile profile = GenerateProfile();
@@ -244,6 +260,12 @@ namespace OpenMetaverse.Rendering
             faces.Add(face);
 
             return faces;
+        }
+
+
+        public SimpleMesh GenerateSimpleSculptMesh(Primitive prim, Bitmap sculptTexture, DetailLevel lod)
+        {
+            throw new NotImplementedException();
         }
     }
 }

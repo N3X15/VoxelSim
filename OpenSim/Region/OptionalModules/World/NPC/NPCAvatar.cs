@@ -572,8 +572,6 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         {
         }
 
-		public virtual void SendVoxelData(int[,,] map) {}
-		
         public virtual void SendWindData(Vector2[] windSpeeds) { }
 
         public virtual void SendCloudData(float[] cloudCover) { }
@@ -1166,6 +1164,15 @@ namespace OpenSim.Region.OptionalModules.World.NPC
         }
         
         public void StopFlying(ISceneEntity presence)
+        {
+        }
+
+
+        public void SendVoxelUpdate(int x, int y, int z, byte b)
+        {
+        }
+
+        public void SendChunkUpdate(int x, int y, int z)
         {
         }
     }

@@ -616,61 +616,6 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                 // Clients who look at the map will never see changes after they looked at the map, so i've commented this out.
                 //m_scene.CreateTerrainTexture(true);
             }
-
-            List<VoxelUpdate> FineChanges = new List<VoxelUpdate>();
-            List<ChunkUpdate> ChunkChanges = new List<ChunkUpdate>();
-
-            // NumVoxelsPerChunk/4 = Maximum fine changes PER UPDATE allowed.
-            int MaxFineChangesAllowed = (VoxelChannel.CHUNK_SIZE_X*VoxelChannel.CHUNK_SIZE_Y*VoxelChannel.CHUNK_SIZE_Z)/4;
-            int NumFineChanges=0;
-            
-            // For each chunk...
-            for(int cx=0;cx<(m_channel.Width/VoxelChannel.CHUNK_SIZE_X);cx++)
-            {
-                for (int cy = 0; cy < (m_channel.Length / VoxelChannel.CHUNK_SIZE_Y); cy++)
-                {
-                    // Get voxels in each chunk...
-                    byte[] data_a = m_channel.GetChunkData(cx, cy);
-                    byte[] data_b = m_revert.GetChunkData(cx, cy);
-
-                    // Compare
-                    for (int x = 0; x < VoxelChannel.CHUNK_SIZE_X; x++)
-                    {
-                        for (int y = 0; y < VoxelChannel.CHUNK_SIZE_Y; y++)
-                        {
-                            for (int z = 0; z < VoxelChannel.CHUNK_SIZE_Z; z++)
-                            {
-                                // Compare newest voxel with revert map voxel
-                                byte a = m_channel.GetChunkBlock(ref data_a, x, y, z);
-                                if(a != m_channel.GetChunkBlock(ref data_b, x, y, z))
-                                {
-                                    // Too many fine updates?
-                                    NumFineChanges++;
-                                    if (NumFineChanges > MaxFineChangesAllowed)
-                                    {
-                                        // Clear fine updates, reset counter, and add a coarse update.
-                                        FineChanges.Clear();
-                                        NumFineChanges = 0;
-                                        ChunkUpdate cu = new ChunkUpdate();
-                                        cu.X=cx;
-                                        cu.Y=cy;
-                                        cu.Z=0;
-                                        ChunkChanges.Add(cu);
-                                    } else {
-                                        // Otherwise, add a fine update.
-                                        VoxelUpdate vu = new VoxelUpdate();
-                                        vu.X=x;
-                                        vu.Y=y;
-                                        vu.Z=z;
-                                        vu.Type=a;
-                                        FineChanges.Add(vu);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -716,90 +661,77 @@ namespace OpenSim.Region.CoreModules.World.Voxels
         /// </summary>
         private void CheckForTerrainUpdates()
         {
-            CheckForTerrainUpdates(false);
-        }
-		
-        private void CheckForHeightmapUpdates(bool respectEstateSettings)
-        {
-            bool shouldTaint = false;
-            float[] serialised = m_channel.GetFloatsSerialised();
-            int x;
-            for (x = 0; x < m_channel.Width; x += Constants.TerrainPatchSize)
-            {
-                int y;
-                for (y = 0; y < m_channel.Height; y += Constants.TerrainPatchSize)
-                {
-                    if (m_channel.Tainted(x, y, 0))
-                    {
-                        // if we should respect the estate settings then
-                        // fixup and height deltas that don't respect them
-                        /*if (respectEstateSettings && LimitChannelChanges(x, y))
-                        {
-                            // this has been vetoed, so update
-                            // what we are going to send to the client
-                            serialised = m_channel.GetFloatsSerialised();
-                        }*/
 
-                        SendToClients(serialised, x, y);
-                        shouldTaint = true;
+            List<VoxelUpdate> FineChanges = new List<VoxelUpdate>();
+            List<ChunkUpdate> ChunkChanges = new List<ChunkUpdate>();
+
+            // NumVoxelsPerChunk/4 = Maximum fine changes PER UPDATE allowed.
+            int MaxFineChangesAllowed = (VoxelChannel.CHUNK_SIZE_X * VoxelChannel.CHUNK_SIZE_Y * VoxelChannel.CHUNK_SIZE_Z) / 4;
+            int NumFineChanges = 0;
+
+            // For each chunk...
+            for (int cx = 0; cx < (m_channel.Width / VoxelChannel.CHUNK_SIZE_X); cx++)
+            {
+                for (int cy = 0; cy < (m_channel.Length / VoxelChannel.CHUNK_SIZE_Y); cy++)
+                {
+                    // Get voxels in each chunk...
+                    byte[] data_a = m_channel.GetChunkData(cx, cy);
+                    byte[] data_b = m_revert.GetChunkData(cx, cy);
+
+                    // Compare
+                    for (int x = 0; x < VoxelChannel.CHUNK_SIZE_X; x++)
+                    {
+                        for (int y = 0; y < VoxelChannel.CHUNK_SIZE_Y; y++)
+                        {
+                            for (int z = 0; z < VoxelChannel.CHUNK_SIZE_Z; z++)
+                            {
+                                // Compare newest voxel with revert map voxel
+                                byte a = m_channel.GetChunkBlock(ref data_a, x, y, z);
+                                if (a != m_channel.GetChunkBlock(ref data_b, x, y, z))
+                                {
+                                    // Too many fine updates?
+                                    NumFineChanges++;
+                                    if (NumFineChanges > MaxFineChangesAllowed)
+                                    {
+                                        // Clear fine updates, reset counter, and add a coarse update.
+                                        FineChanges.Clear();
+                                        NumFineChanges = 0;
+                                        ChunkUpdate cu = new ChunkUpdate();
+                                        cu.X = cx;
+                                        cu.Y = cy;
+                                        cu.Z = 0;
+                                        ChunkChanges.Add(cu);
+                                    }
+                                    else
+                                    {
+                                        // Otherwise, add a fine update.
+                                        VoxelUpdate vu = new VoxelUpdate();
+                                        vu.X = x;
+                                        vu.Y = y;
+                                        vu.Z = z;
+                                        vu.Type = a;
+                                        FineChanges.Add(vu);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-            if (shouldTaint)
-            {
-                m_tainted = true;
-            }
-        }
-        /// <summary>
-        /// Sends a copy of the current terrain to the scenes clients
-        /// </summary>
-        /// <param name="serialised">A copy of the terrain as a 1D float array of size w*h</param>
-        /// <param name="x">The patch corner to send</param>
-        /// <param name="y">The patch corner to send</param>
-        private void SendToClients(float[] serialised, int x, int y)
-        {
-            m_scene.ForEachClient(
-                delegate(IClientAPI controller)
-                    { controller.SendLayerData(
-                        x / Constants.TerrainPatchSize, y / Constants.TerrainPatchSize, serialised);
-                    }
-            );
-        }
 
-        /// <summary>
-        /// Checks to see if the terrain has been modified since last check.
-        /// If it has been modified, every all the terrain patches are sent to the client.
-        /// If the call is asked to respect the estate settings for terrain_raise_limit and
-        /// terrain_lower_limit, it will clamp terrain updates between these values
-        /// currently invoked by client_OnModifyTerrain only and not the Commander interfaces
-        /// <param name="respectEstateSettings">should height map deltas be limited to the estate settings limits</param>
-        /// </summary>
-        private void CheckForTerrainUpdates(bool respectEstateSettings)
-        {
-			CheckForHeightmapUpdates(respectEstateSettings);
-            bool shouldTaint = false;
-            int[,,] serialised = m_channel.ToMaterialMap();
-			int z;
-			for(z=0;z<m_channel.Height;z++)
-			{
-				// if we should respect the estate settings then
-	            // fixup and height deltas that don't respect them
-	            if (respectEstateSettings && LimitChannelChanges(z))
-	            {
-	                // this has been vetoed, so update
-	                // what we are going to send to the client
-	                serialised = m_channel.ToMaterialMap();
-	            }
-	
-	            SendToClients(serialised);
-	            shouldTaint = true;
-			}
-            if (shouldTaint)
+            m_scene.ForEachClient(delegate(IClientAPI cli)
             {
-                m_tainted = true;
-            }
+                foreach (VoxelUpdate up in FineChanges)
+                {
+                    cli.SendVoxelUpdate(up.X, up.Y, up.Z, up.Type);
+                }
+                foreach (ChunkUpdate up in ChunkChanges)
+                {
+                    cli.SendChunkUpdate(up.X, up.Y, up.Z);
+                }
+            });
         }
-
+		
         /// <summary>
         /// Checks to see height deltas in the tainted terrain patch at xStart ,yStart
         /// are all within the current estate limits
@@ -856,21 +788,6 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             }
         }
 
-        /// <summary>
-        /// Sends a copy of the current terrain to the scenes clients
-        /// </summary>
-        /// <param name="serialised">A copy of the terrain as a 1D float array of size w*h</param>
-        /// <param name="z">Layer ID</param>
-        private void SendToClients(int[,,] map)
-        {
-            m_scene.ForEachClient(
-                delegate(IClientAPI controller)
-				{ 
-					controller.SendVoxelData(map);
-				}
-            );
-        }
-
         private void client_OnModifyTerrain(UUID user, int x, int y, int z, byte action, double str, UUID agentId)
         {
             bool god = m_scene.Permissions.IsGod(user);
@@ -894,7 +811,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
                     m_painteffects[(StandardVoxelActions) action].PaintEffect(
                         m_channel, allowMask, x,y,z,str);
 
-                    CheckForTerrainUpdates(!god); //revert changes outside estate limits
+                    CheckForTerrainUpdates(); //revert changes outside estate limits
                 }
             }
         }
@@ -1284,6 +1201,20 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
 
         #endregion
+    }
 
+    internal struct VoxelUpdate
+    {
+        public int X;
+        public int Y;
+        public int Z;
+        public byte Type;
+    }
+
+    internal struct ChunkUpdate
+    {
+        public int X;
+        public int Y;
+        public int Z;
     }
 }

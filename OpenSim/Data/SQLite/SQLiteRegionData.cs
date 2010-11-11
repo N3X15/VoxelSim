@@ -350,11 +350,11 @@ namespace OpenSim.Data.SQLite
 
             lock (ds)
             {
-                foreach (SceneObjectPart prim in obj.Children.Values)
+                obj.ForEachPart(delegate(SceneObjectPart prim)
                 {
-//                    m_log.Info("[REGION DB]: Adding obj: " + obj.UUID + " to region: " + regionUUID);
+                    //m_log.Info("[REGION DB]: Adding obj: " + obj.UUID + " to region: " + regionUUID);
                     addPrim(prim, obj.UUID, regionUUID);
-                }
+                });
             }
 
             Commit();
@@ -1427,7 +1427,7 @@ namespace OpenSim.Data.SQLite
             UUID.TryParse((string)row["AuthbuyerID"], out authBuyerID);
 
             newData.OtherCleanTime = Convert.ToInt32(row["OtherCleanTime"]);
-            newData.Dwell = Convert.ToInt32(row["Dwell"]);
+            //newData.Dwell = Convert.ToInt32(row["Dwell"]);
 
             return newData;
         }
@@ -1739,7 +1739,7 @@ namespace OpenSim.Data.SQLite
             row["UserLookAtZ"] = land.UserLookAt.Z;
             row["AuthbuyerID"] = land.AuthBuyerID.ToString();
             row["OtherCleanTime"] = land.OtherCleanTime;
-            row["Dwell"] = land.Dwell;
+            //row["Dwell"] = land.Dwell;
         }
 
         /// <summary>

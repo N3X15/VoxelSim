@@ -1159,5 +1159,14 @@ namespace OpenSim.Region.Examples.SimpleModule
         public void StopFlying(ISceneEntity presence)
         {
         }
+
+
+        public void SendVoxelUpdate(int x, int y, int z, byte b)
+        {
+        }
+
+        public void SendChunkUpdate(int x, int y, int z)
+        {
+        }
     }
 }

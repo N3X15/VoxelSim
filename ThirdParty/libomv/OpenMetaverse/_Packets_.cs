@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, openmetaverse.org
+ * Copyright (c) 2008, openmetaverse.org
  * All rights reserved.
  *
  * - Redistribution and use in source and binary forms, with or without
@@ -69331,23 +69331,22 @@ namespace OpenMetaverse.Packets
         {
             get
             {
-                int length = 11;
-                for (int j = 0; j < VoxelData.Length; j++)
-                    length += VoxelData[j].Length;
+                int length = 10;
+                length += VoxelData.Length;
                 return length;
             }
         }
-        public VoxelDataBlock[] VoxelData;
+        public VoxelDataBlock VoxelData;
 
         public VoxelUpdatePacket()
         {
-            HasVariableBlocks = true;
+            HasVariableBlocks = false;
             Type = PacketType.VoxelUpdate;
             Header = new Header();
             Header.Frequency = PacketFrequency.Low;
             Header.ID = 911;
             Header.Reliable = true;
-            VoxelData = null;
+            VoxelData = new VoxelDataBlock();
         }
 
         public VoxelUpdatePacket(byte[] bytes, ref int i) : this()
@@ -69364,14 +69363,7 @@ namespace OpenMetaverse.Packets
                 packetEnd = Helpers.ZeroDecode(bytes, packetEnd + 1, zeroBuffer) - 1;
                 bytes = zeroBuffer;
             }
-            int count = (int)bytes[i++];
-            if(VoxelData == null || VoxelData.Length != -1) {
-                VoxelData = new VoxelDataBlock[count];
-                for(int j = 0; j < count; j++)
-                { VoxelData[j] = new VoxelDataBlock(); }
-            }
-            for (int j = 0; j < count; j++)
-            { VoxelData[j].FromBytes(bytes, ref i); }
+            VoxelData.FromBytes(bytes, ref i);
         }
 
         public VoxelUpdatePacket(Header head, byte[] bytes, ref int i): this()
@@ -69383,85 +69375,25 @@ namespace OpenMetaverse.Packets
         override public void FromBytes(Header header, byte[] bytes, ref int i, ref int packetEnd)
         {
             Header = header;
-            int count = (int)bytes[i++];
-            if(VoxelData == null || VoxelData.Length != count) {
-                VoxelData = new VoxelDataBlock[count];
-                for(int j = 0; j < count; j++)
-                { VoxelData[j] = new VoxelDataBlock(); }
-            }
-            for (int j = 0; j < count; j++)
-            { VoxelData[j].FromBytes(bytes, ref i); }
+            VoxelData.FromBytes(bytes, ref i);
         }
 
         public override byte[] ToBytes()
         {
             int length = 10;
-            length++;
-            for (int j = 0; j < VoxelData.Length; j++) { length += VoxelData[j].Length; }
+            length += VoxelData.Length;
             if (Header.AckList != null && Header.AckList.Length > 0) { length += Header.AckList.Length * 4 + 1; }
             byte[] bytes = new byte[length];
             int i = 0;
             Header.ToBytes(bytes, ref i);
-            bytes[i++] = (byte)VoxelData.Length;
-            for (int j = 0; j < VoxelData.Length; j++) { VoxelData[j].ToBytes(bytes, ref i); }
+            VoxelData.ToBytes(bytes, ref i);
             if (Header.AckList != null && Header.AckList.Length > 0) { Header.AcksToBytes(bytes, ref i); }
             return bytes;
         }
 
         public override byte[][] ToBytesMultiple()
         {
-            System.Collections.Generic.List<byte[]> packets = new System.Collections.Generic.List<byte[]>();
-            int i = 0;
-            int fixedLength = 10;
-
-            byte[] ackBytes = null;
-            int acksLength = 0;
-            if (Header.AckList != null && Header.AckList.Length > 0) {
-                Header.AppendedAcks = true;
-                ackBytes = new byte[Header.AckList.Length * 4 + 1];
-                Header.AcksToBytes(ackBytes, ref acksLength);
-            }
-
-            byte[] fixedBytes = new byte[fixedLength];
-            Header.ToBytes(fixedBytes, ref i);
-            fixedLength += 1;
-
-            int VoxelDataStart = 0;
-            do
-            {
-                int variableLength = 0;
-                int VoxelDataCount = 0;
-
-                i = VoxelDataStart;
-                while (fixedLength + variableLength + acksLength < Packet.MTU && i < VoxelData.Length) {
-                    int blockLength = VoxelData[i].Length;
-                    if (fixedLength + variableLength + blockLength + acksLength <= MTU) {
-                        variableLength += blockLength;
-                        ++VoxelDataCount;
-                    }
-                    else { break; }
-                    ++i;
-                }
-
-                byte[] packet = new byte[fixedLength + variableLength + acksLength];
-                int length = fixedBytes.Length;
-                Buffer.BlockCopy(fixedBytes, 0, packet, 0, length);
-                if (packets.Count > 0) { packet[0] = (byte)(packet[0] & ~0x10); }
-
-                packet[length++] = (byte)VoxelDataCount;
-                for (i = VoxelDataStart; i < VoxelDataStart + VoxelDataCount; i++) { VoxelData[i].ToBytes(packet, ref length); }
-                VoxelDataStart += VoxelDataCount;
-
-                if (acksLength > 0) {
-                    Buffer.BlockCopy(ackBytes, 0, packet, length, acksLength);
-                    acksLength = 0;
-                }
-
-                packets.Add(packet);
-            } while (
-                VoxelDataStart < VoxelData.Length);
-
-            return packets.ToArray();
+            return new byte[][] { ToBytes() };
         }
     }
 
@@ -69516,23 +69448,22 @@ namespace OpenMetaverse.Packets
         {
             get
             {
-                int length = 11;
-                for (int j = 0; j < ChunkData.Length; j++)
-                    length += ChunkData[j].Length;
+                int length = 10;
+                length += ChunkData.Length;
                 return length;
             }
         }
-        public ChunkDataBlock[] ChunkData;
+        public ChunkDataBlock ChunkData;
 
         public ChunkUpdatePacket()
         {
-            HasVariableBlocks = true;
+            HasVariableBlocks = false;
             Type = PacketType.ChunkUpdate;
             Header = new Header();
             Header.Frequency = PacketFrequency.Low;
             Header.ID = 912;
             Header.Reliable = true;
-            ChunkData = null;
+            ChunkData = new ChunkDataBlock();
         }
 
         public ChunkUpdatePacket(byte[] bytes, ref int i) : this()
@@ -69549,14 +69480,7 @@ namespace OpenMetaverse.Packets
                 packetEnd = Helpers.ZeroDecode(bytes, packetEnd + 1, zeroBuffer) - 1;
                 bytes = zeroBuffer;
             }
-            int count = (int)bytes[i++];
-            if(ChunkData == null || ChunkData.Length != -1) {
-                ChunkData = new ChunkDataBlock[count];
-                for(int j = 0; j < count; j++)
-                { ChunkData[j] = new ChunkDataBlock(); }
-            }
-            for (int j = 0; j < count; j++)
-            { ChunkData[j].FromBytes(bytes, ref i); }
+            ChunkData.FromBytes(bytes, ref i);
         }
 
         public ChunkUpdatePacket(Header head, byte[] bytes, ref int i): this()
@@ -69568,85 +69492,25 @@ namespace OpenMetaverse.Packets
         override public void FromBytes(Header header, byte[] bytes, ref int i, ref int packetEnd)
         {
             Header = header;
-            int count = (int)bytes[i++];
-            if(ChunkData == null || ChunkData.Length != count) {
-                ChunkData = new ChunkDataBlock[count];
-                for(int j = 0; j < count; j++)
-                { ChunkData[j] = new ChunkDataBlock(); }
-            }
-            for (int j = 0; j < count; j++)
-            { ChunkData[j].FromBytes(bytes, ref i); }
+            ChunkData.FromBytes(bytes, ref i);
         }
 
         public override byte[] ToBytes()
         {
             int length = 10;
-            length++;
-            for (int j = 0; j < ChunkData.Length; j++) { length += ChunkData[j].Length; }
+            length += ChunkData.Length;
             if (Header.AckList != null && Header.AckList.Length > 0) { length += Header.AckList.Length * 4 + 1; }
             byte[] bytes = new byte[length];
             int i = 0;
             Header.ToBytes(bytes, ref i);
-            bytes[i++] = (byte)ChunkData.Length;
-            for (int j = 0; j < ChunkData.Length; j++) { ChunkData[j].ToBytes(bytes, ref i); }
+            ChunkData.ToBytes(bytes, ref i);
             if (Header.AckList != null && Header.AckList.Length > 0) { Header.AcksToBytes(bytes, ref i); }
             return bytes;
         }
 
         public override byte[][] ToBytesMultiple()
         {
-            System.Collections.Generic.List<byte[]> packets = new System.Collections.Generic.List<byte[]>();
-            int i = 0;
-            int fixedLength = 10;
-
-            byte[] ackBytes = null;
-            int acksLength = 0;
-            if (Header.AckList != null && Header.AckList.Length > 0) {
-                Header.AppendedAcks = true;
-                ackBytes = new byte[Header.AckList.Length * 4 + 1];
-                Header.AcksToBytes(ackBytes, ref acksLength);
-            }
-
-            byte[] fixedBytes = new byte[fixedLength];
-            Header.ToBytes(fixedBytes, ref i);
-            fixedLength += 1;
-
-            int ChunkDataStart = 0;
-            do
-            {
-                int variableLength = 0;
-                int ChunkDataCount = 0;
-
-                i = ChunkDataStart;
-                while (fixedLength + variableLength + acksLength < Packet.MTU && i < ChunkData.Length) {
-                    int blockLength = ChunkData[i].Length;
-                    if (fixedLength + variableLength + blockLength + acksLength <= MTU) {
-                        variableLength += blockLength;
-                        ++ChunkDataCount;
-                    }
-                    else { break; }
-                    ++i;
-                }
-
-                byte[] packet = new byte[fixedLength + variableLength + acksLength];
-                int length = fixedBytes.Length;
-                Buffer.BlockCopy(fixedBytes, 0, packet, 0, length);
-                if (packets.Count > 0) { packet[0] = (byte)(packet[0] & ~0x10); }
-
-                packet[length++] = (byte)ChunkDataCount;
-                for (i = ChunkDataStart; i < ChunkDataStart + ChunkDataCount; i++) { ChunkData[i].ToBytes(packet, ref length); }
-                ChunkDataStart += ChunkDataCount;
-
-                if (acksLength > 0) {
-                    Buffer.BlockCopy(ackBytes, 0, packet, length, acksLength);
-                    acksLength = 0;
-                }
-
-                packets.Add(packet);
-            } while (
-                ChunkDataStart < ChunkData.Length);
-
-            return packets.ToArray();
+            return new byte[][] { ToBytes() };
         }
     }
 

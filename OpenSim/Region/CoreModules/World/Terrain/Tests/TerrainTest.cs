@@ -24,11 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+/*
 using System;
 using NUnit.Framework;
 using OpenSim.Framework;
-using OpenSim.Region.CoreModules.World.Terrain.PaintBrushes;
 using OpenSim.Region.Framework.Scenes;
 
 namespace OpenSim.Region.CoreModules.World.Terrain.Tests
@@ -117,3 +116,4 @@ namespace OpenSim.Region.CoreModules.World.Terrain.Tests
         }
     }
 }
+*/

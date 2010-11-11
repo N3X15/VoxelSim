@@ -183,9 +183,9 @@ namespace OpenSim.ApplicationPlugins.Rest.Regions
         protected string RegionTerrain(OSHttpResponse httpResponse, Scene scene)
         {
             httpResponse.SendChunked = true;
-            httpResponse.ContentType = "application/binary";
+            httpResponse.ContentType = "application/octet-stream";
 
-            return scene.Voxels.SaveToVox();
+            return (scene.Voxels as VoxelChannel).ToBytes().ToString();
             //return Failure(httpResponse, OSHttpStatusCode.ServerErrorNotImplemented,
             //               "GET", "terrain not implemented");
         }

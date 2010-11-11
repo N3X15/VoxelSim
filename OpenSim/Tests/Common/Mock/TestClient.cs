@@ -533,10 +533,6 @@ namespace OpenSim.Tests.Common.Mock
         {
         }
 
-        public virtual void SendVoxelData(int[,,] map)
-        {
-        }
-
         public virtual void SendLayerData(int px, int py, float[] map)
         {
         }
@@ -1222,6 +1218,15 @@ namespace OpenSim.Tests.Common.Mock
         }
 
         public void StopFlying(ISceneEntity presence)
+        {
+        }
+
+
+        public void SendVoxelUpdate(int x, int y, int z, byte b)
+        {
+        }
+
+        public void SendChunkUpdate(int x, int y, int z)
         {
         }
     }

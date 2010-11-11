@@ -368,12 +368,12 @@ namespace OpenMetaverse
 
             // Register the internal callbacks
             RegisterCallback(PacketType.RegionHandshake, RegionHandshakeHandler);
-            RegisterCallback(PacketType.StartPingCheck, StartPingCheckHandler);
+            RegisterCallback(PacketType.StartPingCheck, StartPingCheckHandler, false);
             RegisterCallback(PacketType.DisableSimulator, DisableSimulatorHandler);
             RegisterCallback(PacketType.KickUser, KickUserHandler);
             RegisterCallback(PacketType.LogoutReply, LogoutReplyHandler);
-            RegisterCallback(PacketType.CompletePingCheck, CompletePingCheckHandler);
-            RegisterCallback(PacketType.SimStats, SimStatsHandler);
+            RegisterCallback(PacketType.CompletePingCheck, CompletePingCheckHandler, false);
+            RegisterCallback(PacketType.SimStats, SimStatsHandler, false);
 
             // GLOBAL SETTING: Don't force Expect-100: Continue headers on HTTP POST calls
             ServicePointManager.Expect100Continue = false;
@@ -389,7 +389,26 @@ namespace OpenMetaverse
         /// is received</param>
         public void RegisterCallback(PacketType type, EventHandler<PacketReceivedEventArgs> callback)
         {
-            PacketEvents.RegisterEvent(type, callback);
+            RegisterCallback(type, callback, true);
+        }
+
+        /// <summary>
+        /// Register an event handler for a packet. This is a low level event
+        /// interface and should only be used if you are doing something not
+        /// supported in the library
+        /// </summary>
+        /// <param name="type">Packet type to trigger events for</param>
+        /// <param name="callback">Callback to fire when a packet of this type
+        /// is received</param>
+        /// <param name="isAsync">True if the callback should be ran 
+        /// asynchronously. Only set this to false (synchronous for callbacks 
+        /// that will always complete quickly)</param>
+        /// <remarks>If any callback for a packet type is marked as 
+        /// asynchronous, all callbacks for that packet type will be fired
+        /// asynchronously</remarks>
+        public void RegisterCallback(PacketType type, EventHandler<PacketReceivedEventArgs> callback, bool isAsync)
+        {
+            PacketEvents.RegisterEvent(type, callback, isAsync);
         }
 
         /// <summary>
@@ -862,7 +881,7 @@ namespace OpenMetaverse
 
                     if (packet != null)
                     {
-                        // skip blacklisted packets
+                        // Skip blacklisted packets
                         if (UDPBlacklist.Contains(packet.Type.ToString()))
                         {
                             Logger.Log(String.Format("Discarding Blacklisted packet {0} from {1}",
@@ -870,14 +889,8 @@ namespace OpenMetaverse
                             return;
                         }
 
-                        #region Fire callbacks
-
-                        if (Client.Settings.SYNC_PACKETCALLBACKS)
-                            PacketEvents.RaiseEvent(packet.Type, packet, simulator);
-                        else
-                            PacketEvents.BeginRaiseEvent(packet.Type, packet, simulator);
-
-                        #endregion Fire callbacks
+                        // Fire the callback(s), if any
+                        PacketEvents.RaiseEvent(packet.Type, packet, simulator);
                     }
                 }
             }
@@ -998,9 +1011,9 @@ namespace OpenMetaverse
         protected void CompletePingCheckHandler(object sender, PacketReceivedEventArgs e)
         {
             CompletePingCheckPacket pong = (CompletePingCheckPacket)e.Packet;
-            String retval = "Pong2: " + (Environment.TickCount - e.Simulator.Stats.LastPingSent);
-            if ((pong.PingID.PingID - e.Simulator.Stats.LastPingID + 1) != 0)
-                retval += " (gap of " + (pong.PingID.PingID - e.Simulator.Stats.LastPingID + 1) + ")";
+            //String retval = "Pong2: " + (Environment.TickCount - e.Simulator.Stats.LastPingSent);
+            //if ((pong.PingID.PingID - e.Simulator.Stats.LastPingID + 1) != 0)
+            //    retval += " (gap of " + (pong.PingID.PingID - e.Simulator.Stats.LastPingID + 1) + ")";
 
             e.Simulator.Stats.LastLag = Environment.TickCount - e.Simulator.Stats.LastPingSent;
             e.Simulator.Stats.ReceivedPongs++;

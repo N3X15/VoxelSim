@@ -223,7 +223,7 @@ namespace OpenSim.Region.CoreModules.World.LegacyMap
         private Bitmap DrawObjectVolume(Scene whichScene, Bitmap mapbmp)
         {
             int tc = 0;
-            double[,] hm = whichScene.Heightmap.GetDoubles();
+            double[,] hm = whichScene.Voxels.GetDoubles();
             tc = Environment.TickCount;
             m_log.Info("[MAPTILE]: Generating Maptile Step 2: Object Volume Profile");
             EntityBase[] objs = whichScene.GetEntities();

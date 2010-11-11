@@ -977,10 +977,6 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         {
             
         }
-		
-		public void SendVoxelData(int[,,] map)
-		{
-		}
 
         public void SendLayerData(int px, int py, float[] map)
         {
@@ -1683,6 +1679,14 @@ namespace OpenSim.Region.OptionalModules.Agent.InternetRelayClientView.Server
         }
 
         public void StopFlying(ISceneEntity presence)
+        {
+        }
+
+        public void SendVoxelUpdate(int x, int y, int z, byte b)
+        {
+        }
+
+        public void SendChunkUpdate(int x, int y, int z)
         {
         }
     }

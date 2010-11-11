@@ -232,7 +232,7 @@ namespace OpenSim.Data.MSSQL
         /// <param name="regionUUID"></param>
         public void StoreObject(SceneObjectGroup obj, UUID regionUUID)
         {
-            _Log.InfoFormat("[MSSQL]: Adding/Changing SceneObjectGroup: {0} to region: {1}, object has {2} prims.", obj.UUID, regionUUID, obj.Children.Count);
+            _Log.InfoFormat("[MSSQL]: Adding/Changing SceneObjectGroup: {0} to region: {1}, object has {2} prims.", obj.UUID, regionUUID, obj.PrimCount);
 
             using (SqlConnection conn = new SqlConnection(m_connectionString))
             {
@@ -241,7 +241,7 @@ namespace OpenSim.Data.MSSQL
 
                 try
                 {
-                    foreach (SceneObjectPart sceneObjectPart in obj.Children.Values)
+                    obj.ForEachPart(delegate(SceneObjectPart sceneObjectPart)
                     {
                         //Update prim
                         using (SqlCommand sqlCommand = conn.CreateCommand())
@@ -272,7 +272,7 @@ namespace OpenSim.Data.MSSQL
                                 throw;
                             }
                         }
-                    }
+                    });
 
                     transaction.Commit();
                 }
@@ -956,7 +956,7 @@ VALUES
             newData.SnapshotID = new UUID((Guid)row["SnapshotUUID"]);
 
             newData.OtherCleanTime = Convert.ToInt32(row["OtherCleanTime"]);
-            newData.Dwell = Convert.ToInt32(row["Dwell"]);
+            //newData.Dwell = Convert.ToInt32(row["Dwell"]);
 
             try
             {
@@ -1353,7 +1353,7 @@ VALUES
             parameters.Add(_Database.CreateParameter("UserLookAtZ", land.UserLookAt.Z));
             parameters.Add(_Database.CreateParameter("AuthBuyerID", land.AuthBuyerID));
             parameters.Add(_Database.CreateParameter("OtherCleanTime", land.OtherCleanTime));
-            parameters.Add(_Database.CreateParameter("Dwell", land.Dwell));
+            //parameters.Add(_Database.CreateParameter("Dwell", land.Dwell));
 
             return parameters.ToArray();
         }

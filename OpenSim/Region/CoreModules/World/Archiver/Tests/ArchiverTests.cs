@@ -26,6 +26,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -33,8 +34,8 @@ using log4net.Config;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using OpenMetaverse;
+using OpenMetaverse.Assets;
 using OpenSim.Framework;
-
 using OpenSim.Framework.Serialization;
 using OpenSim.Framework.Serialization.External;
 using OpenSim.Region.CoreModules.World.Serialiser;
@@ -44,6 +45,10 @@ using OpenSim.Region.Framework.Scenes.Serialization;
 using OpenSim.Tests.Common;
 using OpenSim.Tests.Common.Mock;
 using OpenSim.Tests.Common.Setup;
+using ArchiveConstants = OpenSim.Framework.Serialization.ArchiveConstants;
+using TarArchiveReader = OpenSim.Framework.Serialization.TarArchiveReader;
+using TarArchiveWriter = OpenSim.Framework.Serialization.TarArchiveWriter;
+using RegionSettings = OpenSim.Framework.RegionSettings;
 
 namespace OpenSim.Region.CoreModules.World.Archiver.Tests
 {
@@ -55,16 +60,18 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
 
         protected TestScene m_scene;
         protected ArchiverModule m_archiverModule;
+
+        protected TaskInventoryItem m_soundItem;
         
         [SetUp]
         public void SetUp()
         {
             m_archiverModule = new ArchiverModule();
             SerialiserModule serialiserModule = new SerialiserModule();
-            //TerrainModule terrainModule = new TerrainModule();
+            VoxelModule terrainModule = new VoxelModule();
 
-            m_scene = SceneSetupHelpers.SetupScene("useraccounts");
-            SceneSetupHelpers.SetupSceneModules(m_scene, m_archiverModule, serialiserModule);
+            m_scene = SceneSetupHelpers.SetupScene();
+            SceneSetupHelpers.SetupSceneModules(m_scene, m_archiverModule, serialiserModule, terrainModule);
         }
         
         private void LoadCompleted(Guid requestId, string errorMessage)
@@ -124,10 +131,25 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
             //log4net.Config.XmlConfigurator.Configure();
 
             SceneObjectPart part1 = CreateSceneObjectPart1();
-            m_scene.AddNewSceneObject(new SceneObjectGroup(part1), false);
+            SceneObjectGroup sog1 = new SceneObjectGroup(part1);
+            m_scene.AddNewSceneObject(sog1, false);
 
             SceneObjectPart part2 = CreateSceneObjectPart2();
-            m_scene.AddNewSceneObject(new SceneObjectGroup(part2), false);
+            
+            AssetNotecard nc = new AssetNotecard();
+            nc.BodyText = "Hello World!";
+            nc.Encode();
+            UUID ncAssetUuid = new UUID("00000000-0000-0000-1000-000000000000");
+            UUID ncItemUuid = new UUID("00000000-0000-0000-1100-000000000000");
+            AssetBase ncAsset 
+                = AssetHelpers.CreateAsset(ncAssetUuid, AssetType.Notecard, nc.AssetData, UUID.Zero);
+            m_scene.AssetService.Store(ncAsset);
+            SceneObjectGroup sog2 = new SceneObjectGroup(part2);
+            TaskInventoryItem ncItem 
+                = new TaskInventoryItem { Name = "ncItem", AssetID = ncAssetUuid, ItemID = ncItemUuid };
+            part2.Inventory.AddInventoryItem(ncItem, true);
+            
+            m_scene.AddNewSceneObject(sog2, false);
 
             MemoryStream archiveWriteStream = new MemoryStream();
             m_scene.EventManager.OnOarFileSaved += SaveCompleted;
@@ -151,18 +173,14 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
             TarArchiveReader tar = new TarArchiveReader(archiveReadStream);
 
             bool gotControlFile = false;
-            bool gotObject1File = false;
-            bool gotObject2File = false;
-            string expectedObject1FileName = string.Format(
-                "{0}_{1:000}-{2:000}-{3:000}__{4}.xml",
-                part1.Name,
-                Math.Round(part1.GroupPosition.X), Math.Round(part1.GroupPosition.Y), Math.Round(part1.GroupPosition.Z),
-                part1.UUID);
-            string expectedObject2FileName = string.Format(
-                "{0}_{1:000}-{2:000}-{3:000}__{4}.xml",
-                part2.Name,
-                Math.Round(part2.GroupPosition.X), Math.Round(part2.GroupPosition.Y), Math.Round(part2.GroupPosition.Z),
-                part2.UUID);
+            bool gotNcAssetFile = false;
+            
+            string expectedNcAssetFileName = string.Format("{0}_{1}", ncAssetUuid, "notecard.txt");
+
+            List<string> foundPaths = new List<string>();
+            List<string> expectedPaths = new List<string>();
+            expectedPaths.Add(ArchiveHelpers.CreateObjectPath(sog1));
+            expectedPaths.Add(ArchiveHelpers.CreateObjectPath(sog2));
 
             string filePath;
             TarArchiveReader.TarEntryType tarEntryType;
@@ -173,26 +191,22 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
                 {
                     gotControlFile = true;
                 }
+                else if (filePath.StartsWith(ArchiveConstants.ASSETS_PATH))
+                {
+                    string fileName = filePath.Remove(0, ArchiveConstants.ASSETS_PATH.Length);
+
+                    Assert.That(fileName, Is.EqualTo(expectedNcAssetFileName));
+                    gotNcAssetFile = true;
+                }
                 else if (filePath.StartsWith(ArchiveConstants.OBJECTS_PATH))
                 {
-                    string fileName = filePath.Remove(0, ArchiveConstants.OBJECTS_PATH.Length);
-
-                    if (fileName.StartsWith(part1.Name))
-                    {
-                        Assert.That(fileName, Is.EqualTo(expectedObject1FileName));
-                        gotObject1File = true;
-                    }
-                    else if (fileName.StartsWith(part2.Name))
-                    {
-                        Assert.That(fileName, Is.EqualTo(expectedObject2FileName));
-                        gotObject2File = true;
-                    }
+                    foundPaths.Add(filePath);
                 }
             }
 
             Assert.That(gotControlFile, Is.True, "No control file in archive");
-            Assert.That(gotObject1File, Is.True, "No object1 file in archive");
-            Assert.That(gotObject2File, Is.True, "No object2 file in archive");
+            Assert.That(gotNcAssetFile, Is.True, "No notecard asset file in archive");
+            Assert.That(foundPaths, Is.EquivalentTo(expectedPaths));
 
             // TODO: Test presence of more files and contents of files.
         }
@@ -204,7 +218,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
         public void TestLoadOarV0_2()
         {
             TestHelper.InMethod();
-            //log4net.Config.XmlConfigurator.Configure();
+//            log4net.Config.XmlConfigurator.Configure();
 
             MemoryStream archiveWriteStream = new MemoryStream();
             TarArchiveWriter tar = new TarArchiveWriter(archiveWriteStream);
@@ -216,7 +230,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
             // upset load
             tar.WriteDir(ArchiveConstants.TERRAINS_PATH);
             
-            tar.WriteFile(ArchiveConstants.CONTROL_FILE_PATH, ArchiveWriteRequestExecution.Create0p2ControlFile());
+            tar.WriteFile(ArchiveConstants.CONTROL_FILE_PATH, ArchiveWriteRequestPreparation.Create0p2ControlFile(new Dictionary<string, Object>()));
 
             SceneObjectPart part1 = CreateSceneObjectPart1();
             SceneObjectGroup object1 = new SceneObjectGroup(part1);
@@ -315,7 +329,7 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
             TarArchiveWriter tar = new TarArchiveWriter(archiveWriteStream);
             
             tar.WriteDir(ArchiveConstants.TERRAINS_PATH);
-            tar.WriteFile(ArchiveConstants.CONTROL_FILE_PATH, ArchiveWriteRequestExecution.Create0p2ControlFile());
+            tar.WriteFile(ArchiveConstants.CONTROL_FILE_PATH, ArchiveWriteRequestPreparation.Create0p2ControlFile(new Dictionary<string, Object>()));
 
             RegionSettings rs = new RegionSettings();
             rs.AgentLimit = 17;
@@ -417,10 +431,10 @@ namespace OpenSim.Region.CoreModules.World.Archiver.Tests
             {
                 ArchiverModule archiverModule = new ArchiverModule();
                 SerialiserModule serialiserModule = new SerialiserModule();
-                //TerrainModule terrainModule = new TerrainModule();
+                VoxelModule terrainModule = new VoxelModule();
 
                 Scene scene = SceneSetupHelpers.SetupScene();
-                SceneSetupHelpers.SetupSceneModules(scene, archiverModule, serialiserModule);
+                SceneSetupHelpers.SetupSceneModules(scene, archiverModule, serialiserModule, terrainModule);
 
                 m_scene.AddNewSceneObject(new SceneObjectGroup(part2), false);
 

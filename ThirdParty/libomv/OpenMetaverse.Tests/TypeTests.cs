@@ -72,6 +72,34 @@ namespace OpenMetaverse.Tests
         }
 
         [Test]
+        public void Vector3ApproxEquals()
+        {
+            Vector3 a = new Vector3(1f, 0f, 0f);
+            Vector3 b = new Vector3(0f, 0f, 0f);
+
+            Assert.IsFalse(a.ApproxEquals(b, 0.9f), "ApproxEquals failed (1)");
+            Assert.IsTrue(a.ApproxEquals(b, 1.0f), "ApproxEquals failed (2)");
+
+            a = new Vector3(-1f, 0f, 0f);
+            b = new Vector3(1f, 0f, 0f);
+
+            Assert.IsFalse(a.ApproxEquals(b, 1.9f), "ApproxEquals failed (3)");
+            Assert.IsTrue(a.ApproxEquals(b, 2.0f), "ApproxEquals failed (4)");
+
+            a = new Vector3(0f, -1f, 0f);
+            b = new Vector3(0f, -1.1f, 0f);
+
+            Assert.IsFalse(a.ApproxEquals(b, 0.09f), "ApproxEquals failed (5)");
+            Assert.IsTrue(a.ApproxEquals(b, 0.11f), "ApproxEquals failed (6)");
+
+            a = new Vector3(0f, 0f, 0.00001f);
+            b = new Vector3(0f, 0f, 0f);
+
+            Assert.IsFalse(b.ApproxEquals(a, Single.Epsilon), "ApproxEquals failed (6)");
+            Assert.IsTrue(b.ApproxEquals(a, 0.0001f), "ApproxEquals failed (7)");
+        }
+
+        [Test]
         public void Quaternions()
         {
             Quaternion a = new Quaternion(1, 0, 0, 0);
@@ -194,6 +222,22 @@ namespace OpenMetaverse.Tests
 
             b = bitpacker.UnpackBits(16);
             Assert.IsTrue(b == 1000, "Unpacked " + b + " instead of 1000");
+
+            packedBytes = new byte[1];
+            bitpacker = new BitPack(packedBytes, 0);
+            bitpacker.PackBit(true);
+
+            bitpacker = new BitPack(packedBytes, 0);
+            b = bitpacker.UnpackBits(1);
+            Assert.IsTrue(b == 1, "Unpacked " + b + " instead of 1");
+
+            packedBytes = new byte[1] { Byte.MaxValue };
+            bitpacker = new BitPack(packedBytes, 0);
+            bitpacker.PackBit(false);
+
+            bitpacker = new BitPack(packedBytes, 0);
+            b = bitpacker.UnpackBits(1);
+            Assert.IsTrue(b == 0, "Unpacked " + b + " instead of 0");
         }
 
         [Test]

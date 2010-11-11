@@ -945,10 +945,6 @@ namespace OpenSim.Client.MXP.ClientStack
             MXPSendTerrain(map);
         }
 
-		public void SendVoxelData(int[,,] map)
-		{
-			// Translate
-		}
         public void SendLayerData(int px, int py, float[] map)
         {
         }

@@ -36,53 +36,63 @@ namespace OpenMetaverse.Assets
 {
     public static class OarFile
     {
-        public delegate void AssetLoadedCallback(Asset asset);
-        public delegate void TerrainLoadedCallback(float[,] terrain);
+        public delegate void AssetLoadedCallback(Asset asset, long bytesRead, long totalBytes);
+        public delegate void TerrainLoadedCallback(float[,] terrain, long bytesRead, long totalBytes);
+        public delegate void SceneObjectLoadedCallback(AssetPrim linkset, long bytesRead, long totalBytes);
+        public delegate void SettingsLoadedCallback(string regionName, RegionSettings settings);
 
         #region Archive Loading
 
-        public static void UnpackageArchive(string filename, AssetLoadedCallback assetCallback, TerrainLoadedCallback terrainCallback)
+        public static void UnpackageArchive(string filename, AssetLoadedCallback assetCallback, TerrainLoadedCallback terrainCallback,
+            SceneObjectLoadedCallback objectCallback, SettingsLoadedCallback settingsCallback)
         {
             int successfulAssetRestores = 0;
             int failedAssetRestores = 0;
-            List<byte[]> serialisedSceneObjects = new List<byte[]>();
 
             try
             {
-                using (Stream loadStream = new GZipStream(new FileStream(filename, FileMode.Open, FileAccess.Read), CompressionMode.Decompress))
+                using (FileStream fileStream = new FileStream(filename, FileMode.Open, FileAccess.Read))
                 {
-                    TarArchiveReader archive = new TarArchiveReader(loadStream);
-
-                    string filePath = "ERROR";
-
-                    byte[] data;
-                    TarArchiveReader.TarEntryType entryType;
-
-                    while ((data = archive.ReadEntry(out filePath, out entryType)) != null)
+                    using (GZipStream loadStream = new GZipStream(fileStream, CompressionMode.Decompress))
                     {
-                        if (filePath.StartsWith(ArchiveConstants.OBJECTS_PATH))
-                        {
-                            serialisedSceneObjects.Add(data);
-                        }
-                        else if (filePath.StartsWith(ArchiveConstants.ASSETS_PATH))
-                        {
-                            if (LoadAsset(filePath, data, assetCallback))
-                                successfulAssetRestores++;
-                            else
-                                failedAssetRestores++;
-                        }
-                        else if (filePath.StartsWith(ArchiveConstants.TERRAINS_PATH))
-                        {
-                            LoadTerrain(filePath, data, terrainCallback);
-                        }
-                        else if (filePath.StartsWith(ArchiveConstants.SETTINGS_PATH))
-                        {
-                            // FIXME: Support this
-                            //LoadRegionSettings(filePath, data);
-                        }
-                    }
+                        TarArchiveReader archive = new TarArchiveReader(loadStream);
 
-                    archive.Close();
+                        string filePath;
+                        byte[] data;
+                        TarArchiveReader.TarEntryType entryType;
+
+                        while ((data = archive.ReadEntry(out filePath, out entryType)) != null)
+                        {
+                            if (filePath.StartsWith(ArchiveConstants.OBJECTS_PATH))
+                            {
+                                // Deserialize the XML bytes
+                                if (objectCallback != null)
+                                    LoadObjects(data, objectCallback, fileStream.Position, fileStream.Length);
+                            }
+                            else if (filePath.StartsWith(ArchiveConstants.ASSETS_PATH))
+                            {
+                                if (assetCallback != null)
+                                {
+                                    if (LoadAsset(filePath, data, assetCallback, fileStream.Position, fileStream.Length))
+                                        successfulAssetRestores++;
+                                    else
+                                        failedAssetRestores++;
+                                }
+                            }
+                            else if (filePath.StartsWith(ArchiveConstants.TERRAINS_PATH))
+                            {
+                                if (terrainCallback != null)
+                                    LoadTerrain(filePath, data, terrainCallback, fileStream.Position, fileStream.Length);
+                            }
+                            else if (filePath.StartsWith(ArchiveConstants.SETTINGS_PATH))
+                            {
+                                if (settingsCallback != null)
+                                    LoadRegionSettings(filePath, data, settingsCallback);
+                            }
+                        }
+
+                        archive.Close();
+                    }
                 }
             }
             catch (Exception e)
@@ -93,17 +103,9 @@ namespace OpenMetaverse.Assets
 
             if (failedAssetRestores > 0)
                 Logger.Log(String.Format("[OarFile]: Failed to load {0} assets", failedAssetRestores), Helpers.LogLevel.Warning);
-
-            for (int i = 0; i < serialisedSceneObjects.Count; i++)
-            {
-                byte[] objectData = serialisedSceneObjects[i];
-
-                // Deserialize the XML bytes
-                LoadObjects(objectData, assetCallback);
-            }
         }
 
-        private static bool LoadAsset(string assetPath, byte[] data, AssetLoadedCallback assetCallback)
+        private static bool LoadAsset(string assetPath, byte[] data, AssetLoadedCallback assetCallback, long bytesRead, long totalBytes)
         {
             // Right now we're nastily obtaining the UUID from the filename
             string filename = assetPath.Remove(0, ArchiveConstants.ASSETS_PATH.Length);
@@ -137,6 +139,12 @@ namespace OpenMetaverse.Assets
                     case AssetType.Clothing:
                         asset = new AssetClothing(uuid, data);
                         break;
+                    case AssetType.Gesture:
+                        asset = new AssetGesture(uuid, data);
+                        break;
+                    case AssetType.Landmark:
+                        asset = new AssetLandmark(uuid, data);
+                        break;
                     case AssetType.LSLBytecode:
                         asset = new AssetScriptBinary(uuid, data);
                         break;
@@ -145,6 +153,9 @@ namespace OpenMetaverse.Assets
                         break;
                     case AssetType.Notecard:
                         asset = new AssetNotecard(uuid, data);
+                        break;
+                    case AssetType.Object:
+                        asset = new AssetPrim(uuid, data);
                         break;
                     case AssetType.Sound:
                         asset = new AssetSound(uuid, data);
@@ -159,7 +170,7 @@ namespace OpenMetaverse.Assets
 
                 if (asset != null)
                 {
-                    assetCallback(asset);
+                    assetCallback(asset, bytesRead, totalBytes);
                     return true;
                 }
             }
@@ -168,7 +179,32 @@ namespace OpenMetaverse.Assets
             return false;
         }
 
-        private static bool LoadTerrain(string filePath, byte[] data, TerrainLoadedCallback terrainCallback)
+        private static bool LoadRegionSettings(string filePath, byte[] data, SettingsLoadedCallback settingsCallback)
+        {
+            RegionSettings settings = null;
+            bool loaded = false;
+
+            try
+            {
+                using (MemoryStream stream = new MemoryStream(data))
+                    settings = RegionSettings.FromStream(stream);
+                loaded = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("[OarFile] Failed to parse region settings file " + filePath + ": " + ex.Message, Helpers.LogLevel.Warning);
+            }
+
+            // Parse the region name out of the filename
+            string regionName = Path.GetFileNameWithoutExtension(filePath);
+
+            if (loaded)
+                settingsCallback(regionName, settings);
+
+            return loaded;
+        }
+
+        private static bool LoadTerrain(string filePath, byte[] data, TerrainLoadedCallback terrainCallback, long bytesRead, long totalBytes)
         {
             float[,] terrain = new float[256, 256];
             bool loaded = false;
@@ -220,14 +256,13 @@ namespace OpenMetaverse.Assets
             }
 
             if (loaded)
-                terrainCallback(terrain);
+                terrainCallback(terrain, bytesRead, totalBytes);
 
             return loaded;
         }
 
-        private static void LoadObjects(byte[] objectData, AssetLoadedCallback assetCallback)
+        public static void LoadObjects(byte[] objectData, SceneObjectLoadedCallback objectCallback, long bytesRead, long totalBytes)
         {
-            // TODO: If we can get by without XmlDocument it will fix the memory problems when loading large XML files
             XmlDocument doc = new XmlDocument();
 
             using (XmlTextReader reader = new XmlTextReader(new MemoryStream(objectData)))
@@ -244,14 +279,14 @@ namespace OpenMetaverse.Assets
                 {
                     AssetPrim linkset = new AssetPrim(node.OuterXml);
                     if (linkset != null)
-                        assetCallback(linkset);
+                        objectCallback(linkset, bytesRead, totalBytes);
                 }
             }
             else
             {
                 AssetPrim linkset = new AssetPrim(rootNode.OuterXml);
                 if (linkset != null)
-                    assetCallback(linkset);
+                    objectCallback(linkset, bytesRead, totalBytes);
             }
         }
 

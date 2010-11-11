@@ -135,7 +135,7 @@ namespace OpenSim.Data.MySQL
                     dbcon.Open();
                     MySqlCommand cmd = dbcon.CreateCommand();
 
-                    foreach (SceneObjectPart prim in obj.Children.Values)
+                    obj.ForEachPart(delegate(SceneObjectPart prim)
                     {
                         cmd.Parameters.Clear();
 
@@ -238,7 +238,7 @@ namespace OpenSim.Data.MySQL
                         FillShapeCommand(cmd, prim);
 
                         ExecuteNonQuery(cmd);
-                    }
+                    });
                     cmd.Dispose();
                 }
             }
@@ -1323,7 +1323,8 @@ namespace OpenSim.Data.MySQL
             UUID.TryParse((string)row["AuthBuyerID"], out authedbuyer);
             UUID.TryParse((string)row["SnapshotUUID"], out snapshotID);
             newData.OtherCleanTime = Convert.ToInt32(row["OtherCleanTime"]);
-            newData.Dwell = Convert.ToInt32(row["Dwell"]);
+            // ERROR: LandData does not contain a definition for Dwell 
+            //newData.Dwell = Convert.ToInt32(row["Dwell"]);
 
             newData.AuthBuyerID = authedbuyer;
             newData.SnapshotID = snapshotID;
@@ -1645,7 +1646,8 @@ namespace OpenSim.Data.MySQL
             cmd.Parameters.AddWithValue("UserLookAtZ", land.UserLookAt.Z);
             cmd.Parameters.AddWithValue("AuthBuyerID", land.AuthBuyerID);
             cmd.Parameters.AddWithValue("OtherCleanTime", land.OtherCleanTime);
-            cmd.Parameters.AddWithValue("Dwell", land.Dwell);
+            // ERROR: LandData doesn't contain def for Dwell
+            //cmd.Parameters.AddWithValue("Dwell", land.Dwell);
         }
 
         /// <summary>

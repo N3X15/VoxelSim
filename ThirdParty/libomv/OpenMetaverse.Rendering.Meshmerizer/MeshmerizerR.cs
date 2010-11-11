@@ -29,17 +29,11 @@
 /*
  * MeshmerizerR class implments OpenMetaverse.Rendering.IRendering interface
  * using PrimMesher (http://forge.opensimulator.org/projects/primmesher).
- * The faceted mesh returned is made up of separate face meshes.
  * There are a few additions/changes:
- *  GenerateSimpleMesh() does not generate anything. Use the other mesher for that.
- *  ShouldScaleMesh property sets whether the mesh should be sized up or down
- *      based on the prim scale parameters. If turned off, the mesh will not be
- *      scaled thus allowing the scaling to happen in the graphics library
- *  GenerateScupltMesh() does what it says: takes a bitmap and returns a mesh
- *      based on the RGB coordinates in the bitmap.
- *  TransformTexCoords() does regular transformations but does not do planier
+ *  TransformTexCoords() does regular transformations but does not do planar
  *      mapping of textures.
  */
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -55,19 +49,67 @@ namespace OpenMetaverse.Rendering
     [RendererName("MeshmerizerR")]
     public class MeshmerizerR : OMVR.IRendering
     {
-        // If this is set to 'true' the returned mesh will be scaled by the prim's scaling
-        // parameters. Otherwise the mesh is a unit mesh and needs scaling elsewhere.
-        private bool m_shouldScale = true;
-        public bool ShouldScaleMesh { get { return m_shouldScale; } set { m_shouldScale = value; } }
-
         /// <summary>
         /// Generates a basic mesh structure from a primitive
         /// </summary>
         /// <param name="prim">Primitive to generate the mesh from</param>
         /// <param name="lod">Level of detail to generate the mesh at</param>
-        /// <returns>The generated mesh</returns>
+        /// <returns>The generated mesh or null on failure</returns>
         public OMVR.SimpleMesh GenerateSimpleMesh(OMV.Primitive prim, OMVR.DetailLevel lod)
         {
+            PrimMesher.PrimMesh newPrim = GeneratePrimMesh(prim, lod, false);
+            if (newPrim == null)
+                return null;
+
+            SimpleMesh mesh = new SimpleMesh();
+            mesh.Path = new Path();
+            mesh.Prim = prim;
+            mesh.Profile = new Profile();
+            mesh.Vertices = new List<Vertex>(newPrim.coords.Count);
+            for (int i = 0; i < newPrim.coords.Count; i++)
+            {
+                PrimMesher.Coord c = newPrim.coords[i];
+                mesh.Vertices.Add(new Vertex { Position = new Vector3(c.X, c.Y, c.Z) });
+            }
+
+            mesh.Indices = new List<ushort>(newPrim.faces.Count * 3);
+            for (int i = 0; i < newPrim.faces.Count; i++)
+            {
+                PrimMesher.Face face = newPrim.faces[i];
+                mesh.Indices.Add((ushort)face.v1);
+                mesh.Indices.Add((ushort)face.v2);
+                mesh.Indices.Add((ushort)face.v3);
+            }
+
+            return mesh;
+        }
+
+        /// <summary>
+        /// Generates a basic mesh structure from a sculpted primitive
+        /// </summary>
+        /// <param name="prim">Sculpted primitive to generate the mesh from</param>
+        /// <param name="sculptTexture">Sculpt texture</param>
+        /// <param name="lod">Level of detail to generate the mesh at</param>
+        /// <returns>The generated mesh or null on failure</returns>
+        public OMVR.SimpleMesh GenerateSimpleSculptMesh(OMV.Primitive prim, System.Drawing.Bitmap sculptTexture, OMVR.DetailLevel lod)
+        {
+            OMVR.FacetedMesh faceted = GenerateFacetedSculptMesh(prim, sculptTexture, lod);
+
+            if (faceted != null && faceted.Faces.Count == 1)
+            {
+                Face face = faceted.Faces[0];
+
+                SimpleMesh mesh = new SimpleMesh();
+                mesh.Indices = face.Indices;
+                mesh.Vertices = face.Vertices;
+                mesh.Path = faceted.Path;
+                mesh.Prim = prim;
+                mesh.Profile = faceted.Profile;
+                mesh.Vertices = face.Vertices;
+
+                return mesh;
+            }
+
             return null;
         }
 
@@ -80,112 +122,10 @@ namespace OpenMetaverse.Rendering
         /// <returns>The generated mesh</returns >
         public OMVR.FacetedMesh GenerateFacetedMesh(OMV.Primitive prim, OMVR.DetailLevel lod)
         {
-
-            OMV.Primitive.ConstructionData primData = prim.PrimData;
-            int sides = 4;
-            int hollowsides = 4;
-
-            float profileBegin = primData.ProfileBegin;
-            float profileEnd = primData.ProfileEnd;
-            bool isSphere = false;
-
-            if ((OMV.ProfileCurve)(primData.profileCurve & 0x07) == OMV.ProfileCurve.Circle)
-            {
-                switch (lod)
-                {
-                    case OMVR.DetailLevel.Low:
-                        sides = 6;
-                        break;
-                    case OMVR.DetailLevel.Medium:
-                        sides = 12;
-                        break;
-                    default:
-                        sides = 24;
-                        break;
-                }
-            }
-            else if ((OMV.ProfileCurve)(primData.profileCurve & 0x07) == OMV.ProfileCurve.EqualTriangle)
-                sides = 3;
-            else if ((OMV.ProfileCurve)(primData.profileCurve & 0x07) == OMV.ProfileCurve.HalfCircle)
-            {
-                // half circle, prim is a sphere
-                isSphere = true;
-                switch (lod)
-                {
-                    case OMVR.DetailLevel.Low:
-                        sides = 6;
-                        break;
-                    case OMVR.DetailLevel.Medium:
-                        sides = 12;
-                        break;
-                    default:
-                        sides = 24;
-                        break;
-                }
-                profileBegin = 0.5f * profileBegin + 0.5f;
-                profileEnd = 0.5f * profileEnd + 0.5f;
-            }
-
-            if ((OMV.HoleType)primData.ProfileHole == OMV.HoleType.Same)
-                hollowsides = sides;
-            else if ((OMV.HoleType)primData.ProfileHole == OMV.HoleType.Circle)
-            {
-                switch (lod)
-                {
-                    case OMVR.DetailLevel.Low:
-                        hollowsides = 6;
-                        break;
-                    case OMVR.DetailLevel.Medium:
-                        hollowsides = 12;
-                        break;
-                    default:
-                        hollowsides = 24;
-                        break;
-                }
-            }
-            else if ((OMV.HoleType)primData.ProfileHole == OMV.HoleType.Triangle)
-                hollowsides = 3;
-
-            PrimMesher.PrimMesh newPrim = new PrimMesher.PrimMesh(sides, profileBegin, profileEnd, (float)primData.ProfileHollow, hollowsides);
-            newPrim.viewerMode = true;
-            newPrim.holeSizeX = primData.PathScaleX;
-            newPrim.holeSizeY = primData.PathScaleY;
-            newPrim.pathCutBegin = primData.PathBegin;
-            newPrim.pathCutEnd = primData.PathEnd;
-            newPrim.topShearX = primData.PathShearX;
-            newPrim.topShearY = primData.PathShearY;
-            newPrim.radius = primData.PathRadiusOffset;
-            newPrim.revolutions = primData.PathRevolutions;
-            newPrim.skew = primData.PathSkew;
-            switch (lod)
-            {
-                case OMVR.DetailLevel.Low:
-                    newPrim.stepsPerRevolution = 6;
-                    break;
-                case OMVR.DetailLevel.Medium:
-                    newPrim.stepsPerRevolution = 12;
-                    break;
-                default:
-                    newPrim.stepsPerRevolution = 24;
-                    break;
-            }
-
-            if ((primData.PathCurve == OMV.PathCurve.Line) || (primData.PathCurve == OMV.PathCurve.Flexible))
-            {
-                newPrim.taperX = 1.0f - primData.PathScaleX;
-                newPrim.taperY = 1.0f - primData.PathScaleY;
-                newPrim.twistBegin = (int)(180 * primData.PathTwistBegin);
-                newPrim.twistEnd = (int)(180 * primData.PathTwist);
-                newPrim.ExtrudeLinear();
-            }
-            else
-            {
-                newPrim.taperX = primData.PathTaperX;
-                newPrim.taperY = primData.PathTaperY;
-                newPrim.twistBegin = (int)(360 * primData.PathTwistBegin);
-                newPrim.twistEnd = (int)(360 * primData.PathTwist);
-                newPrim.ExtrudeCircular();
-            }
+            bool isSphere = ((OMV.ProfileCurve)(prim.PrimData.profileCurve & 0x07) == OMV.ProfileCurve.HalfCircle);
+            PrimMesher.PrimMesh newPrim = GeneratePrimMesh(prim, lod, true);
+            if (newPrim == null)
+                return null;
 
             int numViewerFaces = newPrim.viewerFaces.Count;
             int numPrimFaces = newPrim.numPrimFaces;
@@ -200,10 +140,6 @@ namespace OpenMetaverse.Rendering
                     vf.uv2.U = (vf.uv2.U - 0.5f) * 2.0f;
                     vf.uv3.U = (vf.uv3.U - 0.5f) * 2.0f;
                 }
-            }
-            if (m_shouldScale)
-            {
-                newPrim.Scale(prim.Scale.X, prim.Scale.Y, prim.Scale.Z);
             }
 
             // copy the vertex information into OMVR.IRendering structures
@@ -306,12 +242,8 @@ namespace OpenMetaverse.Rendering
         /// Create a sculpty faceted mesh. The actual scuplt texture is fetched and passed to this
         /// routine since all the context for finding teh texture is elsewhere.
         /// </summary>
-        /// <param name="scupltTexture"></param>
-        /// <param name="prim"></param>
-        /// <param name="lod"></param>
-        /// <returns>the faceted mesh or null if can't do it</returns>
-        public OMVR.FacetedMesh GenerateSculptMesh(System.Drawing.Bitmap scupltTexture,
-                                        OMV.Primitive prim, OMVR.DetailLevel lod)
+        /// <returns>The faceted mesh or null if can't do it</returns>
+        public OMVR.FacetedMesh GenerateFacetedSculptMesh(OMV.Primitive prim, System.Drawing.Bitmap scupltTexture, OMVR.DetailLevel lod)
         {
             byte sculptType = (byte)prim.Sculpt.Type;
             bool mirror = ((sculptType & 128) != 0);
@@ -358,11 +290,6 @@ namespace OpenMetaverse.Rendering
             }
             PrimMesher.SculptMesh newMesh =
                 new PrimMesher.SculptMesh(scupltTexture, smSculptType, mesherLod, true, mirror, invert);
-
-            if (ShouldScaleMesh)
-            {
-                newMesh.Scale(prim.Scale.X, prim.Scale.Y, prim.Scale.Z);
-            }
 
             int numPrimFaces = 1;       // a scuplty has only one face
 
@@ -451,6 +378,115 @@ namespace OpenMetaverse.Rendering
                 vertices[ii] = vert;
             }
             return;
+        }
+
+        private PrimMesher.PrimMesh GeneratePrimMesh(Primitive prim, DetailLevel lod, bool viewerMode)
+        {
+            OMV.Primitive.ConstructionData primData = prim.PrimData;
+            int sides = 4;
+            int hollowsides = 4;
+
+            float profileBegin = primData.ProfileBegin;
+            float profileEnd = primData.ProfileEnd;
+
+            if ((OMV.ProfileCurve)(primData.profileCurve & 0x07) == OMV.ProfileCurve.Circle)
+            {
+                switch (lod)
+                {
+                    case OMVR.DetailLevel.Low:
+                        sides = 6;
+                        break;
+                    case OMVR.DetailLevel.Medium:
+                        sides = 12;
+                        break;
+                    default:
+                        sides = 24;
+                        break;
+                }
+            }
+            else if ((OMV.ProfileCurve)(primData.profileCurve & 0x07) == OMV.ProfileCurve.EqualTriangle)
+                sides = 3;
+            else if ((OMV.ProfileCurve)(primData.profileCurve & 0x07) == OMV.ProfileCurve.HalfCircle)
+            {
+                // half circle, prim is a sphere
+                switch (lod)
+                {
+                    case OMVR.DetailLevel.Low:
+                        sides = 6;
+                        break;
+                    case OMVR.DetailLevel.Medium:
+                        sides = 12;
+                        break;
+                    default:
+                        sides = 24;
+                        break;
+                }
+                profileBegin = 0.5f * profileBegin + 0.5f;
+                profileEnd = 0.5f * profileEnd + 0.5f;
+            }
+
+            if ((OMV.HoleType)primData.ProfileHole == OMV.HoleType.Same)
+                hollowsides = sides;
+            else if ((OMV.HoleType)primData.ProfileHole == OMV.HoleType.Circle)
+            {
+                switch (lod)
+                {
+                    case OMVR.DetailLevel.Low:
+                        hollowsides = 6;
+                        break;
+                    case OMVR.DetailLevel.Medium:
+                        hollowsides = 12;
+                        break;
+                    default:
+                        hollowsides = 24;
+                        break;
+                }
+            }
+            else if ((OMV.HoleType)primData.ProfileHole == OMV.HoleType.Triangle)
+                hollowsides = 3;
+
+            PrimMesher.PrimMesh newPrim = new PrimMesher.PrimMesh(sides, profileBegin, profileEnd, (float)primData.ProfileHollow, hollowsides);
+            newPrim.viewerMode = viewerMode;
+            newPrim.holeSizeX = primData.PathScaleX;
+            newPrim.holeSizeY = primData.PathScaleY;
+            newPrim.pathCutBegin = primData.PathBegin;
+            newPrim.pathCutEnd = primData.PathEnd;
+            newPrim.topShearX = primData.PathShearX;
+            newPrim.topShearY = primData.PathShearY;
+            newPrim.radius = primData.PathRadiusOffset;
+            newPrim.revolutions = primData.PathRevolutions;
+            newPrim.skew = primData.PathSkew;
+            switch (lod)
+            {
+                case OMVR.DetailLevel.Low:
+                    newPrim.stepsPerRevolution = 6;
+                    break;
+                case OMVR.DetailLevel.Medium:
+                    newPrim.stepsPerRevolution = 12;
+                    break;
+                default:
+                    newPrim.stepsPerRevolution = 24;
+                    break;
+            }
+
+            if ((primData.PathCurve == OMV.PathCurve.Line) || (primData.PathCurve == OMV.PathCurve.Flexible))
+            {
+                newPrim.taperX = 1.0f - primData.PathScaleX;
+                newPrim.taperY = 1.0f - primData.PathScaleY;
+                newPrim.twistBegin = (int)(180 * primData.PathTwistBegin);
+                newPrim.twistEnd = (int)(180 * primData.PathTwist);
+                newPrim.ExtrudeLinear();
+            }
+            else
+            {
+                newPrim.taperX = primData.PathTaperX;
+                newPrim.taperY = primData.PathTaperY;
+                newPrim.twistBegin = (int)(360 * primData.PathTwistBegin);
+                newPrim.twistEnd = (int)(360 * primData.PathTwist);
+                newPrim.ExtrudeCircular();
+            }
+
+            return newPrim;
         }
     }
 }

@@ -61,8 +61,10 @@ namespace OpenSim.Region.OptionalModules.Scripting.Minimodule
 
         protected void Set(int x, int y, double val)
         {
-			// TODO: Fix this.
-            //m_scene.Heightmap[x, y] = val;
+            for (int z = 0; z < m_scene.Voxels.Height; z++)
+                m_scene.Voxels[x, y, z] = (z > val) ? 0x00 : m_scene.Voxels[x, y, z];
+            if (m_scene.Voxels.GetDoubles()[x, y] < (int)val)
+                m_scene.Voxels[x, y, (int)val] = 0x01;
         }
     }
 }

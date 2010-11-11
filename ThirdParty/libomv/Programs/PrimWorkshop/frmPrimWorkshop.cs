@@ -17,21 +17,6 @@ using OpenMetaverse.Rendering;
 
 namespace PrimWorkshop
 {
-    public struct FaceData
-    {
-        public float[] Vertices;
-        public ushort[] Indices;
-        public float[] TexCoords;
-        public int TexturePointer;
-        public System.Drawing.Image Texture;
-        // TODO: Normals / binormals?
-    }
-
-    public static class Render
-    {
-        public static IRendering Plugin;
-    }
-
     public partial class frmPrimWorkshop : Form
     {
         #region Form Globals
@@ -225,7 +210,7 @@ namespace PrimWorkshop
             Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadIdentity();
 
-            Glu.gluPerspective(50.0d, 1.0d, 0.1d, 50d);
+            Glu.gluPerspective(50.0d, 1.0d, 0.1d, 256d);
 
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glPopMatrix();
@@ -239,128 +224,233 @@ namespace PrimWorkshop
         {
             Prims = null;
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "Prim Package (*.zip)|*.zip";
+            dialog.Filter = "Prim Package (*.zip)|*.zip|Sculpt Map (*.png)|*.png|OAR XML (*.xml)|*.xml";
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                string tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(),
-                    System.IO.Path.GetRandomFileName());
-
-                try
+                if (dialog.FileName.ToLowerInvariant().EndsWith(".zip"))
                 {
-                    // Create a temporary directory
-                    Directory.CreateDirectory(tempPath);
-
-                    FastZip fastzip = new FastZip();
-                    fastzip.ExtractZip(dialog.FileName, tempPath, String.Empty);
+                    LoadPrimPackage(dialog.FileName);
                 }
-                catch (Exception ex)
+                else if (dialog.FileName.ToLowerInvariant().EndsWith(".xml"))
                 {
-                    MessageBox.Show(ex.Message);
-                    return;
-                }
-
-                // Check for the prims.xml file
-                string primsFile = System.IO.Path.Combine(tempPath, "prims.xml");
-                if (!File.Exists(primsFile))
-                {
-                    MessageBox.Show("prims.xml not found in the archive");
-                    return;
-                }
-
-                OSD osd = null;
-
-                try { osd = OSDParser.DeserializeLLSDXml(File.ReadAllText(primsFile)); }
-                catch (Exception ex) { MessageBox.Show(ex.Message); }
-
-                if (osd != null && osd.Type == OSDType.Map)
-                {
-                    List<Primitive> primList = Helpers.OSDToPrimList(osd);
-                    Prims = new List<FacetedMesh>(primList.Count);
-
-                    for (int i = 0; i < primList.Count; i++)
-                    {
-                        // TODO: Can't render sculpted prims without the textures
-                        if (primList[i].Sculpt.SculptTexture != UUID.Zero)
-                            continue;
-
-                        Primitive prim = primList[i];
-                        FacetedMesh mesh = Render.Plugin.GenerateFacetedMesh(prim, DetailLevel.Highest);
-
-                        // Create a FaceData struct for each face that stores the 3D data
-                        // in a Tao.OpenGL friendly format
-                        for (int j = 0; j < mesh.Faces.Count; j++)
-                        {
-                            Face face = mesh.Faces[j];
-                            FaceData data = new FaceData();
-                            
-                            // Vertices for this face
-                            data.Vertices = new float[face.Vertices.Count * 3];
-                            for (int k = 0; k < face.Vertices.Count; k++)
-                            {
-                                data.Vertices[k * 3 + 0] = face.Vertices[k].Position.X;
-                                data.Vertices[k * 3 + 1] = face.Vertices[k].Position.Y;
-                                data.Vertices[k * 3 + 2] = face.Vertices[k].Position.Z;
-                            }
-
-                            // Indices for this face
-                            data.Indices = face.Indices.ToArray();
-
-                            // Texture transform for this face
-                            Primitive.TextureEntryFace teFace = prim.Textures.GetFace((uint)j);
-                            Render.Plugin.TransformTexCoords(face.Vertices, face.Center, teFace);
-
-                            // Texcoords for this face
-                            data.TexCoords = new float[face.Vertices.Count * 2];
-                            for (int k = 0; k < face.Vertices.Count; k++)
-                            {
-                                data.TexCoords[k * 2 + 0] = face.Vertices[k].TexCoord.X;
-                                data.TexCoords[k * 2 + 1] = face.Vertices[k].TexCoord.Y;
-                            }
-
-                            // Texture for this face
-                            if (LoadTexture(tempPath, teFace.TextureID, ref data.Texture))
-                            {
-                                Bitmap bitmap = new Bitmap(data.Texture);
-                                bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
-                                Rectangle rectangle = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
-                                BitmapData bitmapData = bitmap.LockBits(rectangle, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-
-                                Gl.glGenTextures(1, out data.TexturePointer);
-                                Gl.glBindTexture(Gl.GL_TEXTURE_2D, data.TexturePointer);
-
-                                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR_MIPMAP_LINEAR);
-                                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
-                                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, Gl.GL_REPEAT);
-                                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, Gl.GL_REPEAT);
-                                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_GENERATE_MIPMAP, Gl.GL_TRUE);
-
-                                Glu.gluBuild2DMipmaps(Gl.GL_TEXTURE_2D, Gl.GL_RGB8, bitmap.Width, bitmap.Height, Gl.GL_BGR, Gl.GL_UNSIGNED_BYTE, bitmapData.Scan0);
-
-                                bitmap.UnlockBits(bitmapData);
-                                bitmap.Dispose();
-                            }
-
-                            // Set the UserData for this face to our FaceData struct
-                            face.UserData = data;
-                            mesh.Faces[j] = face;
-                        }
-
-                        Prims.Add(mesh);
-                    }
-
-                    // Setup the dropdown list of prims
-                    PopulatePrimCombobox();
-
-                    glControl.Invalidate();
+                    LoadXmlPrim(dialog.FileName);
                 }
                 else
                 {
-                    MessageBox.Show("Failed to load LLSD formatted primitive data from " + dialog.FileName);
+                    LoadSculpt(dialog.FileName);
+                }
+            }
+        }
+
+        private void LoadDebugPrim()
+        {
+            Prims = new List<FacetedMesh>();
+            Primitive prim = new Primitive();
+            prim.Textures = new Primitive.TextureEntry(UUID.Zero);
+            prim.Scale = Vector3.One;
+            prim.PrimData = ObjectManager.BuildBasicShape(PrimType.Cylinder);
+            prim.PrimData.ProfileHollow = 0.95f;
+            SimpleMesh simpleMesh = Render.Plugin.GenerateSimpleMesh(prim, DetailLevel.High);
+            FacetedMesh facetedMesh = new FacetedMesh();
+            facetedMesh.Faces = new List<Face> { new Face { Vertices = simpleMesh.Vertices, Indices = simpleMesh.Indices } };
+            facetedMesh.Path = simpleMesh.Path;
+            facetedMesh.Profile = simpleMesh.Profile;
+            facetedMesh.Prim = prim;
+            LoadMesh(facetedMesh, ".");
+            PopulatePrimCombobox();
+            glControl.Invalidate();
+        }
+
+        private void LoadXmlPrim(string filename)
+        {
+            byte[] data = File.ReadAllBytes(filename);
+
+            OpenMetaverse.Assets.OarFile.LoadObjects(data, XmlObjectLoadedHandler, 0, data.Length);
+        }
+
+        private void XmlObjectLoadedHandler(OpenMetaverse.Assets.AssetPrim linkset, long bytesRead, long totalBytes)
+        {
+            Prims = new List<FacetedMesh>(linkset.Children.Count + 1);
+
+            Primitive parent = linkset.Parent.ToPrimitive();
+            {
+                FacetedMesh mesh = null;
+
+                if (parent.Sculpt == null || parent.Sculpt.SculptTexture == UUID.Zero)
+                    mesh = Render.Plugin.GenerateFacetedMesh(parent, DetailLevel.Highest);
+                if (mesh != null)
+                    LoadMesh(mesh, null);
+            }
+
+            for (int i = 0; i < linkset.Children.Count; i++)
+            {
+                Primitive child = linkset.Children[i].ToPrimitive();
+                FacetedMesh mesh = null;
+
+                if (parent.Sculpt == null || child.Sculpt.SculptTexture == UUID.Zero)
+                    mesh = Render.Plugin.GenerateFacetedMesh(child, DetailLevel.Highest);
+                if (mesh != null)
+                    LoadMesh(mesh, null);
+            }
+
+            PopulatePrimCombobox();
+
+            glControl.Invalidate();
+        }
+
+        private void LoadSculpt(string filename)
+        {
+            // Try to parse this as an image file
+            Image sculptTexture = Image.FromFile(filename);
+
+            Primitive prim = new Primitive();
+            prim.PrimData = ObjectManager.BuildBasicShape(PrimType.Sculpt);
+            prim.Sculpt = new Primitive.SculptData { SculptTexture = UUID.Random(), Type = SculptType.Sphere };
+            prim.Textures = new Primitive.TextureEntry(UUID.Zero);
+            prim.Scale = Vector3.One * 3f;
+
+            FacetedMesh mesh = Render.Plugin.GenerateFacetedSculptMesh(prim, (Bitmap)sculptTexture, DetailLevel.Highest);
+            if (mesh != null)
+            {
+                Prims = new List<FacetedMesh>(1);
+                LoadMesh(mesh, null);
+            }
+
+            glControl.Invalidate();
+        }
+
+        private void LoadPrimPackage(string filename)
+        {
+            string tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName());
+
+            try
+            {
+                // Create a temporary directory
+                Directory.CreateDirectory(tempPath);
+
+                FastZip fastzip = new FastZip();
+                fastzip.ExtractZip(filename, tempPath, String.Empty);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+
+            // Check for the prims.xml file
+            string primsFile = System.IO.Path.Combine(tempPath, "prims.xml");
+            if (!File.Exists(primsFile))
+            {
+                MessageBox.Show("prims.xml not found in the archive");
+                return;
+            }
+
+            OSD osd = null;
+
+            try { osd = OSDParser.DeserializeLLSDXml(File.ReadAllText(primsFile)); }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+
+            if (osd != null && osd.Type == OSDType.Map)
+            {
+                List<Primitive> primList = Helpers.OSDToPrimList(osd);
+                Prims = new List<FacetedMesh>(primList.Count);
+
+                for (int i = 0; i < primList.Count; i++)
+                {
+                    Primitive prim = primList[i];
+                    FacetedMesh mesh = null;
+
+                    if (prim.Sculpt.SculptTexture != UUID.Zero)
+                    {
+                        Image sculptTexture = null;
+                        if (LoadTexture(tempPath, prim.Sculpt.SculptTexture, ref sculptTexture))
+                            mesh = Render.Plugin.GenerateFacetedSculptMesh(prim, (Bitmap)sculptTexture, DetailLevel.Highest);
+                    }
+                    else
+                    {
+                        mesh = Render.Plugin.GenerateFacetedMesh(prim, DetailLevel.Highest);
+                    }
+
+                    if (mesh != null)
+                        LoadMesh(mesh, tempPath);
                 }
 
-                Directory.Delete(tempPath);
+                // Setup the dropdown list of prims
+                PopulatePrimCombobox();
+
+                glControl.Invalidate();
             }
+            else
+            {
+                MessageBox.Show("Failed to load LLSD formatted primitive data from " + filename);
+            }
+
+            Directory.Delete(tempPath);
+        }
+
+        private void LoadMesh(FacetedMesh mesh, string basePath)
+        {
+            // Create a FaceData struct for each face that stores the 3D data
+            // in a Tao.OpenGL friendly format
+            for (int j = 0; j < mesh.Faces.Count; j++)
+            {
+                Face face = mesh.Faces[j];
+                FaceData data = new FaceData();
+
+                // Vertices for this face
+                data.Vertices = new float[face.Vertices.Count * 3];
+                for (int k = 0; k < face.Vertices.Count; k++)
+                {
+                    data.Vertices[k * 3 + 0] = face.Vertices[k].Position.X;
+                    data.Vertices[k * 3 + 1] = face.Vertices[k].Position.Y;
+                    data.Vertices[k * 3 + 2] = face.Vertices[k].Position.Z;
+                }
+
+                // Indices for this face
+                data.Indices = face.Indices.ToArray();
+
+                // Texture transform for this face
+                Primitive.TextureEntryFace teFace = mesh.Prim.Textures.GetFace((uint)j);
+                Render.Plugin.TransformTexCoords(face.Vertices, face.Center, teFace);
+
+                // Texcoords for this face
+                data.TexCoords = new float[face.Vertices.Count * 2];
+                for (int k = 0; k < face.Vertices.Count; k++)
+                {
+                    data.TexCoords[k * 2 + 0] = face.Vertices[k].TexCoord.X;
+                    data.TexCoords[k * 2 + 1] = face.Vertices[k].TexCoord.Y;
+                }
+
+                // Texture for this face
+                if (!String.IsNullOrEmpty(basePath) && LoadTexture(basePath, teFace.TextureID, ref data.Texture))
+                {
+                    Bitmap bitmap = new Bitmap(data.Texture);
+                    bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                    Rectangle rectangle = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+                    BitmapData bitmapData = bitmap.LockBits(rectangle, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+
+                    Gl.glGenTextures(1, out data.TexturePointer);
+                    Gl.glBindTexture(Gl.GL_TEXTURE_2D, data.TexturePointer);
+
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR_MIPMAP_LINEAR);
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, Gl.GL_REPEAT);
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, Gl.GL_REPEAT);
+                    Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_GENERATE_MIPMAP, Gl.GL_TRUE);
+
+                    Glu.gluBuild2DMipmaps(Gl.GL_TEXTURE_2D, Gl.GL_RGB8, bitmap.Width, bitmap.Height, Gl.GL_BGR, Gl.GL_UNSIGNED_BYTE, bitmapData.Scan0);
+
+                    bitmap.UnlockBits(bitmapData);
+                    bitmap.Dispose();
+                }
+
+                // Set the UserData for this face to our FaceData struct
+                face.UserData = data;
+                mesh.Faces[j] = face;
+            }
+
+            Prims.Add(mesh);
         }
 
         private bool LoadTexture(string basePath, UUID textureID, ref System.Drawing.Image texture)
@@ -570,7 +660,7 @@ namespace PrimWorkshop
         {
             cboFace.Items.Clear();
 
-            if (CurrentPrim != null)
+            if (CurrentPrim != null && CurrentPrim.Profile.Faces != null)
             {
                 for (int i = 0; i < CurrentPrim.Profile.Faces.Count; i++)
                     cboFace.Items.Add(CurrentPrim.Profile.Faces[i]);
@@ -593,5 +683,20 @@ namespace PrimWorkshop
             frmBrowser browser = new frmBrowser();
             browser.ShowDialog();
         }
+    }
+
+    public struct FaceData
+    {
+        public float[] Vertices;
+        public ushort[] Indices;
+        public float[] TexCoords;
+        public int TexturePointer;
+        public System.Drawing.Image Texture;
+        // TODO: Normals
+    }
+
+    public static class Render
+    {
+        public static IRendering Plugin;
     }
 }

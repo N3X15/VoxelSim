@@ -32,7 +32,7 @@
       </Options>
     </Configuration>
 
-    <!-- Core VoxelSim Projects -->
+    <!-- Core OpenSim Projects -->
 <!--
         <Project frameworkVersion="v3_5" name="OpenSim.Model" path="OpenSim/Model" type="Library">
           <Configuration name="Debug">
@@ -1437,10 +1437,10 @@
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*.addin.xml" recurse="true"/>
         <Match pattern="*.cs" recurse="true">
           <Exclude name="Tests" pattern="Tests"/>
-          <Exclude name="Terrain" pattern="World/Terrain" />
-          <Exclude name="TerrainDefaultEffects" pattern="World/Terrain/DefaultEffects" />
+
+		  <!-- VoxelSim: These must be excluded or the compile WILL fail. -->
+          <Exclude name="Terrain" pattern="World/Terrain/*.cs" />
         </Match>
-        <Match buildAction="EmbeddedResource" path="Resources" pattern="*.addin.xml" recurse="true"/>
       </Files>
     </Project>
 

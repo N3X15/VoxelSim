@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using OpenSim.Region.CoreModules.World.Terrain;
-using OpenSim.Region.CoreModules.World.Terrain.FileLoaders;
+using OpenSim.Region.CoreModules.World.Voxels;
+//using OpenSim.Region.CoreModules.World.Voxels.FileLoaders;
 using OpenSim.Region.Framework.Scenes;
 using System.IO;
 
@@ -38,15 +38,22 @@ namespace OpenSim.Region.CoreModules.World.Serialiser
 
         public string WriteToFile(Scene scene, string dir)
         {
-            ITerrainLoader fileSystemExporter = new RAW32();
+            /*
+            IVoxelLoader fileSystemExporter = new RAW32();
             string targetFileName = Path.Combine(dir, "heightmap.r32");
 
-            lock (scene.Heightmap)
+            lock (scene.Voxels)
             {
-                fileSystemExporter.SaveFile(targetFileName, scene.Heightmap);
+                fileSystemExporter.SaveFile(targetFileName, scene.Voxels);
             }
-
+            
             return "heightmap.r32";
+            */
+            lock (scene.Voxels)
+            {
+                scene.Voxels.Save(Path.Combine(dir, "terrain.osvox"));
+            }
+            return "terrain.osvox";
         }
 
         #endregion

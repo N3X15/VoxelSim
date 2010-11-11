@@ -210,7 +210,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
             double[,] hm = whichScene.Voxels.GetDoubles();
             tc = Environment.TickCount;
             m_log.Info("[MAPTILE]: Generating Maptile Step 2: Object Volume Profile");
-            List<EntityBase> objs = whichScene.GetEntities();
+            EntityBase[] objs = whichScene.GetEntities();
             Dictionary<uint, DrawStruct> z_sort = new Dictionary<uint, DrawStruct>();
             //SortedList<float, RectangleDrawStruct> z_sort = new SortedList<float, RectangleDrawStruct>();
             List<float> z_sortheights = new List<float>();
@@ -226,10 +226,10 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                         SceneObjectGroup mapdot = (SceneObjectGroup)obj;
                         Color mapdotspot = Color.Gray; // Default color when prim color is white
                         // Loop over prim in group
-                        foreach (SceneObjectPart part in mapdot.Children.Values)
+                        mapdot.ForEachPart(delegate(SceneObjectPart part)
                         {
                             if (part == null)
-                                continue;
+                                return;
 
                             // Draw if the object is at least 1 meter wide in any direction
                             if (part.Scale.X > 1f || part.Scale.Y > 1f || part.Scale.Z > 1f)
@@ -241,20 +241,20 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                                     // get the null checks out of the way
                                     // skip the ones that break
                                     if (part == null)
-                                        continue;
+                                        return;
 
                                     if (part.Shape == null)
-                                        continue;
+                                        return;
 
                                     if (part.Shape.PCode == (byte)PCode.Tree || part.Shape.PCode == (byte)PCode.NewTree || part.Shape.PCode == (byte)PCode.Grass)
-                                        continue; // eliminates trees from this since we don't really have a good tree representation
+                                        return; // eliminates trees from this since we don't really have a good tree representation
                                     // if you want tree blocks on the map comment the above line and uncomment the below line
                                     //mapdotspot = Color.PaleGreen;
 
                                     Primitive.TextureEntry textureEntry = part.Shape.Textures;
 
                                     if (textureEntry == null || textureEntry.DefaultTexture == null)
-                                        continue;
+                                        return;
 
                                     Color4 texcolor = textureEntry.DefaultTexture.RGBA;
 
@@ -290,12 +290,12 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
 
                                 // skip prim outside of retion
                                 if (pos.X < 0f || pos.X > 256f || pos.Y < 0f || pos.Y > 256f)
-                                    continue;
+                                    return;
 
                                 // skip prim in non-finite position
                                 if (Single.IsNaN(pos.X) || Single.IsNaN(pos.Y) ||
                                     Single.IsInfinity(pos.X) || Single.IsInfinity(pos.Y))
-                                    continue;
+                                    return;
 
                                 // Figure out if object is under 256m above the height of the terrain
                                 bool isBelow256AboveTerrain = false;
@@ -314,7 +314,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                                     Vector3 lscale = new Vector3(part.Shape.Scale.X, part.Shape.Scale.Y, part.Shape.Scale.Z);
                                     Vector3 scale = new Vector3();
                                     Vector3 tScale = new Vector3();
-                                    Vector3 axPos = new Vector3(pos.X,pos.Y,pos.Z);
+                                    Vector3 axPos = new Vector3(pos.X, pos.Y, pos.Z);
 
                                     Quaternion llrot = part.GetWorldRotation();
                                     Quaternion rot = new Quaternion(llrot.W, llrot.X, llrot.Y, llrot.Z);
@@ -335,9 +335,9 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                                     if (mapdrawstartX < 0 || mapdrawstartX > ((int)Constants.RegionSize - 1) || mapdrawendX < 0 || mapdrawendX > ((int)Constants.RegionSize - 1)
                                                           || mapdrawstartY < 0 || mapdrawstartY > ((int)Constants.RegionSize - 1) || mapdrawendY < 0
                                                           || mapdrawendY > ((int)Constants.RegionSize - 1))
-                                        continue;
+                                        return;
 
-#region obb face reconstruction part duex
+                                    #region obb face reconstruction part duex
                                     Vector3[] vertexes = new Vector3[8];
 
                                     // float[] distance = new float[6];
@@ -441,7 +441,7 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
                                     FaceD[2] = vertexes[7];
                                     FaceC[3] = vertexes[7];
                                     FaceD[5] = vertexes[7];
-#endregion
+                                    #endregion
 
                                     //int wy = 0;
 
@@ -474,29 +474,29 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
 
                                     //for (int wx = mapdrawstartX; wx < mapdrawendX; wx++)
                                     //{
-                                        //for (wy = mapdrawstartY; wy < mapdrawendY; wy++)
-                                        //{
-                                            //m_log.InfoFormat("[MAPDEBUG]: {0},{1}({2})", wx, (255 - wy),wy);
-                                            //try
-                                            //{
-                                                // Remember, flip the y!
-                                            //    mapbmp.SetPixel(wx, (255 - wy), mapdotspot);
-                                            //}
-                                            //catch (ArgumentException)
-                                            //{
-                                            //    breakYN = true;
-                                            //}
+                                    //for (wy = mapdrawstartY; wy < mapdrawendY; wy++)
+                                    //{
+                                    //m_log.InfoFormat("[MAPDEBUG]: {0},{1}({2})", wx, (255 - wy),wy);
+                                    //try
+                                    //{
+                                    // Remember, flip the y!
+                                    //    mapbmp.SetPixel(wx, (255 - wy), mapdotspot);
+                                    //}
+                                    //catch (ArgumentException)
+                                    //{
+                                    //    breakYN = true;
+                                    //}
 
-                                            //if (breakYN)
-                                            //    break;
-                                        //}
+                                    //if (breakYN)
+                                    //    break;
+                                    //}
 
-                                        //if (breakYN)
-                                        //    break;
+                                    //if (breakYN)
+                                    //    break;
                                     //}
                                 } // Object is within 256m Z of terrain
                             } // object is at least a meter wide
-                        } // loop over group children
+                        }); // loop over group children
                     } // entitybase is sceneobject group
                 } // foreach loop over entities
 
@@ -581,5 +581,20 @@ namespace OpenSim.Region.CoreModules.World.WorldMap
 //             }
 //         }
 //         #endregion
+
+        public Bitmap CreateMapTile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Bitmap CreateViewImage(Vector3 camPos, Vector3 camDir, float fov, int width, int height, bool useTextures)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[] WriteJpeg2000Image()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

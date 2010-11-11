@@ -30,19 +30,33 @@ using OpenMetaverse;
 namespace OpenMetaverse.Assets
 {
     /// <summary>
-    /// Represents an <seealso cref="AssetWearable"/> that represents an avatars body ie: Hair, Etc.
+    /// Represents Mesh asset
     /// </summary>
-    public class AssetBodypart : AssetWearable
+    public class AssetMesh : Asset
     {
         /// <summary>Override the base classes AssetType</summary>
-        public override AssetType AssetType { get { return AssetType.Bodypart; } }
+        public override AssetType AssetType { get { return AssetType.Mesh; } }
 
-        /// <summary>Initializes a new instance of an AssetBodyPart object</summary>
-        public AssetBodypart() { }
+        /// <summary>Initializes a new instance of an AssetMesh object</summary>
+        public AssetMesh() { }
 
-        /// <summary>Initializes a new instance of an AssetBodyPart object with parameters</summary>
+        /// <summary>Initializes a new instance of an AssetMesh object with parameters</summary>
         /// <param name="assetID">A unique <see cref="UUID"/> specific to this asset</param>
         /// <param name="assetData">A byte array containing the raw asset data</param>
-        public AssetBodypart(UUID assetID, byte[] assetData) : base(assetID, assetData) { }
+        public AssetMesh(UUID assetID, byte[] assetData)
+            : base(assetID, assetData)
+        {
+        }
+
+        /// <summary>
+        /// TODO: Encodes a scripts contents into a LSO Bytecode file
+        /// </summary>
+        public override void Encode() { }
+
+        /// <summary>
+        /// TODO: Decode LSO Bytecode into a string
+        /// </summary>
+        /// <returns>true</returns>
+        public override bool Decode() { return true; }
     }
 }

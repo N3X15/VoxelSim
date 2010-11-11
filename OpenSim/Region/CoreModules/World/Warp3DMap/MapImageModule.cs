@@ -243,7 +243,7 @@ namespace OpenSim.Region.CoreModules.World.Warp3DMap
 
         private void CreateTerrain(WarpRenderer renderer, bool textureTerrain)
         {
-            ITerrainChannel terrain = m_scene.Heightmap;
+            IVoxelChannel terrain = m_scene.Voxels;
             float[] heightmap = terrain.GetFloatsSerialised();
 
             warp_Object obj = new warp_Object(256 * 256, 255 * 255 * 2);
