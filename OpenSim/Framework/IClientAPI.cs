@@ -512,19 +512,6 @@ namespace OpenSim.Framework
         public uint Status;
     }
 
-    public struct VoxelUpdate
-    {
-        public int X;
-        public int Y;
-        public int Z;
-        public byte Type;
-    }
-    public struct ChunkUpdate
-    {
-        public int X;
-        public int Y;
-        public int Z;
-    }
     public struct DirPeopleReplyData
     {
         public UUID agentID;
@@ -1326,6 +1313,7 @@ namespace OpenSim.Framework
 
         void StopFlying(ISceneEntity presence);
 
-        void SendChunkUpdates(bool[,] changed);
+        void SendVoxelUpdate(int x, int y, int z, byte b);
+        void SendChunkUpdate(int x, int y, int z);
     }
 }

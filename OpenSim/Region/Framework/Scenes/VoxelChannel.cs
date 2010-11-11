@@ -939,7 +939,7 @@ namespace OpenSim.Region.Framework.Scenes
         }
         public byte GetChunkBlock(ref byte[] chunk, int x, int y, int z)
         {
-            chunk[y * ZScale + x * ZScale * XScale + z] = type;
+            return chunk[y * ZScale + x * ZScale * XScale + z];
         }
     }
 }

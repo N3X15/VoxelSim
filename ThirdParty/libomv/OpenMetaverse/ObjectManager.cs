@@ -1146,6 +1146,32 @@ namespace OpenMetaverse
         }
 
         /// <summary>
+        /// Delink/Unlink multiple prims from a linkset
+        /// </summary>
+        /// <param name="simulator">A reference to the <seealso cref="OpenMetaverse.Simulator"/> object where the objects reside</param>
+        /// <param name="localIDs">An array which contains the IDs of the objects to delink</param>
+        public void DelinkPrims(Simulator simulator, List<uint> localIDs)
+        {
+            ObjectDelinkPacket packet = new ObjectDelinkPacket();
+
+            packet.AgentData.AgentID = Client.Self.AgentID;
+            packet.AgentData.SessionID = Client.Self.SessionID;
+
+            packet.ObjectData = new ObjectDelinkPacket.ObjectDataBlock[localIDs.Count];
+
+            int i = 0;
+            foreach (uint localID in localIDs)
+            {
+                packet.ObjectData[i] = new ObjectDelinkPacket.ObjectDataBlock();
+                packet.ObjectData[i].ObjectLocalID = localID;
+
+                i++;
+            }
+
+            Client.Network.SendPacket(packet, simulator);
+        }
+
+        /// <summary>
         /// Change the rotation of an object
         /// </summary>
         /// <param name="simulator">A reference to the <seealso cref="OpenMetaverse.Simulator"/> object where the object resides</param>
@@ -2034,6 +2060,7 @@ namespace OpenMetaverse
 
                         avatar.ID = block.FullID;
                         avatar.LocalID = block.ID;
+                        avatar.Scale = block.Scale;
                         avatar.CollisionPlane = objectupdate.CollisionPlane;
                         avatar.Position = objectupdate.Position;
                         avatar.Velocity = objectupdate.Velocity;

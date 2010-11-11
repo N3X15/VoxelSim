@@ -11985,5 +11985,8 @@ namespace OpenSim.Region.ClientStack.LindenUDP
             //        AbsolutePosition, Velocity, Vector3.Zero, m_bodyRot, new Vector4(0,0,1,AbsolutePosition.Z - 0.5f), m_uuid, null, GetUpdatePriority(ControllingClient)));
 
         }
+
+        public void SendVoxelUpdate(int x, int y, int z, byte type) { }
+        public void SendChunkUpdate(int x, int y, int z) { }
     }
 }

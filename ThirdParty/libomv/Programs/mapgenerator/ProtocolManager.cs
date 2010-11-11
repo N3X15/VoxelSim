@@ -63,8 +63,7 @@ namespace mapgenerator
         /// <summary></summary>
 		Single,
         /// <summary></summary>
-		Multiple,
-		Voxel
+		Multiple
 	}
 
     /// <summary>
@@ -216,7 +215,6 @@ namespace mapgenerator
             TypeSizes.Add(FieldType.LLQuaternion, 16);
 			TypeSizes.Add(FieldType.IPADDR, 4);
 			TypeSizes.Add(FieldType.IPPORT, 2);
-			TypeSizes.Add(FieldType.Voxel,16);
 			TypeSizes.Add(FieldType.Variable, -1);
 			TypeSizes.Add(FieldType.Fixed, -2);
 
@@ -640,7 +638,7 @@ namespace mapgenerator
 									//Client.Log("Unknown block frequency", Helpers.LogLevel.Error);
                                     throw new Exception("Unknown block frequency");
 								}
-								Console.WriteLine("{0} - Block Count: {1}",currentBlock.Name,currentBlock.Count);
+
 								#endregion
 							}
 						}

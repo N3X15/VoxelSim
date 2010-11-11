@@ -1218,5 +1218,9 @@ namespace OpenSim.Client.VWoHTTP.ClientStack
         public void StopFlying(ISceneEntity presence)
         {
         }
+
+
+        public void SendVoxelUpdate(int x, int y, int z, byte type) { }
+        public void SendChunkUpdate(int x, int y, int z) { }
     }
 }

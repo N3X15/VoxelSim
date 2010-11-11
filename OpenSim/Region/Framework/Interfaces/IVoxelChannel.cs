@@ -40,5 +40,7 @@ namespace OpenSim.Region.Framework.Interfaces
 		Vector3 FindNearestAirVoxel(Vector3 subject, bool ForAvatar);
 
         byte[] GetChunk(int X, int Y);
+
+        bool[,] GetChangedChunks();
     }
 }

@@ -1239,24 +1239,52 @@ namespace OpenMetaverse
         {
             get
             {
-                if (sittingOn != 0)
-                {
-                    Primitive parent;
-                    if (Client.Network.CurrentSim != null && Client.Network.CurrentSim.ObjectsPrimitives.TryGetValue(sittingOn, out parent))
-                    {
-                        return parent.Position + Vector3.Transform(relativePosition, Matrix4.CreateFromQuaternion(parent.Rotation));
-                    }
-                    else
-                    {
-                        Logger.Log("Currently sitting on object " + sittingOn + " which is not tracked, SimPosition will be inaccurate",
-                            Helpers.LogLevel.Warning, Client);
-                        return relativePosition;
-                    }
-                }
-                else
+                // simple case, agent not seated
+                if (sittingOn == 0)
                 {
                     return relativePosition;
                 }
+
+                // a bit more complicatated, agent sitting on a prim
+                Primitive p = null;
+                Vector3 fullPosition = relativePosition;
+
+                if (Client.Network.CurrentSim.ObjectsPrimitives.TryGetValue(sittingOn, out p))
+                {
+                    fullPosition += p.Position;
+                }
+
+                // go up the hiearchy trying to find the root prim
+                while (p != null && p.ParentID != 0)
+                {
+                    Avatar av;
+                    if (Client.Network.CurrentSim.ObjectsAvatars.TryGetValue(p.ParentID, out av))
+                    {
+                        p = av;
+                        fullPosition += p.Position;
+                    }
+                    else
+                    {
+                        if (Client.Network.CurrentSim.ObjectsPrimitives.TryGetValue(p.ParentID, out p))
+                        {
+                            fullPosition += p.Position;
+                        }
+                    }
+                }
+
+                if (p != null) // we found the root prim
+                {
+                    return fullPosition;
+                }
+
+                // Didn't find the seat's root prim, try returning coarse loaction
+                if (Client.Network.CurrentSim.avatarPositions.TryGetValue(AgentID, out fullPosition))
+                {
+                    return fullPosition;
+                }
+
+                Logger.Log("Failed to determine agents sim position", Helpers.LogLevel.Warning, Client);
+                return relativePosition;
             }
         }
         /// <summary>
@@ -1689,6 +1717,10 @@ namespace OpenMetaverse
 
                 CapsClient request = new CapsClient(url);
                 request.BeginGetResponse(acceptInvite.Serialize(), OSDFormat.Xml, Client.Settings.CAPS_TIMEOUT);
+
+                lock (GroupChatSessions.Dictionary)
+                    if (!GroupChatSessions.ContainsKey(session_id))
+                        GroupChatSessions.Add(session_id, new List<ChatSessionMember>());
             }
             else
             {
@@ -3773,9 +3805,12 @@ namespace OpenMetaverse
         {
             ChatterBoxSessionStartReplyMessage msg = (ChatterBoxSessionStartReplyMessage)message;
 
-            lock (GroupChatSessions.Dictionary)
-                if (!GroupChatSessions.ContainsKey(msg.SessionID))
-                    GroupChatSessions.Add(msg.SessionID, new List<ChatSessionMember>());
+            if (msg.Success)
+            {
+                lock (GroupChatSessions.Dictionary)
+                    if (!GroupChatSessions.ContainsKey(msg.SessionID))
+                        GroupChatSessions.Add(msg.SessionID, new List<ChatSessionMember>());
+            }
 
             OnGroupChatJoined(new GroupChatJoinedEventArgs(msg.SessionID, msg.SessionName, msg.TempSessionID, msg.Success));
         }
@@ -3894,7 +3929,14 @@ namespace OpenMetaverse
                 im.Message = msg.Message;
                 im.Offline = msg.Offline;
                 im.BinaryBucket = msg.BinaryBucket;
-
+                try
+                {
+                    ChatterBoxAcceptInvite(msg.IMSessionID);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Failed joining IM:", Helpers.LogLevel.Warning, Client, ex);
+                }
                 OnInstantMessage(new InstantMessageEventArgs(im, simulator));
             }
         }
