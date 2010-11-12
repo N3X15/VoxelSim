@@ -1432,6 +1432,7 @@
 
 	  <!-- VoxelSim -->
       <Reference name="LibNbt" path="../../../bin/" localCopy="true"/>
+      <Reference name="LibNoise" path="../../../bin/" localCopy="true"/>
 
       <Files>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*.addin.xml" recurse="true"/>

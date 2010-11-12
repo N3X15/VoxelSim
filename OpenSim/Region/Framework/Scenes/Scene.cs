@@ -59,6 +59,7 @@ namespace OpenSim.Region.Framework.Scenes
     {
         private const long DEFAULT_MIN_TIME_FOR_PERSISTENCE = 60L;
         private const long DEFAULT_MAX_TIME_FOR_PERSISTENCE = 600L;
+        protected long GenerationSeed = 0L;
 
         public delegate void SynchronizeSceneHandler(Scene scene);
 
@@ -687,6 +688,9 @@ namespace OpenSim.Region.Framework.Scenes
                         RegionInfo.RegionSettings.TerrainImageID = tileID;
                     }
                 }
+
+                Random rnd = new Random();
+                GenerationSeed = startupConfig.GetLong("TerragenSeed", (long)rnd.Next());
             }
             catch
             {
@@ -759,6 +763,9 @@ namespace OpenSim.Region.Framework.Scenes
             m_eventManager = new EventManager();
 
             m_lastUpdate = Util.EnvironmentTickCount();
+
+            Random rnd = new Random();
+            GenerationSeed = (long)rnd.Next();
         }
 
         #endregion
@@ -1678,7 +1685,8 @@ namespace OpenSim.Region.Framework.Scenes
             catch (IOException)
             {
 				m_log.Info("[TERRAIN]: No default terrain. Generating a new terrain.");
-                Voxels = (new VoxelChannel(sz,sz,256)).Generate("default");
+                Voxels = new VoxelChannel(sz, sz, 256);
+                Voxels.Generate("default", GenerationSeed, (long)RegionInfo.RegionLocX, (long)RegionInfo.RegionLocY);
                 Voxels.Save(RegionInfo.RegionID.ToString());
 				
                 // Non standard region size.    If there's an old terrain in the database, it might read past the buffer

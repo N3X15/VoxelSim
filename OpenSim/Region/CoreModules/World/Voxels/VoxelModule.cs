@@ -1060,8 +1060,11 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 		
 		private void InterfaceGenerate(Object[] args)
 		{
-			
-			m_scene.Voxels=(m_scene.Voxels as VoxelChannel).Generate("default");
+            Random rnd = new Random();
+            long seed = (long)rnd.Next();
+            if ((string)args[0] != "")
+                seed = long.Parse((string)args[0]);
+            (m_scene.Voxels as VoxelChannel).Generate("default", seed, (long)m_scene.RegionInfo.RegionLocX, (long)m_scene.RegionInfo.RegionLocY);
 			TaintTerrain();
 		}
 

@@ -30,8 +30,8 @@ namespace OpenSim.Region.Framework.Interfaces
         IVoxelChannel MakeCopy();
         string SaveToXmlString();
         void LoadFromXmlString(string data);
-		
-		IVoxelChannel Generate(string method);
+
+        void Generate(string method, long seed, long X, long Y);
 		
 		void Save(string name);
 		void Load(string name);
