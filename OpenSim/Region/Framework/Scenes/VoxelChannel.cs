@@ -156,16 +156,11 @@ namespace OpenSim.Region.Framework.Scenes
 		{
 			if(!inGrid(pos)) return AIR_VOXEL;
 
-			int px=(int)Math.Round(pos.X);
-			int py=(int)Math.Round(pos.Y);
+			int x=(int)Math.Round(pos.X);
+			int y=(int)Math.Round(pos.Y);
 			int z=(int)Math.Round(pos.Z);
 
-			int X = px / 16;
-			int Y = py / 16;
-
-			int x = (px >> 4) & 0xf;
-			int y = (py >> 4) & 0xf;
-			return Voxels[py * ZScale + px * ZScale * XScale + z];
+			return Voxels[y * ZScale + x * ZScale * XScale + z];
 		}
 		public byte GetVoxel(int x,int y,int z)
 		{
@@ -258,33 +253,7 @@ namespace OpenSim.Region.Framework.Scenes
 			if(!File.Exists("terrain/"+RegionName+".osvox"))
 				throw new IOException("File not found.");
 			LoadFromFile("terrain/"+RegionName+".osvox");
-			/*
-			VoxelLayer[] vl=new VoxelLayer[ZScale];
-			for(int z = 0;z<ZScale;z++)
-			{
-				VoxelLayer l = new VoxelLayer(z,XScale,YScale);
-				l.Load(RegionName);
-				
-				for(int x=0;x<XScale;x++)
-					for(int y=0;y<YScale;y++)
-						Voxels[x,y,z]=l.Layer[x,y];
-			}*/
 		}
-		/*
-		public VoxelLayer[] GetLayers()
-		{
-			VoxelLayer[] vl=new VoxelLayer[ZScale];
-			for(int l=0;l<ZScale;l++)
-			{
-				VoxelLayer lyr = new VoxelLayer(l,XScale,YScale);
-				for(int x=0;x<XScale;x++)
-					for(int y=0;y<YScale;y++)
-						lyr.Layer[x,y]=Voxels[x,y,l];
-				vl[l]=lyr;
-			}
-			return vl;
-		}
-		*/
 		public double GetHeightAt(int x,int y)
 		{
 			double h=0;
@@ -302,6 +271,7 @@ namespace OpenSim.Region.Framework.Scenes
 		/// <returns>
 		/// A <see cref="System.Single[]"/>
 		/// </returns>
+        [Obsolete("Switch to marching tetras")]
 		public float[] GetFloatsSerialised()
 		{
 			/* Basically, get the highest point on each column. */
