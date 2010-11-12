@@ -102,8 +102,10 @@ namespace OpenSim.Region.Framework.Scenes
 			VoxMaterial m = new VoxMaterial();
 			m.Flags=MatFlags.Solid;
 			AddMaterial(m);
-			
-			FillVoxels(new Vector3(0,0,0),new Vector3((int)x,(int)y,(int)z),AIR_VOXEL);
+
+            FillVoxels(new Vector3(0, 0, 0), new Vector3((int)x, (int)y, (int)z), AIR_VOXEL);
+
+            TerrainGenerators.Add("default", new HillGenerator());
 		}
 		
 		public void SetVoxel(int x,int y,int z,byte voxel)
@@ -132,7 +134,7 @@ namespace OpenSim.Region.Framework.Scenes
 
 			int x = (px >> 4) & 0xf;
 			int y = (py >> 4) & 0xf;
-			Voxels[y * ZScale + x * ZScale * XScale + z]=v;
+			Voxels[py * ZScale + px * ZScale * XScale + z]=v;
 		}
 		
 		public IVoxelChannel MakeCopy()
@@ -334,6 +336,7 @@ namespace OpenSim.Region.Framework.Scenes
             }
             else
             {
+                Console.WriteLine("[TERRAGEN] Terrain generation module \"{0}\" not installed.", method);
                 return;
             }
 			Image image =  new Bitmap(XScale,YScale);
@@ -342,7 +345,7 @@ namespace OpenSim.Region.Framework.Scenes
             {
                 for(int y=0;y<YScale;y++)
                 {
-                    int c = (int)(255.0d*hm[x,y]);
+                    int c = (int)(255.0d*(hm[x,y]/256d));
                     (image as Bitmap).SetPixel(x,255-y,Color.FromArgb(c,c,c));
                 }
             }

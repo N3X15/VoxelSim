@@ -1156,10 +1156,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
 
 			Command generateCommand=
 				new Command("generate",CommandIntentions.COMMAND_HAZARDOUS, InterfaceGenerate,"Generate terrain.");
-			generateCommand.AddArgument("Frequency","Perlin frequency","Double");
-			generateCommand.AddArgument("Lucunarity","Hell if I know","Double");
-			generateCommand.AddArgument("Persistance","Hell if I know","Double");
-			generateCommand.AddArgument("Octaves","Hell if I know","Integer");
+			generateCommand.AddArgument("Seed","Starting point for the random number generator","Integer");
 			
             Command rescaleCommand =
                 new Command("rescale", CommandIntentions.COMMAND_HAZARDOUS, InterfaceRescaleTerrain, "Rescales the current terrain to fit between the given min and max heights");
