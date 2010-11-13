@@ -488,11 +488,12 @@ namespace OpenSim.Region.Physics.BulletXPlugin
         //OpenSim calls Simulate 10 times per seconds. So FPS = "Simulate Calls" * simulationSubSteps = 100 FPS
         private const int simulationSubSteps = 10;
         //private float[] _heightmap;
-        private BulletXPlanet _simFlatPlanet;
+        private BulletXPrim _simVoxelPlanet;
         internal Dictionary<RigidBody, BulletXCharacter> _characters = new Dictionary<RigidBody, BulletXCharacter>();
         internal Dictionary<RigidBody, BulletXPrim> _prims = new Dictionary<RigidBody, BulletXPrim>();
 
         public IMesher mesher;
+        public IVoxelMesher voxmesher;
         // private IConfigSource m_config;
 
         // protected internal String identifier;
@@ -565,9 +566,10 @@ namespace OpenSim.Region.Physics.BulletXPlugin
             //this._heightmap = new float[65536];
         }
 
-        public override void Initialise(IMesher meshmerizer, IConfigSource config)
+        public override void Initialise(IMesher meshmerizer, IVoxelMesher vmesher, IConfigSource config)
         {
             mesher = meshmerizer;
+            voxmesher = vmesher;
             // m_config = config;
         }
 
@@ -729,29 +731,7 @@ namespace OpenSim.Region.Physics.BulletXPlugin
 
         private void ValidateHeightForAll()
         {
-            float _height;
-            foreach (BulletXCharacter actor in _characters.Values)
-            {
-                //_height = HeightValue(actor.RigidBodyPosition);
-                _height = _simFlatPlanet.HeightValue(actor.RigidBodyPosition);
-                actor.ValidateHeight(_height);
-                //if (_simFlatPlanet.heightIsNotValid(actor.RigidBodyPosition, out _height)) actor.ValidateHeight(_height);
-            }
-            foreach (BulletXPrim prim in _prims.Values)
-            {
-                //_height = HeightValue(prim.RigidBodyPosition);
-                _height = _simFlatPlanet.HeightValue(prim.RigidBodyPosition);
-                prim.ValidateHeight(_height);
-                //if (_simFlatPlanet.heightIsNotValid(prim.RigidBodyPosition, out _height)) prim.ValidateHeight(_height);
-            }
-            //foreach (BulletXCharacter actor in _characters)
-            //{
-            //    actor.ValidateHeight(0);
-            //}
-            //foreach (BulletXPrim prim in _prims)
-            //{
-            //    prim.ValidateHeight(0);
-            //}
+            
         }
 
         private void UpdateKineticsForAll()
@@ -781,53 +761,40 @@ namespace OpenSim.Region.Physics.BulletXPlugin
             }
         }
 
-        public override void SetTerrain(float[] heightMap)
+        /// <summary>
+        /// VOXELSIM WAS HERE
+        /// </summary>
+        /// <param name="heightMap"></param>
+        public override void SetTerrain(bool[] heightMap)
         {
-            ////As the same as ODE, heightmap (x,y) must be swapped for BulletX
-            //for (int i = 0; i < 65536; i++)
-            //{
-            //    // this._heightmap[i] = (double)heightMap[i];
-            //    // dbm (danx0r) -- heightmap x,y must be swapped for Ode (should fix ODE, but for now...)
-            //    int x = i & 0xff;
-            //    int y = i >> 8;
-            //    this._heightmap[i] = heightMap[x * 256 + y];
-            //}
-
-            //float[] swappedHeightMap = new float[65536];
-            ////As the same as ODE, heightmap (x,y) must be swapped for BulletX
-            //for (int i = 0; i < 65536; i++)
-            //{
-            //    // this._heightmap[i] = (double)heightMap[i];
-            //    // dbm (danx0r) -- heightmap x,y must be swapped for Ode (should fix ODE, but for now...)
-            //    int x = i & 0xff;
-            //    int y = i >> 8;
-            //    swappedHeightMap[i] = heightMap[x * 256 + y];
-            //}
             DeleteTerrain();
-            //There is a BulletXLock inside the constructor of BulletXPlanet
-            //this._simFlatPlanet = new BulletXPlanet(this, swappedHeightMap);
-            _simFlatPlanet = new BulletXPlanet(this, heightMap);
-            //this._heightmap = heightMap;
+            
+            // I sure hope this is correct.
+            _simVoxelPlanet = new BulletXPrim("__TERRAIN__", this, new OpenMetaverse.Vector3(128, 128, 128), new OpenMetaverse.Vector3(256, 256, 256), OpenMetaverse.Quaternion.Identity, voxmesher.ToMesh(heightMap), PrimitiveBaseShape.Default, false);
+            this._prims.Add(_simVoxelPlanet.RigidBody, _simVoxelPlanet);
         }
 
+        /// <summary>
+        /// VOXELSIM WAS HERE, TOO
+        /// </summary>
         public override void DeleteTerrain()
         {
-            if (_simFlatPlanet != null)
+            if (_simVoxelPlanet != null)
             {
                 lock (BulletXLock)
                 {
                     try
                     {
-                        ddWorld.RemoveRigidBody(_simFlatPlanet.RigidBody);
+                        ddWorld.RemoveRigidBody(_simVoxelPlanet.RigidBody);
                     }
                     catch (Exception ex)
                     {
                         BulletXMessage(is_ex_message + ex.Message, true);
-                        _simFlatPlanet.RigidBody.ActivationState = ActivationState.DisableSimulation;
-                        AddForgottenRigidBody(_simFlatPlanet.RigidBody);
+                        _simVoxelPlanet.RigidBody.ActivationState = ActivationState.DisableSimulation;
+                        AddForgottenRigidBody(_simVoxelPlanet.RigidBody);
                     }
                 }
-                _simFlatPlanet = null;
+                _simVoxelPlanet = null;
                 GC.Collect();
                 BulletXMessage("Terrain erased!", false);
             }
@@ -1795,8 +1762,8 @@ namespace OpenSim.Region.Physics.BulletXPlugin
         {
             get { return _flatPlanet; }
         }
-
-        internal BulletXPlanet(BulletXScene parent_scene, float[] heightField)
+        /*
+        internal BulletXPlanet(BulletXScene parent_scene, bool[] heightField)
         {
             _staticPosition = new OpenMetaverse.Vector3(BulletXScene.MaxXY / 2, BulletXScene.MaxXY / 2, 0);
 //             _staticVelocity = new PhysicsVector();
@@ -1817,7 +1784,9 @@ namespace OpenSim.Region.Physics.BulletXPlugin
                 try
                 {
                     _startTransform.Translation = BulletXMaths.PhysicsVectorToXnaVector3(_staticPosition);
-                    CollisionShape _collisionShape =
+                    StridingMeshInterface smi = new StridingMeshInterface();
+                    smi.
+                    CollisionShape _collisionShape = new TriangleMeshShape(
                         new HeightfieldTerrainShape(BulletXScene.MaxXY, BulletXScene.MaxXY, _heightField,
                                                     (float) BulletXScene.MaxZ, 2, true, false);
                     DefaultMotionState _motionState = new DefaultMotionState(_startTransform, _centerOfMassOffset);
@@ -1839,7 +1808,7 @@ namespace OpenSim.Region.Physics.BulletXPlugin
             }
             BulletXScene.BulletXMessage("BulletXPlanet created.", false);
         }
-
+        */
         internal float HeightValue(Vector3 position)
         {
             int li_x, li_y;

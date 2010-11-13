@@ -12,6 +12,7 @@ using OpenMetaverse;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using Math = System.Math;
+
 namespace OpenSim.Region.Framework.Scenes
 {
 	public enum ReplaceMode
@@ -125,16 +126,11 @@ namespace OpenSim.Region.Framework.Scenes
 		{
 			if(!inGrid(pos)) return;
 
-			int px=(int)Math.Round(pos.X);
-			int py=(int)Math.Round(pos.Y);
+			int x=(int)Math.Round(pos.X);
+			int y=(int)Math.Round(pos.Y);
 			int z=(int)Math.Round(pos.Z);
 
-			int X = px / 16;
-			int Y = py / 16;
-
-			int x = (px >> 4) & 0xf;
-			int y = (py >> 4) & 0xf;
-			Voxels[py * ZScale + px * ZScale * XScale + z]=v;
+			Voxels[y * ZScale + x * ZScale * XScale + z]=v;
 		}
 		
 		public IVoxelChannel MakeCopy()
@@ -287,6 +283,7 @@ namespace OpenSim.Region.Framework.Scenes
 			}
 			return sf.ToArray();
 		}
+
 		public void Generate(string method,long seed,long X, long Y)
 		{
             Generate(method,seed,X,Y,new object[]{});
@@ -643,6 +640,22 @@ namespace OpenSim.Region.Framework.Scenes
                 }
             }
             return d;
+        }
+
+        public bool[] GetSolidsArray()
+        {   
+            bool[] solids = new bool[Constants.RegionSize * Constants.RegionSize * Constants.RegionSize];
+            for(int x=0;x<Constants.RegionSize;++x)
+            {   
+                for(int y=0;y<Constants.RegionSize;++y)
+                {
+                    for (int z = 0; z < Constants.RegionSize; ++z)
+                    {
+                        solids[y * ZScale + x * ZScale * XScale + z] = IsSolid(x, y, z);
+                    }
+                }
+            }
+            return solids;
         }
 
         public void SetChunkBlock(ref byte[] chunk, byte type, int x, int y, int z)

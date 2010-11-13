@@ -43,13 +43,14 @@ namespace OpenSim.Region.Physics.PhysXPlugin
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private List<PhysXCharacter> _characters = new List<PhysXCharacter>();
         private List<PhysXPrim> _prims = new List<PhysXPrim>();
-        private float[] _heightMap = null;
+        private bool[] _voxelMap = null;
         private NxPhysicsSDK mySdk;
         private NxScene scene;
 
         // protected internal string sceneIdentifier;
         public PhysXScene(string _sceneIdentifier)
         {
+            throw new NotImplementedException();
             //sceneIdentifier = _sceneIdentifier;
 
             mySdk = NxPhysicsSDK.CreateSDK();
@@ -57,7 +58,7 @@ namespace OpenSim.Region.Physics.PhysXPlugin
             scene = mySdk.CreateScene();
         }
 
-        public override void Initialise(IMesher meshmerizer, IConfigSource config)
+        public override void Initialise(IMesher meshmerizer, IVoxelMesher hurr, IConfigSource config)
         {
             // Does nothing right now
         }
@@ -158,15 +159,15 @@ namespace OpenSim.Region.Physics.PhysXPlugin
             get { return (false); }
         }
 
-        public override void SetTerrain(float[] heightMap)
+        public override void SetTerrain(bool[] heightMap)
         {
-            if (_heightMap != null)
+            if (_voxelMap != null)
             {
                 m_log.Debug("PhysX - deleting old terrain");
                 scene.DeleteTerrain();
             }
-            _heightMap = heightMap;
-            scene.AddTerrain(heightMap);
+            _voxelMap = heightMap;
+            // Loop through, add boxes for every voxel?
         }
 
         public override void DeleteTerrain()

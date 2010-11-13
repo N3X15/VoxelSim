@@ -62,7 +62,7 @@ namespace OpenSim.Region.Physics.Manager
         }
 
 
-        public abstract void Initialise(IMesher meshmerizer, IConfigSource config);
+        public abstract void Initialise(IMesher meshmerizer, IVoxelMesher voxmesher, IConfigSource config);
 
         public abstract PhysicsActor AddAvatar(string avName, Vector3 position, Vector3 size, bool isFlying);
 
@@ -147,7 +147,7 @@ namespace OpenSim.Region.Physics.Manager
 
         public abstract void GetResults();
 
-        public abstract void SetTerrain(float[] heightMap);
+        public abstract void SetTerrain(bool[] heightMap);
 
         public abstract void SetWaterLevel(float baseheight);
 
@@ -212,7 +212,7 @@ namespace OpenSim.Region.Physics.Manager
             private static int m_workIndicator;
 
 
-            public override void Initialise(IMesher meshmerizer, IConfigSource config)
+            public override void Initialise(IMesher meshmerizer, IVoxelMesher derp, IConfigSource config)
             {
                 // Does nothing right now
             }
@@ -272,7 +272,7 @@ namespace OpenSim.Region.Physics.Manager
                 m_log.Info("[PHYSICS]: NullPhysicsScene : GetResults()");
             }
 
-            public override void SetTerrain(float[] heightMap)
+            public override void SetTerrain(bool[] heightMap)
             {
                 m_log.InfoFormat("[PHYSICS]: NullPhysicsScene : SetTerrain({0} items)", heightMap.Length);
             }

@@ -57,7 +57,7 @@ namespace OpenSim.Region.Physics.BulletDotNETPlugin
         private btCollisionConfiguration m_collisionConfiguration;
         private btConstraintSolver m_solver;
         private btCollisionDispatcher m_dispatcher;
-        private btHeightfieldTerrainShape m_terrainShape;
+        private PhysicsActor m_terrainShape;
         public btRigidBody TerrainBody;
         private btVector3 m_terrainPosition;
         private btVector3 m_gravity;
@@ -105,6 +105,7 @@ namespace OpenSim.Region.Physics.BulletDotNETPlugin
         private readonly btVector3 worldAabbMax = new btVector3((int)Constants.RegionSize + 10f, (int)Constants.RegionSize + 10f, 9000);
 
         public IMesher mesher;
+        public IVoxelMesher voxmesher;
         private ContactAddedCallbackHandler m_CollisionInterface;
 
         public BulletDotNETScene(string sceneIdentifier)
@@ -118,7 +119,7 @@ namespace OpenSim.Region.Physics.BulletDotNETPlugin
             
         }
 
-        public override void Initialise(IMesher meshmerizer, IConfigSource config)
+        public override void Initialise(IMesher meshmerizer, IVoxelMesher voxmesh, IConfigSource config)
         {
             mesher = meshmerizer;
             // m_config = config;
@@ -137,8 +138,8 @@ namespace OpenSim.Region.Physics.BulletDotNETPlugin
             m_world = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfiguration);
             m_world.setGravity(m_gravity);
             EnableCollisionInterface();
-            
 
+            voxmesher = voxmesh;
         }
 
         public override PhysicsActor AddAvatar(string avName, Vector3 position, Vector3 size, bool isFlying)
@@ -374,38 +375,25 @@ namespace OpenSim.Region.Physics.BulletDotNETPlugin
             
         }
 
-        public override void SetTerrain(float[] heightMap)
+        public override void SetTerrain(bool[] heightMap)
         {
+
             if (m_terrainShape != null)
                 DeleteTerrain();
 
-            float hfmax = -9000;
-            float hfmin = 90000;
-            
-            for (int i = 0; i <heightMap.Length;i++)
-            {
-                if (Single.IsNaN(heightMap[i]) || Single.IsInfinity(heightMap[i]))
-                {
-                    heightMap[i] = 0f;
-                }
+            m_terrainShape = AddPrim(
+                "__TERRAIN__",
+                new Vector3(Constants.RegionSize / 2, Constants.RegionSize / 2, Constants.RegionSize / 2),
+                new Vector3(Constants.RegionSize, Constants.RegionSize, Constants.RegionSize),
+                Quaternion.Identity,
+                voxmesher.ToMesh(heightMap),
+                PrimitiveBaseShape.Default,
+                false);
+            //float AabbCenterX = Constants.RegionSize/2f;
+            //float AabbCenterY = Constants.RegionSize/2f;
 
-                hfmin = (heightMap[i] < hfmin) ? heightMap[i] : hfmin;
-                hfmax = (heightMap[i] > hfmax) ? heightMap[i] : hfmax;
-            }
-            // store this for later reference.
-            // Note, we're storing it  after we check it for anomolies above
-            _origheightmap = heightMap;
-
-            hfmin = 0;
-            hfmax = 256;
-
-            m_terrainShape = new btHeightfieldTerrainShape((int)Constants.RegionSize, (int)Constants.RegionSize, heightMap,
-                                                           1.0f, hfmin, hfmax, (int)btHeightfieldTerrainShape.UPAxis.Z,
-                                                           (int)btHeightfieldTerrainShape.PHY_ScalarType.PHY_FLOAT, false);
-            float AabbCenterX = Constants.RegionSize/2f;
-            float AabbCenterY = Constants.RegionSize/2f;
-
-            float AabbCenterZ = 0;
+            //float AabbCenterZ = 0f;
+            /*
             float temphfmin, temphfmax;
 
             temphfmin = hfmin;
@@ -438,6 +426,7 @@ namespace OpenSim.Region.Physics.BulletDotNETPlugin
                     m_terrainPosition = new btVector3(AabbCenterX, AabbCenterY, AabbCenterZ);
                 }
             }
+            */
             if (m_terrainMotionState != null)
             {
                 m_terrainMotionState.Dispose();
@@ -445,11 +434,6 @@ namespace OpenSim.Region.Physics.BulletDotNETPlugin
             }
             m_terrainTransform = new btTransform(QuatIdentity, m_terrainPosition);
             m_terrainMotionState = new btDefaultMotionState(m_terrainTransform);
-            TerrainBody = new btRigidBody(0, m_terrainMotionState, m_terrainShape);
-            TerrainBody.setUserPointer((IntPtr)0);
-            m_world.addRigidBody(TerrainBody);
-
-
         }
 
         public override void SetWaterLevel(float baseheight)
@@ -466,7 +450,7 @@ namespace OpenSim.Region.Physics.BulletDotNETPlugin
 
             if (m_terrainShape != null)
             {
-                m_terrainShape.Dispose();
+                //m_terrainShape.Dispose();
                 m_terrainShape = null;
             }
 

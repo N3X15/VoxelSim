@@ -46,7 +46,7 @@ namespace OpenSim.Region.Physics.BasicPhysicsPlugin
             //sceneIdentifier = _sceneIdentifier;
         }
 
-        public override void Initialise(IMesher meshmerizer, IConfigSource config)
+        public override void Initialise(IMesher meshmerizer, IVoxelMesher voxmesh, IConfigSource config)
         {
         }
 
@@ -165,13 +165,24 @@ namespace OpenSim.Region.Physics.BasicPhysicsPlugin
 
         public override bool IsThreaded
         {
-            get { return (false); // for now we won't be multithreaded
-            }
+            get { return (false); } // for now we won't be multithreaded
         }
 
-        public override void SetTerrain(float[] heightMap)
+        public override void SetTerrain(bool[] solids)
         {
-            _heightMap = heightMap;
+            _heightMap = new float[Constants.RegionSize * Constants.RegionSize];
+            for (int x = 0; x < Constants.RegionSize; x++)
+            {
+                for (int y = 0; y < Constants.RegionSize; y++)
+                {
+                    float h = 0f;
+                    for (int z = 0; z < Constants.RegionSize; z++)
+                        if (solids[y * Constants.RegionSize + x * Constants.RegionSize * Constants.RegionSize + z]
+                            && z > h)
+                            h = z;
+                    _heightMap[y * Constants.RegionSize + (int)x] = h;
+                }
+            }
         }
 
         public override void DeleteTerrain()

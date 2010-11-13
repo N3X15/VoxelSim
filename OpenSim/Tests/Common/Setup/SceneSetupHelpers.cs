@@ -222,7 +222,7 @@ namespace OpenSim.Tests.Common.Setup
             PhysicsPluginManager physicsPluginManager = new PhysicsPluginManager();
             physicsPluginManager.LoadPluginsFromAssembly("Physics/OpenSim.Region.Physics.BasicPhysicsPlugin.dll");
             testScene.PhysicsScene
-                = physicsPluginManager.GetPhysicsScene("basicphysics", "ZeroMesher",   new IniConfigSource(), "test");
+                = physicsPluginManager.GetPhysicsScene("basicphysics", "MarchingCubes", "ZeroMesher",   new IniConfigSource(), "test");
 
             // It's really not a good idea to use static variables as they carry over between tests, leading to
             // problems that are extremely hard to debug.  Really, these static fields need to be eliminated -

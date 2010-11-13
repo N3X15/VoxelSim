@@ -110,13 +110,13 @@ namespace OpenSim.Region.ClientStack
         /// </param>
         /// <returns></returns>
         protected PhysicsScene GetPhysicsScene(
-            string engine, string meshEngine, IConfigSource config, string osSceneIdentifier)
+            string engine, string voxMeshEngine, string meshEngine, IConfigSource config, string osSceneIdentifier)
         {
             PhysicsPluginManager physicsPluginManager;
             physicsPluginManager = new PhysicsPluginManager();
             physicsPluginManager.LoadPluginsFromAssemblies("Physics");
             
-            return physicsPluginManager.GetPhysicsScene(engine, meshEngine, config, osSceneIdentifier);
+            return physicsPluginManager.GetPhysicsScene(engine, voxMeshEngine, meshEngine, config, osSceneIdentifier);
         }
     }
 }

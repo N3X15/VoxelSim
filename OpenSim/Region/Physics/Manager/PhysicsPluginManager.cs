@@ -43,6 +43,7 @@ namespace OpenSim.Region.Physics.Manager
 
         private Dictionary<string, IPhysicsPlugin> _PhysPlugins = new Dictionary<string, IPhysicsPlugin>();
         private Dictionary<string, IMeshingPlugin> _MeshPlugins = new Dictionary<string, IMeshingPlugin>();
+        private Dictionary<string, IVoxelMeshingPlugin> _VoxMeshPlugins = new Dictionary<string, IVoxelMeshingPlugin>();
 
         /// <summary>
         /// Constructor.
@@ -62,10 +63,11 @@ namespace OpenSim.Region.Physics.Manager
         /// Get a physics scene for the given physics engine and mesher.
         /// </summary>
         /// <param name="physEngineName"></param>
+        /// <param name="voxMesherName"></param>
         /// <param name="meshEngineName"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public PhysicsScene GetPhysicsScene(string physEngineName, string meshEngineName, IConfigSource config, string regionName)
+        public PhysicsScene GetPhysicsScene(string physEngineName, string voxMesherName, string meshEngineName, IConfigSource config, string regionName)
         {
             if (String.IsNullOrEmpty(physEngineName))
             {
@@ -73,6 +75,11 @@ namespace OpenSim.Region.Physics.Manager
             }
 
             if (String.IsNullOrEmpty(meshEngineName))
+            {
+                return PhysicsScene.Null;
+            }
+
+            if (String.IsNullOrEmpty(voxMesherName))
             {
                 return PhysicsScene.Null;
             }
@@ -89,11 +96,23 @@ namespace OpenSim.Region.Physics.Manager
                 throw new ArgumentException(String.Format("couldn't find meshingEngine: {0}", meshEngineName));
             }
 
+            IVoxelMesher voxelMesher=null;
+            if (_VoxMeshPlugins.ContainsKey(voxMesherName))
+            {
+                m_log.Info("[PHYSICS]: creating voxel meshing engine " + voxMesherName);
+                voxelMesher = _VoxMeshPlugins[voxMesherName].GetMesher(config);
+            }
+            else
+            {
+                m_log.WarnFormat("[PHYSICS]: couldn't find meshingEngine: {0}", voxMesherName);
+                throw new ArgumentException(String.Format("couldn't find meshingEngine: {0}", voxMesherName));
+            }
+
             if (_PhysPlugins.ContainsKey(physEngineName))
             {
                 m_log.Info("[PHYSICS]: creating " + physEngineName);
                 PhysicsScene result = _PhysPlugins[physEngineName].GetScene(regionName);
-                result.Initialise(meshEngine, config);
+                result.Initialise(meshEngine, voxelMesher, config);
                 return result;
             }
             else
@@ -196,8 +215,22 @@ namespace OpenSim.Region.Physics.Manager
                                     }
                                 }
 
+                                Type voxMeshTypeInterface = pluginType.GetInterface("IVoxelMeshingPlugin", true);
+
+                                if (voxMeshTypeInterface != null)
+                                {
+                                    IVoxelMeshingPlugin plug =
+                                        (IVoxelMeshingPlugin)Activator.CreateInstance(pluginAssembly.GetType(pluginType.ToString()));
+                                    if (!_MeshPlugins.ContainsKey(plug.GetName()))
+                                    {
+                                        _VoxMeshPlugins.Add(plug.GetName(), plug);
+                                        m_log.Info("[PHYSICS]: Added voxel meshing engine: " + plug.GetName());
+                                    }
+                                }
+
                                 physTypeInterface = null;
                                 meshTypeInterface = null;
+                                voxMeshTypeInterface = null;
                             }
                         }
                     }

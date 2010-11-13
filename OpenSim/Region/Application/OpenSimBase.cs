@@ -565,7 +565,7 @@ namespace OpenSim
             scene.LoadWorldMap();
 
             scene.PhysicsScene = GetPhysicsScene(scene.RegionInfo.RegionName);
-            scene.PhysicsScene.SetTerrain(scene.Voxels.GetFloatsSerialised());
+            scene.PhysicsScene.SetTerrain(scene.Voxels.GetSolidsArray());
             scene.PhysicsScene.SetWaterLevel((float) regionInfo.RegionSettings.WaterHeight);
 
             return scene;
@@ -625,7 +625,7 @@ namespace OpenSim
         protected override PhysicsScene GetPhysicsScene(string osSceneIdentifier)
         {
             return GetPhysicsScene(
-                m_configSettings.PhysicsEngine, m_configSettings.MeshEngineName, m_config.Source, osSceneIdentifier);
+                m_configSettings.PhysicsEngine, m_configSettings.VoxelMeshEngineName, m_configSettings.MeshEngineName, m_config.Source, osSceneIdentifier);
         }
 
         /// <summary>

@@ -43,6 +43,8 @@ using OpenMetaverse.StructuredData;
 using Caps=OpenSim.Framework.Capabilities.Caps;
 using System.Web;
 using System.Collections.Specialized;
+using OpenSim.Region.Physics.Manager;
+using OpenMetaverse.Rendering;
 
 namespace OpenSim.Region.CoreModules.World.Voxels
 {
@@ -610,7 +612,7 @@ namespace OpenSim.Region.CoreModules.World.Voxels
             if (m_tainted)
             {
                 m_tainted = false;
-                m_scene.PhysicsScene.SetTerrain(m_channel.GetFloatsSerialised());
+                m_scene.PhysicsScene.SetTerrain(m_channel.GetSolidsArray());
                 m_scene.SaveTerrain();
 
                 // Clients who look at the map will never see changes after they looked at the map, so i've commented this out.

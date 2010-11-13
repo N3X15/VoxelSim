@@ -145,5 +145,7 @@ namespace OpenSim.Framework
         public const bool DefaultMessageServerHttpSSL = false;
         public const uint DefaultGridServerHttpPort = 8003;
         public const uint DefaultInventoryServerHttpPort = 8003;
+
+        public string VoxelMeshEngineName { get; set; }
     }
 }

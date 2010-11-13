@@ -38,6 +38,11 @@ namespace OpenSim.Region.Physics.Manager
         IMesh CreateMesh(String primName, PrimitiveBaseShape primShape, Vector3 size, float lod, bool isPhysical);
     }
 
+    public interface IVoxelMesher
+    {
+        IMesh ToMesh(bool[] solids);
+    }
+
     public interface IVertex
     {
     }

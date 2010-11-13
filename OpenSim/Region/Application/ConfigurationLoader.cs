@@ -350,6 +350,7 @@ namespace OpenSim
             if (startupConfig != null)
             {
                 m_configSettings.PhysicsEngine = startupConfig.GetString("physics");
+                m_configSettings.VoxelMeshEngineName = startupConfig.GetString("voxelmesher");
                 m_configSettings.MeshEngineName = startupConfig.GetString("meshing");
                 m_configSettings.PhysicalPrim = startupConfig.GetBoolean("physical_prim", true);
 

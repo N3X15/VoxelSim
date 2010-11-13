@@ -48,7 +48,7 @@ namespace OpenSim.Region.Physics.POSPlugin
             //sceneIdentifier = _sceneIdentifier;
         }
 
-        public override void Initialise(IMesher meshmerizer, IConfigSource config)
+        public override void Initialise(IMesher meshmerizer, IVoxelMesher voxmesh, IConfigSource config)
         {
         }
 
@@ -254,9 +254,25 @@ namespace OpenSim.Region.Physics.POSPlugin
             get { return (false); }
         }
 
-        public override void SetTerrain(float[] heightMap)
+        // Use a heightmap instead of voxels.
+        public override void SetTerrain(bool[] heightMap)
         {
-            _heightMap = heightMap;
+            _heightMap = new float[Constants.RegionSize*Constants.RegionSize];
+            for (int x = 0; x < Constants.RegionSize; x++)
+            {
+                for (int y = 0; y < Constants.RegionSize; y++)
+                {
+                    float h=0f;
+                    for (int z = 0; z < Constants.RegionSize; z++)
+                    {
+                        if (heightMap[y * Constants.RegionSize + x * Constants.RegionSize * Constants.RegionSize + z])
+                        {
+                            h = z;
+                        }
+                    }
+                    _heightMap[y * Constants.RegionSize + x] = h;
+                }
+            }
         }
 
         public override void DeleteTerrain()

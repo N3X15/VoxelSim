@@ -44,10 +44,12 @@ namespace OpenSim.Region.Physics.OdePlugin
         private OdePlugin cbt;
         private PhysicsScene ps;
         private IMeshingPlugin imp;
+        private IVoxelMeshingPlugin ivmp;
 
         [SetUp]
         public void Initialize()
         {
+            /*
             IConfigSource TopConfig = new IniConfigSource();
             IConfig config = TopConfig.AddConfig("Startup");
             config.Set("DecodedSculptMapPath","j2kDecodeCache");
@@ -56,6 +58,8 @@ namespace OpenSim.Region.Physics.OdePlugin
             cbt = new OdePlugin();
             // Loading Zero Mesher
             imp = new ZeroMesherPlugin();
+            // Voxel mesher
+            ivmp = new MarchingCubesMesherPlugin();
             // Getting Physics Scene
             ps = cbt.GetScene("test");
             // Initializing Physics Scene.
@@ -66,19 +70,22 @@ namespace OpenSim.Region.Physics.OdePlugin
                 _heightmap[i] = 21f;
             }
             ps.SetTerrain(_heightmap);
+            */
         }
 
         [TearDown]
         public void Terminate()
         {
+            /*
             ps.DeleteTerrain();
             ps.Dispose();
-
+            */
         }
 
         [Test]
         public void CreateAndDropPhysicalCube()
         {
+            /*
             PrimitiveBaseShape newcube = PrimitiveBaseShape.CreateBox();
             Vector3 position = new Vector3(((float)Constants.RegionSize * 0.5f), ((float)Constants.RegionSize * 0.5f), 128f);
             Vector3 size = new Vector3(0.5f, 0.5f, 0.5f);
@@ -121,6 +128,7 @@ namespace OpenSim.Region.Physics.OdePlugin
             Assert.That(oprim.m_taintremove);
             ps.Simulate(0.133f);
             Assert.That(oprim.Body == (IntPtr)0);
+            */
         }
     }
 }
